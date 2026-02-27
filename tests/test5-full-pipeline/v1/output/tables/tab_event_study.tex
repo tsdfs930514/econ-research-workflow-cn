@@ -1,0 +1,48 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Event Study: Dynamic Treatment Effects}
+\begin{tabular}{l*{1}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}         \\
+\midrule
+$\tau \leq -4$      &    -14.4014\sym{**} \\
+                    &    (6.8686)         \\
+\addlinespace
+$\tau = -3$         &      1.7491         \\
+                    &    (7.9031)         \\
+\addlinespace
+$\tau = -2$         &     -1.9792         \\
+                    &    (9.8197)         \\
+\addlinespace
+$\tau = 0$          &    -53.9638\sym{***}\\
+                    &    (8.6188)         \\
+\addlinespace
+$\tau = 1$          &    -47.6307\sym{***}\\
+                    &    (9.9936)         \\
+\addlinespace
+$\tau = 2$          &    -60.5026\sym{***}\\
+                    &    (9.6329)         \\
+\addlinespace
+$\tau = 3$          &    -63.4011\sym{***}\\
+                    &    (9.4841)         \\
+\addlinespace
+$\tau \geq 4$       &    -72.4206\sym{***}\\
+                    &    (8.5150)         \\
+\midrule
+Observations        &         300         \\
+State FE            &         Yes         \\
+Year FE             &         Yes         \\
+Controls            &         Yes         \\
+Clusters            &          30         \\
+Within R$^2$        &      0.9600         \\
+Pre-trend F-stat    &       2.048         \\
+Pre-trend p-value   &       0.129         \\
+\bottomrule
+\multicolumn{2}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{2}{l}{\footnotesize Reference period: $\tau = -1$ (omitted).}\\
+\multicolumn{2}{l}{\footnotesize Endpoints binned: $\tau \leq -4$ and $\tau \geq 4$.}\\
+\multicolumn{2}{l}{\footnotesize Standard errors clustered at the state level in parentheses.}\\
+\multicolumn{2}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\multicolumn{2}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

@@ -1,0 +1,115 @@
+\documentclass[12pt]{article}
+
+% ============================================================
+% Packages
+% ============================================================
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{appendix}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% ============================================================
+% Page Layout
+% ============================================================
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+\doublespacing
+
+% ============================================================
+% Bibliography Setup (AER style)
+% ============================================================
+\bibliographystyle{aer}
+
+% ============================================================
+% Hyperref Setup
+% ============================================================
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+% ============================================================
+% Title and Author
+% ============================================================
+\title{[Paper Title]}
+\author{
+  [Author Name]\thanks{[Affiliation and contact information. Email: xxx@xxx.edu.]}
+}
+\date{\today}
+
+% ============================================================
+\begin{document}
+
+\maketitle
+
+% ============================================================
+% Abstract
+% ============================================================
+\begin{abstract}
+\noindent [Write your abstract here. The abstract should concisely summarize the research question, methodology, main findings, and policy implications. Keep it under 150 words for most economics journals.]
+
+\vspace{1em}
+\noindent\textbf{JEL Codes:} [C00, D00, E00]
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} [keyword 1], [keyword 2], [keyword 3], [keyword 4]
+\end{abstract}
+
+\newpage
+
+% ============================================================
+% Main Body
+% ============================================================
+
+\section{Introduction}
+\input{sections/01_introduction}
+
+\section{Literature Review}
+\input{sections/02_literature}
+
+\section{Data}
+\input{sections/03_data}
+
+\section{Empirical Strategy}
+\input{sections/04_empirical_strategy}
+
+\section{Results}
+\input{sections/05_results}
+
+\section{Robustness Checks}
+\input{sections/06_robustness}
+
+\section{Conclusion}
+\input{sections/07_conclusion}
+
+% ============================================================
+% References
+% ============================================================
+\newpage
+\singlespacing
+\bibliography{references}
+
+% ============================================================
+% Appendix
+% ============================================================
+\newpage
+\doublespacing
+\begin{appendices}
+\section{Appendix Tables}
+% \input{sections/appendix_tables}
+\section{Appendix Figures}
+% \input{sections/appendix_figures}
+\end{appendices}
+
+\end{document}

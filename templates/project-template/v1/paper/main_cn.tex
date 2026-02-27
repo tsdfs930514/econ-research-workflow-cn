@@ -1,0 +1,106 @@
+\documentclass[a4paper,12pt]{ctexart}
+
+% ============================================================
+% Packages
+% ============================================================
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{appendix}
+
+% ============================================================
+% Page Layout
+% ============================================================
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\onehalfspacing
+
+% ============================================================
+% Three-line Table Style
+% ============================================================
+\newcommand{\topcaption}[1]{\caption{#1}}
+
+% ============================================================
+% Bibliography Setup
+% ============================================================
+\bibliographystyle{plainnat}
+
+% ============================================================
+% Title and Author
+% ============================================================
+\title{[论文标题]}
+\author{
+  [作者姓名]\thanks{[作者单位及联系方式。通讯邮箱：xxx@xxx.edu.cn。]}
+}
+\date{\today}
+
+% ============================================================
+\begin{document}
+
+\maketitle
+
+% ============================================================
+% Abstract
+% ============================================================
+\begin{abstract}
+[在此填写中文摘要。摘要应简明扼要地概述研究问题、方法、主要发现和政策含义。建议控制在300字以内。]
+
+\vspace{1em}
+\noindent\textbf{关键词：} [关键词1]；[关键词2]；[关键词3]；[关键词4]
+
+\vspace{0.5em}
+\noindent\textbf{JEL分类号：} [C00, D00, E00]
+\end{abstract}
+
+\newpage
+
+% ============================================================
+% Main Body
+% ============================================================
+
+\section{引言}
+\input{sections/01_introduction}
+
+\section{文献综述}
+\input{sections/02_literature}
+
+\section{制度背景与数据}
+\input{sections/03_background_data}
+
+\section{实证策略}
+\input{sections/04_empirical_strategy}
+
+\section{实证结果}
+\input{sections/05_results}
+
+\section{稳健性检验}
+\input{sections/06_robustness}
+
+\section{结论}
+\input{sections/07_conclusion}
+
+% ============================================================
+% References
+% ============================================================
+\newpage
+\bibliography{references}
+
+% ============================================================
+% Appendix
+% ============================================================
+\newpage
+\begin{appendices}
+\section{附录表格}
+% \input{sections/appendix_tables}
+\section{附录图表}
+% \input{sections/appendix_figures}
+\end{appendices}
+
+\end{document}

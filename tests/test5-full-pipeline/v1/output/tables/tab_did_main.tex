@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect of Policy Adoption on Consumption}
+\begin{tabular}{l*{3}{c}}
+\toprule
+                    &\multicolumn{1}{c}{Consumption}&\multicolumn{1}{c}{Consumption}&\multicolumn{1}{c}{Log Consumption}\\\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}
+                    &\multicolumn{1}{c}{(1)}         &\multicolumn{1}{c}{(2)}         &\multicolumn{1}{c}{(3)}         \\
+\midrule
+Treatment indicator (=1 if post-adoption)&     14.6876         &    -51.9640\sym{***}&     -0.0326\sym{***}\\
+                    &   (27.6623)         &    (5.7996)         &    (0.0039)         \\
+\midrule
+Observations        &         300         &         300         &         300         \\
+State FE            &         Yes         &         Yes         &         Yes         \\
+Year FE             &         Yes         &         Yes         &         Yes         \\
+Controls            &          No         &         Yes         &         Yes         \\
+Clusters            &          30         &          30         &          30         \\
+Within R$^2$        &      0.0009         &      0.9579         &      0.9494         \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize Standard errors clustered at the state level in parentheses.}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}
