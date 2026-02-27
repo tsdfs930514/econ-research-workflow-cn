@@ -1,47 +1,47 @@
 ---
-description: "Run logit/probit, propensity score, treatment effects (RA/IPW/AIPW), and conditional logit pipeline"
+description: "运行 logit/probit、倾向得分、处理效应（RA/IPW/AIPW）和条件 logit 分析管道"
 user_invocable: true
 ---
 
-# /run-logit-probit — Logit/Probit & Discrete Choice Pipeline
+# /run-logit-probit — Logit/Probit 与离散选择管道
 
-When the user invokes `/run-logit-probit`, execute a complete discrete choice and treatment effects pipeline covering standard logit/probit estimation with marginal effects, propensity score estimation, treatment effects via RA/IPW/AIPW, conditional logit for discrete choice, diagnostics (overlap, ROC, Hosmer-Lemeshow), and Python cross-validation.
+当用户调用 `/run-logit-probit` 时，执行完整的离散选择和处理效应管道，涵盖标准 logit/probit 估计及边际效应、倾向得分估计、RA/IPW/AIPW 处理效应、条件 logit 离散选择、诊断检验（重叠、ROC、Hosmer-Lemeshow）以及 Python 交叉验证。
 
-## Stata Execution Command
+## Stata 执行命令
 
-Run .do files via the auto-approved wrapper: `bash .claude/scripts/run-stata.sh "<project_dir>" "code/stata/script.do"`. The wrapper handles `cd`, Stata execution (`-e` flag), and automatic log error checking. See `CLAUDE.md` for details.
+通过自动审批的封装脚本运行 .do 文件：`bash .claude/scripts/run-stata.sh "<project_dir>" "code/stata/script.do"`。该封装脚本处理 `cd`、Stata 执行（`-e` 标志）以及自动日志错误检查。详见 `CLAUDE.md`。
 
-## When to Use This Pipeline
+## 适用场景
 
-- **Binary outcome**: Y is 0/1 — use logit or probit
-- **Propensity score matching/weighting**: Estimating P(Treatment=1|X) for causal inference
-- **Treatment effects**: ATET via regression adjustment, IPW, or doubly robust (AIPW)
-- **Discrete choice**: Consumer/firm choice among alternatives — use conditional logit (clogit)
-- **Ordered outcome**: Likert scale, rating categories — use ologit/oprobit
-- **Multinomial outcome**: Unordered categories (occupation, transport mode) — use mlogit
+- **二值因变量**：Y 为 0/1 — 使用 logit 或 probit
+- **倾向得分匹配/加权**：估计 P(Treatment=1|X) 用于因果推断
+- **处理效应**：通过回归调整、IPW 或双重稳健（AIPW）估计 ATET
+- **离散选择**：消费者/企业在备选方案中的选择 — 使用条件 logit (clogit)
+- **有序因变量**：李克特量表、评级类别 — 使用 ologit/oprobit
+- **多项因变量**：无序类别（职业、交通方式）— 使用 mlogit
 
-## Step 0: Gather Inputs
+## 第 0 步：收集输入信息
 
-Ask the user for:
+向用户询问以下信息：
 
-- **Dataset**: path to .dta file
-- **Outcome type**: binary (0/1), ordered, multinomial, or conditional choice
-- **Dependent variable**: outcome variable
-- **Treatment variable** (if propensity score / treatment effects): binary treatment indicator
-- **Covariates**: control variables for the model
-- **Choice group variable** (if conditional logit): group identifier (e.g., household-year)
-- **Alternative-specific variables** (if conditional logit): variables that vary across alternatives
-- **Cluster variable**: for clustered standard errors
-- **Fixed effects** (if applicable): for absorbed FE
-- **Weight variable** (optional): sampling weights (e.g., `[pw=weight]`)
-- **Purpose**: estimation only, propensity score for matching/weighting, or full treatment effects
+- **数据集**：.dta 文件路径
+- **因变量类型**：二值（0/1）、有序、多项或条件选择
+- **因变量**：结果变量
+- **处理变量**（如进行倾向得分/处理效应分析）：二值处理指标
+- **协变量**：模型中的控制变量
+- **选择组变量**（如条件 logit）：组标识符（如 household-year）
+- **备选方案特定变量**（如条件 logit）：在备选方案间变化的变量
+- **聚类变量**：聚类标准误所用变量
+- **固定效应**（如适用）：需吸收的固定效应
+- **权重变量**（可选）：抽样权重（如 `[pw=weight]`）
+- **目的**：仅估计、用于匹配/加权的倾向得分，还是完整的处理效应分析
 
-## Step 1: Standard Logit/Probit Estimation (Stata .do file)
+## 第 1 步：标准 Logit/Probit 估计（Stata .do 文件）
 
 ```stata
 /*==============================================================================
-  Logit/Probit Analysis — Step 1: Standard Estimation & Marginal Effects
-  Reports AME (Average Marginal Effects) and MEM (Marginal Effects at Means)
+  Logit/Probit 分析 — 第 1 步：标准估计与边际效应
+  报告 AME（平均边际效应）和 MEM（均值处的边际效应）
 ==============================================================================*/
 clear all
 set more off
@@ -58,14 +58,14 @@ eststo clear
 eststo probit_main: probit OUTCOME_VAR TREATMENT_VAR COVARIATES, ///
     vce(cluster CLUSTER_VAR)
 
-* Average Marginal Effects (AME) — preferred for most applications
+* 平均边际效应 (AME) — 大多数应用的首选
 margins, dydx(*) post
 eststo probit_ame
-* AME: average of individual marginal effects across all observations
+* AME：所有观测值上个体边际效应的平均值
 
-* Re-run probit for MEM
+* 重新运行 probit 以计算 MEM
 probit OUTCOME_VAR TREATMENT_VAR COVARIATES, vce(cluster CLUSTER_VAR)
-* Marginal Effects at Means (MEM) — effect evaluated at mean of all X
+* 均值处的边际效应 (MEM) — 在所有 X 的均值处评估的效应
 margins, dydx(*) atmeans post
 eststo probit_mem
 
@@ -73,15 +73,15 @@ eststo probit_mem
 eststo logit_main: logit OUTCOME_VAR TREATMENT_VAR COVARIATES, ///
     vce(cluster CLUSTER_VAR)
 
-* AME for logit
+* Logit 的 AME
 margins, dydx(*) post
 eststo logit_ame
 
-* --- Comparison: LPM (Linear Probability Model) ---
+* --- 对比：LPM（线性概率模型）---
 eststo lpm: reghdfe OUTCOME_VAR TREATMENT_VAR COVARIATES, ///
     absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
 
-* --- Table: Coefficients + AME ---
+* --- 表格：系数 + AME ---
 esttab probit_main logit_main probit_ame logit_ame lpm ///
     using "output/tables/tab_logit_probit.tex", ///
     se(4) b(4) star(* 0.10 ** 0.05 *** 0.01) ///
@@ -93,11 +93,11 @@ esttab probit_main logit_main probit_ame logit_ame lpm ///
          "Column (5): linear probability model with FE." ///
          "Standard errors clustered at CLUSTER_VAR level.")
 
-* --- AME vs MEM comparison ---
+* --- AME vs MEM 比较 ---
 di "============================================="
 di "MARGINAL EFFECTS COMPARISON"
 di "============================================="
-di "  Probit AME (treatment): " _b[TREATMENT_VAR]  // from margins, dydx post
+di "  Probit AME (treatment): " _b[TREATMENT_VAR]  // 来自 margins, dydx post
 di "  Probit MEM (treatment): [from MEM estimation]"
 di "  Logit AME (treatment):  [from logit margins]"
 di "  LPM coefficient:        [from reghdfe]"
@@ -108,14 +108,14 @@ di "============================================="
 log close
 ```
 
-## Step 2: Propensity Score Estimation (Stata .do file)
+## 第 2 步：倾向得分估计（Stata .do 文件）
 
-Following Acemoglu et al. (2019, JPE) Table A11 pattern.
+遵循 Acemoglu et al. (2019, JPE) Table A11 模式。
 
 ```stata
 /*==============================================================================
-  Logit/Probit Analysis — Step 2: Propensity Score Estimation
-  Reference: DDCG Table A11 — probit for propensity score, predict _pscore
+  Logit/Probit 分析 — 第 2 步：倾向得分估计
+  参考：DDCG Table A11 — 用 probit 估计倾向得分，predict _pscore
 ==============================================================================*/
 clear all
 set more off
@@ -126,23 +126,23 @@ log using "output/logs/logit_02_pscore.log", replace
 
 use "DATASET_PATH", clear
 
-* --- Propensity score via probit ---
+* --- 通过 probit 估计倾向得分 ---
 probit TREATMENT_VAR COVARIATES i.YEAR_VAR, vce(cluster CLUSTER_VAR)
 
-* Marginal effects (for reporting)
+* 边际效应（用于报告）
 margins, dydx(COVARIATES) post
 eststo pscore_margins
 
-* Predicted propensity score
+* 预测倾向得分
 probit TREATMENT_VAR COVARIATES i.YEAR_VAR, vce(cluster CLUSTER_VAR)
 predict _pscore, pr
 
-* --- Propensity score diagnostics ---
-* Summary by treatment status
+* --- 倾向得分诊断 ---
+* 按处理状态的描述统计
 tabstat _pscore, by(TREATMENT_VAR) stat(mean sd min p5 p25 p50 p75 p95 max n)
 
-* --- Overlap / Common Support ---
-* Kernel density plot (following DDCG Figure A5/A6)
+* --- 重叠/共同支撑 ---
+* 核密度图（遵循 DDCG Figure A5/A6）
 twoway (kdensity _pscore if TREATMENT_VAR == 1, lcolor(cranberry) lwidth(medthick)) ///
        (kdensity _pscore if TREATMENT_VAR == 0, lcolor(navy) lwidth(medthick)), ///
     legend(order(1 "Treated" 2 "Control") rows(1)) ///
@@ -151,7 +151,7 @@ twoway (kdensity _pscore if TREATMENT_VAR == 1, lcolor(cranberry) lwidth(medthic
     note("Adequate overlap requires substantial density overlap.")
 graph export "output/figures/fig_pscore_overlap.pdf", replace
 
-* --- Histogram version ---
+* --- 直方图版本 ---
 twoway (hist _pscore if TREATMENT_VAR == 1, fcolor(cranberry%40) lcolor(cranberry) width(0.02)) ///
        (hist _pscore if TREATMENT_VAR == 0, fcolor(navy%40) lcolor(navy) width(0.02)), ///
     legend(order(1 "Treated" 2 "Control") rows(1)) ///
@@ -159,7 +159,7 @@ twoway (hist _pscore if TREATMENT_VAR == 1, fcolor(cranberry%40) lcolor(cranberr
     xtitle("Propensity Score") ytitle("Frequency")
 graph export "output/figures/fig_pscore_hist.pdf", replace
 
-* --- Trim to common support ---
+* --- 修剪至共同支撑 ---
 sum _pscore if TREATMENT_VAR == 1, detail
 local trim_lo = r(min)
 sum _pscore if TREATMENT_VAR == 0, detail
@@ -167,8 +167,8 @@ local trim_hi = r(max)
 gen byte common_support = (_pscore >= `trim_lo' & _pscore <= `trim_hi')
 tab common_support TREATMENT_VAR
 
-* --- Covariate balance after weighting ---
-* IPW weights
+* --- 加权后的协变量平衡 ---
+* IPW 权重
 gen _ipw = cond(TREATMENT_VAR == 1, 1/_pscore, 1/(1-_pscore))
 
 foreach var of varlist COVARIATES {
@@ -185,18 +185,18 @@ foreach var of varlist COVARIATES {
 log close
 ```
 
-## Step 3: Treatment Effects — RA, IPW, AIPW (Stata .do file)
+## 第 3 步：处理效应 — RA、IPW、AIPW（Stata .do 文件）
 
-Following Acemoglu et al. (2019, JPE) Table 5 pattern.
+遵循 Acemoglu et al. (2019, JPE) Table 5 模式。
 
-**IMPORTANT: `teffects` commands (ra, ipw, ipwra, nnmatch) only work with cross-sectional data.** They will fail on panel data with repeated observations per unit (r(459) or similar). For panel data, either: (1) collapse to a cross-section first (e.g., pre/post means), (2) use manual IPW weighting with `reghdfe`, or (3) use `bootstrap` wrapping a custom program that computes ATET on a cross-sectional snapshot. All `teffects` calls below should be wrapped in `cap noisily` when data structure is uncertain (Issue #15).
+**重要提示：`teffects` 命令（ra、ipw、ipwra、nnmatch）仅适用于截面数据。** 对于每个个体有重复观测的面板数据会失败（r(459) 等错误）。处理面板数据时可以：(1) 先折叠为截面（如处理前后均值），(2) 使用手动 IPW 加权配合 `reghdfe`，或 (3) 使用 `bootstrap` 包裹在截面快照上计算 ATET 的自定义程序。当数据结构不确定时，所有 `teffects` 调用都应使用 `cap noisily` 包裹（Issue #15）。
 
 ```stata
 /*==============================================================================
-  Logit/Probit Analysis — Step 3: Treatment Effects via teffects
-  Reference: DDCG Table 5 — RA, IPW, AIPW with probit treatment model
-  NOTE: teffects requires cross-sectional data (no repeated observations).
-  For panel data, collapse to cross-section first or use manual IPW.
+  Logit/Probit 分析 — 第 3 步：通过 teffects 估计处理效应
+  参考：DDCG Table 5 — RA、IPW、AIPW，使用 probit 处理模型
+  注意：teffects 要求截面数据（无重复观测）。
+  面板数据需先折叠为截面或使用手动 IPW。
 ==============================================================================*/
 clear all
 set more off
@@ -209,9 +209,9 @@ use "DATASET_PATH", clear
 
 eststo clear
 
-* --- 1. Regression Adjustment (RA) ---
-* Outcome model: OUTCOME ~ COVARIATES, separately for treated and control
-* Wrap in cap noisily — fails on panel data with repeated obs (Issue #15)
+* --- 1. 回归调整 (RA) ---
+* 结果模型：OUTCOME ~ COVARIATES，分别对处理组和对照组
+* 使用 cap noisily 包裹 — 对有重复观测的面板数据会失败（Issue #15）
 cap noisily teffects ra (OUTCOME_VAR COVARIATES) (TREATMENT_VAR), atet
 if _rc == 0 {
     eststo tef_ra
@@ -222,8 +222,8 @@ else {
     di "teffects ra failed (likely panel data with repeated obs). Skipping."
 }
 
-* --- 2. Inverse Probability Weighting (IPW) with probit ---
-* Treatment model: probit(TREATMENT ~ COVARIATES)
+* --- 2. 逆概率加权 (IPW)，使用 probit ---
+* 处理模型：probit(TREATMENT ~ COVARIATES)
 cap noisily teffects ipw (OUTCOME_VAR) (TREATMENT_VAR COVARIATES, probit), atet
 if _rc == 0 {
     eststo tef_ipw
@@ -234,8 +234,8 @@ else {
     di "teffects ipw failed (likely panel data). Skipping."
 }
 
-* --- 3. Doubly Robust: AIPW (Augmented IPW) ---
-* Outcome model + treatment model — consistent if EITHER model is correct
+* --- 3. 双重稳健：AIPW（增强逆概率加权）---
+* 结果模型 + 处理模型 — 任一模型正确即可保持一致性
 cap noisily teffects ipwra (OUTCOME_VAR COVARIATES) (TREATMENT_VAR COVARIATES, probit), atet
 if _rc == 0 {
     eststo tef_aipw
@@ -246,7 +246,7 @@ else {
     di "teffects ipwra failed (likely panel data). Skipping."
 }
 
-* --- 4. Nearest Neighbor Matching ---
+* --- 4. 最近邻匹配 ---
 cap noisily teffects nnmatch (OUTCOME_VAR COVARIATES) (TREATMENT_VAR), ///
     atet nneighbor(5) metric(mahalanobis)
 if _rc == 0 {
@@ -258,7 +258,7 @@ else {
     di "teffects nnmatch failed (likely panel data). Skipping."
 }
 
-* --- Comparison table ---
+* --- 比较表 ---
 esttab tef_ra tef_ipw tef_aipw tef_nn ///
     using "output/tables/tab_treatment_effects.tex", ///
     se(4) b(4) star(* 0.10 ** 0.05 *** 0.01) ///
@@ -269,7 +269,7 @@ esttab tef_ra tef_ipw tef_aipw tef_nn ///
          "AIPW = augmented IPW (doubly robust). NN = nearest-neighbor matching." ///
          "AIPW is preferred: consistent if either outcome or treatment model correct.")
 
-* --- Summary ---
+* --- 总结 ---
 di "============================================="
 di "TREATMENT EFFECTS COMPARISON"
 di "============================================="
@@ -284,14 +284,14 @@ di "============================================="
 log close
 ```
 
-## Step 4: Conditional Logit for Discrete Choice (Stata .do file)
+## 第 4 步：条件 Logit 离散选择（Stata .do 文件）
 
-Following Mexico Retail Table 5 pattern.
+遵循 Mexico Retail Table 5 模式。
 
 ```stata
 /*==============================================================================
-  Logit/Probit Analysis — Step 4: Conditional Logit (Discrete Choice)
-  Reference: Mexico Retail Table 5 — clogit for household store choice
+  Logit/Probit 分析 — 第 4 步：条件 Logit（离散选择）
+  参考：Mexico Retail Table 5 — 家庭门店选择的 clogit
 ==============================================================================*/
 clear all
 set more off
@@ -302,26 +302,26 @@ log using "output/logs/logit_04_clogit.log", replace
 
 use "DATASET_PATH", clear
 
-* --- Conditional logit (McFadden's choice model) ---
-* Data must be in long format: one row per alternative per choice occasion
-* GROUP_VAR identifies the choice group (e.g., household-year)
-* CHOICE_VAR is 1 for the chosen alternative, 0 otherwise
-* X variables can be alternative-specific or interacted with alternative dummies
+* --- 条件 logit (McFadden 选择模型) ---
+* 数据必须为长格式：每个选择场合的每个备选方案一行
+* GROUP_VAR 标识选择组（如 household-year）
+* CHOICE_VAR 为 1 表示被选中的备选方案，0 表示未选中
+* X 变量可以是备选方案特定的或与备选方案虚拟变量的交互项
 
 eststo clear
 eststo clogit_main: clogit CHOICE_VAR ALT_SPECIFIC_VARS ///
     [pw=WEIGHT_VAR], group(GROUP_VAR) vce(cluster CLUSTER_VAR)
 
-* Marginal effects (average over choice groups)
+* 边际效应（在选择组上取平均）
 margins, dydx(*) post
 eststo clogit_ame
 
-* --- Alternative specifications ---
-* Specification with additional controls
+* --- 替代设定 ---
+* 加入附加控制变量的设定
 eststo clogit_full: clogit CHOICE_VAR ALT_SPECIFIC_VARS ADDITIONAL_CONTROLS ///
     [pw=WEIGHT_VAR], group(GROUP_VAR) vce(cluster CLUSTER_VAR)
 
-* --- Table ---
+* --- 表格 ---
 esttab clogit_main clogit_full clogit_ame ///
     using "output/tables/tab_conditional_logit.tex", ///
     se(4) b(4) star(* 0.10 ** 0.05 *** 0.01) ///
@@ -335,12 +335,12 @@ esttab clogit_main clogit_full clogit_ame ///
 log close
 ```
 
-## Step 5: Diagnostics (Stata .do file)
+## 第 5 步：诊断检验（Stata .do 文件）
 
 ```stata
 /*==============================================================================
-  Logit/Probit Analysis — Step 5: Model Diagnostics
-  ROC, Hosmer-Lemeshow, link test, classification
+  Logit/Probit 分析 — 第 5 步：模型诊断
+  ROC、Hosmer-Lemeshow、链接检验、分类
 ==============================================================================*/
 clear all
 set more off
@@ -351,31 +351,31 @@ log using "output/logs/logit_05_diagnostics.log", replace
 
 use "DATASET_PATH", clear
 
-* --- Fit main model ---
+* --- 拟合主模型 ---
 logit OUTCOME_VAR TREATMENT_VAR COVARIATES, vce(cluster CLUSTER_VAR)
 
-* --- ROC Curve and AUC ---
+* --- ROC 曲线和 AUC ---
 lroc, title("ROC Curve") note("AUC = area under curve; 0.5 = random, 1.0 = perfect")
 graph export "output/figures/fig_roc_curve.pdf", replace
 lstat
-* AUC > 0.7 is acceptable; > 0.8 is good; > 0.9 is excellent
+* AUC > 0.7 可接受；> 0.8 良好；> 0.9 优秀
 
-* --- Hosmer-Lemeshow Goodness of Fit ---
-* Re-fit without vce(cluster) for estat gof compatibility
+* --- Hosmer-Lemeshow 拟合优度检验 ---
+* 不使用 vce(cluster) 重新拟合以兼容 estat gof
 logit OUTCOME_VAR TREATMENT_VAR COVARIATES
 estat gof, group(10)
-* Null: model fits well. Reject (p < 0.05) → poor fit
+* 原假设：模型拟合良好。拒绝（p < 0.05）→ 拟合不佳
 
-* --- Link Test (Pregibon) ---
+* --- 链接检验 (Pregibon) ---
 linktest
-* _hat should be significant, _hatsq should NOT be significant
-* Significant _hatsq suggests misspecification (wrong functional form)
+* _hat 应显著，_hatsq 应不显著
+* _hatsq 显著提示误设（函数形式不正确）
 
-* --- Classification Table ---
+* --- 分类表 ---
 estat classification
-* Reports sensitivity, specificity, and overall correct classification rate
+* 报告灵敏度、特异度和总体正确分类率
 
-* --- Pseudo R-squared comparison ---
+* --- 伪 R 方比较 ---
 di "============================================="
 di "MODEL FIT DIAGNOSTICS"
 di "============================================="
@@ -391,12 +391,12 @@ di "============================================="
 log close
 ```
 
-## Step 6: Extensions (Stata .do file)
+## 第 6 步：扩展模型（Stata .do 文件）
 
 ```stata
 /*==============================================================================
-  Logit/Probit Analysis — Step 6: Extensions
-  Multinomial logit, ordered logit/probit, IV probit
+  Logit/Probit 分析 — 第 6 步：扩展模型
+  多项 logit、有序 logit/probit、IV probit
 ==============================================================================*/
 clear all
 set more off
@@ -407,25 +407,25 @@ log using "output/logs/logit_06_extensions.log", replace
 
 use "DATASET_PATH", clear
 
-* --- Multinomial Logit (unordered categories) ---
-* Use when outcome has 3+ unordered categories
+* --- 多项 Logit（无序类别）---
+* 当因变量有 3 个及以上无序类别时使用
 eststo mlogit_main: mlogit MULTI_OUTCOME COVARIATES, ///
     vce(cluster CLUSTER_VAR) baseoutcome(BASE_CATEGORY)
 margins, dydx(TREATMENT_VAR) predict(outcome(CATEGORY_1)) post
-* Repeat for each outcome category
+* 对每个因变量类别重复
 
-* --- Ordered Logit ---
-* Use when outcome is ordinal (Likert scale, rating)
+* --- 有序 Logit ---
+* 当因变量为有序变量时使用（李克特量表、评级）
 eststo ologit_main: ologit ORDERED_OUTCOME COVARIATES, ///
     vce(cluster CLUSTER_VAR)
 margins, dydx(TREATMENT_VAR) predict(outcome(CATEGORY_1)) post
 
-* --- Ordered Probit ---
+* --- 有序 Probit ---
 eststo oprobit_main: oprobit ORDERED_OUTCOME COVARIATES, ///
     vce(cluster CLUSTER_VAR)
 
-* --- IV Probit (endogenous binary treatment) ---
-* When treatment is binary and endogenous
+* --- IV Probit（内生二值处理变量）---
+* 当处理变量为二值且内生时
 eststo ivprobit_main: ivprobit OUTCOME_VAR COVARIATES ///
     (TREATMENT_VAR = INSTRUMENT), vce(cluster CLUSTER_VAR)
 margins, dydx(TREATMENT_VAR) post
@@ -433,11 +433,11 @@ margins, dydx(TREATMENT_VAR) post
 log close
 ```
 
-## Step 7: Python Cross-Validation
+## 第 7 步：Python 交叉验证
 
 ```python
 """
-Logit/Probit Cross-Validation: Stata vs Python (statsmodels, sklearn)
+Logit/Probit 交叉验证：Stata vs Python (statsmodels, sklearn)
 """
 import pandas as pd
 import numpy as np
@@ -447,7 +447,7 @@ from sklearn.metrics import roc_auc_score, classification_report
 
 df = pd.read_stata("DATASET_PATH")
 
-# --- Logit via statsmodels ---
+# --- 通过 statsmodels 的 Logit ---
 X = df[["TREATMENT_VAR"] + COVARIATES_LIST]
 X = sm.add_constant(X)
 y = df["OUTCOME_VAR"]
@@ -457,53 +457,53 @@ logit_model = sm.Logit(y, X).fit(cov_type="cluster",
 print("=== Python Logit (statsmodels) ===")
 print(logit_model.summary())
 
-# --- Marginal effects (AME) ---
+# --- 边际效应 (AME) ---
 ame = logit_model.get_margeff(at="overall")
 print("\n=== Average Marginal Effects ===")
 print(ame.summary())
 
-# --- Probit via statsmodels ---
+# --- 通过 statsmodels 的 Probit ---
 probit_model = sm.Probit(y, X).fit(cov_type="cluster",
                                     cov_kwds={"groups": df["CLUSTER_VAR"]})
 print("\n=== Python Probit (statsmodels) ===")
 print(probit_model.summary())
 
-# --- Cross-validate with Stata ---
-stata_logit_ame = STATA_LOGIT_AME  # AME from Step 1
-python_logit_ame = ame.margeff[0]  # treatment variable AME
+# --- 与 Stata 交叉验证 ---
+stata_logit_ame = STATA_LOGIT_AME  # 来自第 1 步的 AME
+python_logit_ame = ame.margeff[0]  # 处理变量的 AME
 pct_diff = abs(stata_logit_ame - python_logit_ame) / abs(stata_logit_ame) * 100
 print(f"\nCross-validation (Logit AME on treatment):")
 print(f"  Stata:  {stata_logit_ame:.6f}")
 print(f"  Python: {python_logit_ame:.6f}")
 print(f"  Diff:   {pct_diff:.4f}%")
 print(f"  Status: {'PASS' if pct_diff < 0.5 else 'CHECK'}")
-# Note: AME comparison uses 0.5% threshold (numerical integration differences)
+# 注意：AME 比较使用 0.5% 阈值（数值积分差异）
 
 # --- ROC/AUC ---
 y_pred_prob = logit_model.predict(X)
 auc = roc_auc_score(y, y_pred_prob)
 print(f"\nPython AUC: {auc:.4f}")
 
-# --- sklearn for comparison ---
+# --- sklearn 对比 ---
 lr = LogisticRegression(penalty=None, max_iter=10000)
 X_sk = df[["TREATMENT_VAR"] + COVARIATES_LIST]
 lr.fit(X_sk, y)
 print(f"sklearn Logit coef (treatment): {lr.coef_[0][0]:.6f}")
 ```
 
-## Step 8: Diagnostics Summary
+## 第 8 步：诊断总结
 
-After all steps, provide:
+所有步骤完成后，提供以下内容：
 
-1. **Model Selection**: Logit vs probit — coefficients differ but AME should be similar. If AME diverges, report both and note which is preferred.
-2. **LPM Comparison**: LPM coefficient vs logit/probit AME. If similar, nonlinearity is minimal.
-3. **Propensity Score**: Overlap quality (visual + numeric). Flag if common support excludes > 10% of observations.
-4. **Treatment Effects**: RA, IPW, AIPW convergence. If all three agree, result is robust. If IPW diverges from RA, treatment model may be misspecified.
-5. **Diagnostics**: ROC/AUC, Hosmer-Lemeshow, link test results. Flag poor fit (AUC < 0.7 or H-L rejection).
-6. **Conditional Logit** (if applicable): IIA assumption discussion, marginal effects interpretation.
-7. **Cross-Validation**: Stata vs Python AME comparison.
+1. **模型选择**：Logit vs probit — 系数不同但 AME 应相似。如果 AME 不一致，两者均报告并注明哪个更优。
+2. **LPM 比较**：LPM 系数 vs logit/probit AME。如果相似，非线性影响较小。
+3. **倾向得分**：重叠质量（视觉 + 数值）。如果共同支撑排除了 > 10% 的观测值则标记。
+4. **处理效应**：RA、IPW、AIPW 的一致性。如果三者一致，结果稳健。如果 IPW 与 RA 不一致，处理模型可能存在误设。
+5. **诊断检验**：ROC/AUC、Hosmer-Lemeshow、链接检验结果。标记拟合不佳的情况（AUC < 0.7 或 H-L 拒绝）。
+6. **条件 Logit**（如适用）：IIA 假设讨论，边际效应解释。
+7. **交叉验证**：Stata vs Python AME 比较。
 
-## Required Stata Packages
+## 所需 Stata 包
 
 ```stata
 ssc install reghdfe, replace
@@ -512,9 +512,9 @@ ssc install estout, replace
 ssc install coefplot, replace
 ```
 
-## Key References
+## 核心参考文献
 
-- Acemoglu, D., Naidu, S., Restrepo, P. & Robinson, J.A. (2019). "Democracy Does Cause Growth." JPE, 127(1), 47-100. (Propensity score, teffects, bootstrap)
-- Imbens, G.W. (2004). "Nonparametric Estimation of Average Treatment Effects Under Exogeneity." REStat. (IPW, overlap)
-- McFadden, D. (1974). "Conditional Logit Analysis of Qualitative Choice Behavior." (Conditional logit foundation)
-- Cattaneo, M.D. (2010). "Efficient Semiparametric Estimation of Multi-Valued Treatment Effects." JoE. (Treatment effects)
+- Acemoglu, D., Naidu, S., Restrepo, P. & Robinson, J.A. (2019). "Democracy Does Cause Growth." JPE, 127(1), 47-100.（倾向得分、teffects、bootstrap）
+- Imbens, G.W. (2004). "Nonparametric Estimation of Average Treatment Effects Under Exogeneity." REStat.（IPW、重叠）
+- McFadden, D. (1974). "Conditional Logit Analysis of Qualitative Choice Behavior."（条件 logit 基础）
+- Cattaneo, M.D. (2010). "Efficient Semiparametric Estimation of Multi-Valued Treatment Effects." JoE.（处理效应）

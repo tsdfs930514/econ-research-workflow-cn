@@ -5,115 +5,115 @@ paths:
   - "**/docs/**"
 ---
 
-# Replication Standards
+# 复现标准 (Replication Standards)
 
-Standards for creating reproducible research following AEA Data Editor guidelines and TOP5 journal best practices.
+遵循 AEA 数据编辑器指南和 TOP5 期刊最佳实践的可复现研究标准。
 
 ---
 
-## Data Provenance
+## 数据溯源 (Data Provenance)
 
-### Data Availability Statement
+### 数据可用性声明
 
-Every replication package must include a clear statement:
-- Which data are publicly available and where
-- Which data are restricted and how to obtain access
-- Which data are confidential and cannot be shared
+每个复现包必须包含清晰的声明：
+- 哪些数据是公开可用的及其获取方式
+- 哪些数据有访问限制及其申请方式
+- 哪些数据是保密的、无法共享
 
-### Data Documentation
+### 数据文档
 
-For each raw data file, document in REPLICATION.md:
+对 `data/raw/` 中的每个原始数据文件，在 REPLICATION.md 中记录：
 
-| Element | Description |
+| 要素 | 说明 |
 |---------|-------------|
-| **File name** | Exact filename in `data/raw/` |
-| **Source** | Original provider (e.g., NBER, Census, firm website) |
-| **Date accessed** | When the file was downloaded |
-| **DOI/URL** | Persistent identifier or direct download link |
-| **License** | Usage restrictions (public domain, academic use only, etc.) |
-| **MD5/SHA256** | File hash to verify integrity |
-| **Size** | File size (for planning storage) |
+| **文件名** | `data/raw/` 中的确切文件名 |
+| **来源** | 原始数据提供者（如 NBER、Census、企业网站） |
+| **获取日期** | 文件的下载时间 |
+| **DOI/URL** | 持久性标识符或直接下载链接 |
+| **许可证** | 使用限制（公共领域、仅限学术使用等） |
+| **MD5/SHA256** | 文件哈希值，用于验证完整性 |
+| **大小** | 文件大小（用于规划存储） |
 
-### Data Processing Documentation
+### 数据处理文档
 
-Create a `data_dictionary.md` documenting:
-- Variable names and descriptions
-- Units of measurement
-- Coding schemes (e.g., 1=male, 2=female)
-- Missing value codes
-- Known data quality issues
+创建 `data_dictionary.md`，记录：
+- 变量名称和说明
+- 计量单位
+- 编码方案（如 1=男、2=女）
+- 缺失值编码
+- 已知的数据质量问题
 
 ---
 
-## Code Organization
+## 代码组织
 
-### Directory Structure
+### 目录结构
 
 ```
 vN/
 ├── code/
 │   ├── stata/
-│   │   ├── master.do           # Entry point — runs everything
-│   │   ├── 01_clean_data.do    # Data preparation
-│   │   ├── 02_desc_stats.do    # Descriptive statistics
-│   │   ├── 03_main_analysis.do # Main results
-│   │   ├── 04_robustness.do    # Robustness checks
-│   │   └── 05_tables_figures.do # Output generation
+│   │   ├── master.do           # 入口脚本——运行全部程序
+│   │   ├── 01_clean_data.do    # 数据准备
+│   │   ├── 02_desc_stats.do    # 描述性统计
+│   │   ├── 03_main_analysis.do # 主要结果
+│   │   ├── 04_robustness.do    # 稳健性检验
+│   │   └── 05_tables_figures.do # 输出生成
 │   └── python/
-│       └── cross_validation.py  # Validates Stata results
+│       └── cross_validation.py  # 验证 Stata 结果
 ├── data/
-│   ├── raw/                    # Original data (READ-ONLY)
-│   └── clean/                  # Processed data
+│   ├── raw/                    # 原始数据（只读）
+│   └── clean/                  # 处理后数据
 ├── output/
-│   ├── tables/                 # LaTeX tables
-│   ├── figures/                # PDF figures
-│   └── logs/                   # Execution logs
-└── REPLICATION.md              # Instructions
+│   ├── tables/                 # LaTeX 表格
+│   ├── figures/                # PDF 图表
+│   └── logs/                   # 执行日志
+└── REPLICATION.md              # 复现说明
 ```
 
-### Master Script Pattern
+### 主控脚本模式 (Master Script Pattern)
 
-The `master.do` file must:
-1. Set all paths via globals
-2. Create output directories if they don't exist
-3. Install required packages (commented out, with instructions)
-4. Run all scripts in correct order
-5. Verify that expected outputs were created
+`master.do` 文件必须：
+1. 通过全局宏设置所有路径
+2. 如不存在则创建输出目录
+3. 安装所需包（注释形式，附安装说明）
+4. 按正确顺序运行所有脚本
+5. 验证预期输出已生成
 
-See `init-project.md` for the full template.
+详见 `init-project.md` 的完整模板。
 
-### Script Numbering
+### 脚本编号
 
-Use numbered prefixes to indicate execution order:
-- `01_` — Data cleaning and preparation
-- `02_` — Descriptive statistics
-- `03_` — Main analysis
-- `04_` — Robustness checks
-- `05_` — Tables and figures export
-- `06_` — Cross-validation (Python)
+使用数字前缀表示执行顺序：
+- `01_` — 数据清洗与准备
+- `02_` — 描述性统计
+- `03_` — 主要分析
+- `04_` — 稳健性检验
+- `05_` — 表格与图表导出
+- `06_` — 交叉验证（Python）
 
 ---
 
-## Software Environment
+## 软件环境
 
-### Stata Requirements
+### Stata 要求
 
-Document in REPLICATION.md:
-- Stata version (e.g., "Stata 18/MP")
-- Required packages with installation commands
-- Approximate runtime
+在 REPLICATION.md 中记录：
+- Stata 版本（如 "Stata 18/MP"）
+- 所需安装包及安装命令
+- 大致运行时间
 
 ```stata
-* Required Stata packages:
+* 所需 Stata 安装包：
 ssc install reghdfe, replace
 ssc install ftools, replace
 ssc install estout, replace
-* ... (full list in econometrics-standards.md)
+* ...（完整列表见 econometrics-standards.md）
 ```
 
-### Python Requirements
+### Python 要求
 
-Create `requirements.txt`:
+创建 `requirements.txt`：
 
 ```
 pandas==2.1.0
@@ -122,27 +122,27 @@ numpy==1.26.0
 matplotlib==3.8.0
 ```
 
-### Version Pinning
+### 版本锁定
 
-Pin exact versions for critical packages to ensure reproducibility. Update versions only after testing.
+关键包须锁定精确版本以确保可复现性。仅在测试后更新版本。
 
 ---
 
-## Output Verification
+## 输出验证
 
-### Table-to-Script Mapping
+### 表格-脚本映射
 
-In REPLICATION.md, create a table mapping each output to its generating script:
+在 REPLICATION.md 中创建表格，将每个输出映射到其生成脚本：
 
-| Table/Figure | Script | Output File | Line in Script |
+| 表格/图表 | 脚本 | 输出文件 | 脚本中的行号 |
 |-------------|--------|-------------|----------------|
-| Table 1 | `02_desc_stats.do` | `output/tables/tab_descriptive.tex` | Line 45 |
-| Table 2 | `03_main_analysis.do` | `output/tables/tab_main_results.tex` | Line 78 |
-| Figure 1 | `05_tables_figures.do` | `output/figures/fig_event_study.pdf` | Line 120 |
+| 表 1 | `02_desc_stats.do` | `output/tables/tab_descriptive.tex` | 第 45 行 |
+| 表 2 | `03_main_analysis.do` | `output/tables/tab_main_results.tex` | 第 78 行 |
+| 图 1 | `05_tables_figures.do` | `output/figures/fig_event_study.pdf` | 第 120 行 |
 
-### Output Checksums
+### 输出校验和
 
-For critical outputs, record MD5 hashes to detect unintended changes:
+对关键输出，记录 MD5 哈希值以检测意外变更：
 
 ```bash
 md5sum output/tables/*.tex output/figures/*.pdf > output_checksums.txt
@@ -150,26 +150,26 @@ md5sum output/tables/*.tex output/figures/*.pdf > output_checksums.txt
 
 ---
 
-## Cross-Platform Compatibility
+## 跨平台兼容性
 
-### Path Handling
+### 路径处理
 
-Use forward slashes in Stata (works on all platforms):
+在 Stata 中使用正斜杠（兼容所有平台）：
 ```stata
 save "data/clean/panel.dta", replace  ✓
 save "data\clean\panel.dta", replace  ✗
 ```
 
-### Random Seeds
+### 随机种子
 
-Always set seeds for reproducibility:
+始终设置种子以确保可复现性：
 ```stata
 set seed 12345
 ```
 
-### Sorting
+### 排序
 
-When results depend on sort order (e.g., `by` operations), explicitly sort:
+当结果依赖排序顺序时（如 `by` 操作），须显式排序：
 ```stata
 sort panel_id year
 by panel_id: gen lag_y = y[_n-1]
@@ -177,91 +177,91 @@ by panel_id: gen lag_y = y[_n-1]
 
 ---
 
-## Confidential Data Handling
+## 保密数据处理
 
-### When Data Cannot Be Shared
+### 数据无法共享时
 
-If data are confidential:
-1. Provide detailed synthetic data that mimics the structure
-2. Document exactly how to obtain the real data
-3. Provide code that runs on both real and synthetic data
-4. In README, clearly state: "This replication package uses synthetic data. Real data available under [conditions]."
+如果数据为保密数据：
+1. 提供模拟真实数据结构的合成数据
+2. 详细记录获取真实数据的方式
+3. 提供可同时在真实数据和合成数据上运行的代码
+4. 在 README 中明确说明："本复现包使用合成数据。真实数据可在[条件]下获取。"
 
-### Synthetic Data Generation
+### 合成数据生成
 
-Use `syn` package in Stata or Python's `synthpop` to generate synthetic data that preserves:
-- Variable distributions
-- Correlation structure
-- Panel structure (if applicable)
+使用 Stata 的 `syn` 包或 Python 的 `synthpop` 生成合成数据，保留：
+- 变量分布
+- 相关结构
+- 面板结构（如适用）
 
-Do NOT preserve:
-- Exact values (to protect confidentiality)
-- Rare combinations that could identify individuals
+**不得**保留：
+- 精确值（以保护保密性）
+- 可能识别个人身份的罕见组合
 
 ---
 
-## README Template
+## README 模板
 
-Every replication package should have a top-level README.md:
+每个复现包应包含顶层 README.md：
 
 ```markdown
-# Replication Package for "[Paper Title]"
+# "[论文标题]" 复现包
 
-## Authors
-[Author names]
+## 作者
+[作者姓名]
 
-## Paper Abstract
-[2-3 sentence abstract]
+## 论文摘要
+[2-3 句摘要]
 
-## Data Availability
-[Which data are public/restricted/confidential]
+## 数据可用性
+[哪些数据是公开/受限/保密的]
 
-## Computational Requirements
-- Stata 18/MP (required)
-- Python 3.10+ with packages listed in requirements.txt (optional, for cross-validation)
+## 计算环境要求
+- Stata 18/MP（必需）
+- Python 3.10+，需安装 requirements.txt 中列出的包（可选，用于交叉验证）
 
-## Runtime
-Approximately [X] minutes on [machine description]
+## 运行时间
+在[机器描述]上大约 [X] 分钟
 
-## Instructions
-1. Install required Stata packages (see code/stata/master.do header)
-2. Place raw data files in data/raw/ (see REPLICATION.md for sources)
-3. Run code/stata/master.do
-4. Check output/logs/ for any errors
+## 使用说明
+1. 安装所需 Stata 包（见 code/stata/master.do 文件头）
+2. 将原始数据文件放入 data/raw/（数据来源见 REPLICATION.md）
+3. 运行 code/stata/master.do
+4. 检查 output/logs/ 中是否有错误
 
-## Output
-All tables and figures from the paper are generated in output/tables/ and output/figures/
+## 输出
+论文中的所有表格和图表生成在 output/tables/ 和 output/figures/ 中
 
-## Contact
-[Corresponding author email]
+## 联系方式
+[通讯作者邮箱]
 ```
 
 ---
 
-## Quality Checklist
+## 质量检查清单
 
-Before submitting a replication package, verify:
+提交复现包前，验证以下各项：
 
-- [ ] All raw data documented with sources and access dates
-- [ ] master.do runs from start to finish without errors
-- [ ] All expected output files are created
-- [ ] Output files match the paper's tables/figures
-- [ ] README.md and REPLICATION.md are complete
-- [ ] Code is commented and follows naming conventions
-- [ ] Random seeds are set for all stochastic operations
-- [ ] No absolute paths in code (use globals)
-- [ ] No passwords or API keys in code
-- [ ] Data dictionary documents all variables
-- [ ] Synthetic data provided if real data are confidential
+- [ ] 所有原始数据已记录来源和获取日期
+- [ ] master.do 从头到尾运行无错误
+- [ ] 所有预期输出文件已生成
+- [ ] 输出文件与论文中的表格/图表一致
+- [ ] README.md 和 REPLICATION.md 内容完整
+- [ ] 代码有注释且遵循命名规范
+- [ ] 所有随机操作均已设置种子
+- [ ] 代码中无绝对路径（使用全局宏）
+- [ ] 代码中无密码或 API 密钥
+- [ ] 数据字典记录了所有变量
+- [ ] 如真实数据保密，已提供合成数据
 
 ---
 
-## AEA Data Editor Best Practices
+## AEA 数据编辑器最佳实践
 
-Following the American Economic Association Data Editor's guidelines:
+遵循美国经济学会 (AEA) 数据编辑器指南：
 
-1. **One command to run everything**: A single master script should reproduce all results.
-2. **Clean separation**: Raw data should never be modified; all outputs go to clean/temp folders.
-3. **Minimal manual intervention**: No "uncomment this line" or "run sections 1-3 first" instructions.
-4. **Complete documentation**: Every data source, every assumption, every transformation documented.
-5. **Test on a clean machine**: Before submission, test the replication package on a fresh computer.
+1. **一键运行全部**: 单个主控脚本应能复现所有结果。
+2. **清晰分离**: 原始数据不得被修改；所有输出写入 clean/temp 文件夹。
+3. **最少人工干预**: 不得要求"取消注释此行"或"先运行第 1-3 节"之类的操作。
+4. **完整文档**: 每个数据来源、每个假设、每个转换操作均须记录。
+5. **干净环境测试**: 提交前在全新计算机上测试复现包。

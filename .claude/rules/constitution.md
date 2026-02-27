@@ -1,29 +1,29 @@
-# Constitution — Immutable Principles
+# 基本准则 (Constitution) — 不可变原则
 
-These five principles govern all skills, agents, and rules in this workflow. They cannot be overridden, relaxed, or contradicted by any other configuration. The `/learn` skill cannot create rules that violate them.
-
----
-
-## 1. Raw Data Integrity
-
-`data/raw/` is **never** modified, overwritten, or deleted. All transformations read from `data/raw/` and write to `data/clean/` or `data/temp/`. No exception exists for any skill, agent, or manual instruction.
-
-## 2. Full Reproducibility
-
-Every result (table, figure, statistic) must be reproducible from code + raw data by running `master.do` (or the equivalent entry-point script). If a result cannot be traced to a code path from raw data, it is invalid.
-
-## 3. Mandatory Cross-Validation
-
-All regressions are cross-validated between Stata and Python (`pyfixest`). Coefficient differences must be < 0.1%. This requirement is **relaxed only inside `explore/`**, where cross-validation is optional.
-
-## 4. Version Preservation
-
-`vN/` directories are **never** deleted, only superseded by `vN+1/`. Intermediate outputs within a version are preserved — overwriting prior results without saving the previous version is prohibited.
-
-## 5. Score Integrity
-
-Quality scores (from `/score`, `/adversarial-review`, or manual review) are recorded faithfully. Scores are never fabricated, inflated, or omitted to make results appear better than they are.
+以下五条原则约束本工作流中的所有技能、代理和规则。任何其他配置均不得覆盖、放宽或违反这些原则。`/learn` 技能不得创建违反这些原则的规则。
 
 ---
 
-**Enforcement**: Every skill, agent, and rule operates within this envelope. Violations should be flagged immediately and the offending action halted.
+## 1. 原始数据完整性 (Raw Data Integrity)
+
+`data/raw/` **永远不得**被修改、覆盖或删除。所有数据转换从 `data/raw/` 读取，写入 `data/clean/` 或 `data/temp/`。任何技能、代理或手动指令均无例外。
+
+## 2. 完全可复现性 (Full Reproducibility)
+
+每一个结果（表格、图表、统计量）都必须能够通过代码 + 原始数据运行 `master.do`（或等效入口脚本）来复现。如果某个结果无法追溯到从原始数据出发的代码路径，则该结果无效。
+
+## 3. 强制交叉验证 (Mandatory Cross-Validation)
+
+所有回归均须在 Stata 和 Python（`pyfixest`）之间进行交叉验证。系数差异必须 < 0.1%。此要求**仅在 `explore/` 目录内放宽**，探索阶段交叉验证为可选。
+
+## 4. 版本保留 (Version Preservation)
+
+`vN/` 目录**永远不得**删除，只能被 `vN+1/` 替代。版本内的中间输出必须保留——未保存先前版本就覆盖已有结果是被禁止的。
+
+## 5. 评分完整性 (Score Integrity)
+
+质量评分（来自 `/score`、`/adversarial-review` 或人工审查）必须如实记录。评分不得伪造、虚高或遗漏，以使结果看起来优于实际水平。
+
+---
+
+**执行机制**: 所有技能、代理和规则均在此约束范围内运行。违反行为应立即标记并终止相关操作。

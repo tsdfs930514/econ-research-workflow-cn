@@ -1,61 +1,61 @@
 ---
-description: "Generate publication-quality LaTeX regression tables"
+description: "生成可发表质量的 LaTeX 回归表格"
 user_invocable: true
 ---
 
-# /make-table - Generate Publication-Quality LaTeX Tables
+# /make-table — 生成可发表质量的 LaTeX 表格
 
-When the user invokes `/make-table`, follow these steps:
+当用户调用 `/make-table` 时，按以下步骤操作：
 
-## Step 1: Gather Information
+## 步骤 1：收集信息
 
-Ask the user for:
+向用户询问：
 
-1. **Source data** (required) - One of:
-   - Stata estimates (stored via `eststo`) or a .log file path
-   - Python regression output (pyfixest summary or saved results)
-   - Raw data to be formatted (e.g., a CSV of coefficients)
-2. **Table type** (required) - One of:
-   - `main` - Main regression results table
-   - `first_stage` - First stage IV regression table
-   - `robustness` - Robustness summary table
-   - `descriptive` - Descriptive statistics table
-   - `balance` - Balance / summary statistics by group table
-   - `event_study` - Event study coefficients table
-   - `comparison` - Multi-estimator comparison (e.g., CS-DiD vs TWFE vs BJS)
-3. **Target journal language** (required) - `CN` (Chinese) or `EN` (English)
-4. **Target journal style** (optional) - e.g., "经济研究", "管理世界", "AER", "QJE"
-5. **Additional options** (optional):
-   - Number of panels (Panel A, Panel B, etc.)
-   - Column group headers
-   - Whether to include dependent variable mean
-   - Whether to include 95% CIs (in brackets, third row)
-   - Custom notes
+1. **数据来源**（必填）— 以下之一：
+   - Stata 存储的估计结果（通过 `eststo`）或 .log 文件路径
+   - Python 回归输出（pyfixest summary 或保存的结果）
+   - 需要格式化的原始数据（如系数 CSV 文件）
+2. **表格类型**（必填）— 以下之一：
+   - `main` — 主回归结果表
+   - `first_stage` — 第一阶段 IV 回归表
+   - `robustness` — 稳健性汇总表
+   - `descriptive` — 描述性统计表
+   - `balance` — 分组平衡/汇总统计表
+   - `event_study` — 事件研究系数表
+   - `comparison` — 多估计量比较表（如 CS-DiD vs TWFE vs BJS）
+3. **目标期刊语言**（必填）— `CN`（中文）或 `EN`（英文）
+4. **目标期刊风格**（可选）— 如"经济研究"、"管理世界"、"AER"、"QJE"
+5. **其他选项**（可选）：
+   - 面板数量（Panel A、Panel B 等）
+   - 列组标题
+   - 是否包含因变量均值
+   - 是否包含 95% 置信区间（方括号内，第三行）
+   - 自定义注释
 
-## Step 2: Parse Source Data
+## 步骤 2：解析数据来源
 
-### From Stata .log file
-Parse the regression output tables from the log file, extracting:
-- Variable names and labels
-- Coefficients with significance stars
-- Standard errors (in parentheses)
-- Number of observations
-- R-squared (and adjusted/within R-squared)
-- Fixed effects indicators
-- F-statistics (first-stage F, KP F)
-- Number of clusters
+### 从 Stata .log 文件
+解析日志文件中的回归输出表，提取：
+- 变量名称和标签
+- 系数及显著性星号
+- 标准误（括号内）
+- 观测值数量
+- R 方（及调整 R 方/组内 R 方）
+- 固定效应指示符
+- F 统计量（第一阶段 F、KP F）
+- 聚类数量
 
-### From Python output
-Parse pyfixest `.summary()` output or extract from model objects:
-- Coefficients, standard errors, p-values
-- Model fit statistics
-- Add significance stars based on p-values: *** p<0.01, ** p<0.05, * p<0.10
+### 从 Python 输出
+解析 pyfixest `.summary()` 输出或从模型对象中提取：
+- 系数、标准误、p 值
+- 模型拟合统计量
+- 根据 p 值添加显著性星号：*** p<0.01, ** p<0.05, * p<0.10
 
-## Step 3: Generate LaTeX Table
+## 步骤 3：生成 LaTeX 表格
 
-### Chinese Journal Format (三线表 / Three-Line Table)
+### 中文期刊格式（三线表）
 
-For Chinese journals like 经济研究 (Economic Research Journal) or 管理世界 (Management World):
+适用于经济研究、管理世界等中文期刊：
 
 ```latex
 \begin{table}[htbp]
@@ -63,21 +63,21 @@ For Chinese journals like 经济研究 (Economic Research Journal) or 管理世�
 \caption{<表格标题>}
 \label{tab:<label>}
 \begin{threeparttable}
-\begin{tabular}{l<column alignment specs>}
+\begin{tabular}{l<列对齐规格>}
 \toprule
  & \multicolumn{<n>}{c}{<列组标题>} \\
  \cmidrule(lr){<start>-<end>}
  & (1) & (2) & (3) & (4) \\
  & <因变量1> & <因变量2> & <因变量3> & <因变量4> \\
 \midrule
-% Panel A: <面板标题> (if multiple panels)
+% Panel A: <面板标题>（如有多个面板）
 \multicolumn{<n>}{l}{\textit{Panel A: <面板标题>}} \\[3pt]
 <核心解释变量> & <coef>*** & <coef>** & <coef>*** & <coef>* \\
  & (<se>) & (<se>) & (<se>) & (<se>) \\[3pt]
 <控制变量1> & <coef> & <coef> & <coef> & <coef> \\
  & (<se>) & (<se>) & (<se>) & (<se>) \\
 \midrule
-% Footer rows
+% 脚注行
 控制变量 & 是 & 是 & 是 & 是 \\
 个体固定效应 & 是 & 是 & 是 & 是 \\
 时间固定效应 & 否 & 是 & 是 & 是 \\
@@ -95,20 +95,20 @@ R$^2$ & <r2> & <r2> & <r2> & <r2> \\
 \end{table}
 ```
 
-Key formatting rules for Chinese journals:
-- Use `\toprule`, `\midrule`, `\bottomrule` (三线表 format, requires `booktabs` package)
-- Column headers in Chinese
-- "是/否" for Yes/No indicators
-- Fixed effects rows: 个体固定效应, 时间固定效应, 行业固定效应, etc.
-- Controls row: 控制变量
-- Observations: 观测值
-- Notes in Chinese with standard significance disclaimer
-- Use `threeparttable` for proper note alignment
-- Numbers formatted with commas for thousands: 10,000
+中文期刊格式核心要点：
+- 使用 `\toprule`、`\midrule`、`\bottomrule`（三线表格式，需要 `booktabs` 包）
+- 列标题使用中文
+- 使用"是/否"表示 Yes/No 指示符
+- 固定效应行：个体固定效应、时间固定效应、行业固定效应等
+- 控制变量行：控制变量
+- 观测值：观测值
+- 注释使用中文，包含标准的显著性声明
+- 使用 `threeparttable` 确保注释对齐
+- 千位使用逗号分隔：10,000
 
-### English Journal Format (AER/QJE Style)
+### 英文期刊格式（AER/QJE 风格）
 
-For English journals like AER, QJE, Econometrica:
+适用于 AER、QJE、Econometrica 等英文 TOP5 期刊：
 
 ```latex
 \begin{table}[htbp]
@@ -116,24 +116,24 @@ For English journals like AER, QJE, Econometrica:
 \caption{<Table Title>}
 \label{tab:<label>}
 \begin{threeparttable}
-\begin{tabular}{l<column alignment specs>}
+\begin{tabular}{l<列对齐规格>}
 \toprule\toprule
  & \multicolumn{<n>}{c}{<Column Group Header>} \\
  \cmidrule(lr){<start>-<end>}
  & (1) & (2) & (3) & (4) \\
  & <Dep Var 1> & <Dep Var 2> & <Dep Var 3> & <Dep Var 4> \\
 \midrule
-% Panel A: <Panel Title> (if multiple panels)
+% Panel A: <Panel Title>（如有多个面板）
 \multicolumn{<n>}{l}{\textit{Panel A: <Panel Title>}} \\[5pt]
 <Key Variable> & <coef>$^{***}$ & <coef>$^{**}$ & <coef>$^{***}$ & <coef>$^{*}$ \\
  & (<se>) & (<se>) & (<se>) & (<se>) \\
  & [<ci_lo>, <ci_hi>] & [<ci_lo>, <ci_hi>] & [<ci_lo>, <ci_hi>] & [<ci_lo>, <ci_hi>] \\[3pt]
 \midrule\midrule
-% Panel B: <Panel Title> (if applicable)
+% Panel B: <Panel Title>（如适用）
 \multicolumn{<n>}{l}{\textit{Panel B: <Panel Title>}} \\[5pt]
 ...
 \midrule
-% Footer rows
+% 脚注行
 Controls & Yes & Yes & Yes & Yes \\
 Entity FE & \checkmark & \checkmark & \checkmark & \checkmark \\
 Time FE &  & \checkmark & \checkmark & \checkmark \\
@@ -150,21 +150,21 @@ $R^2$ & <r2> & <r2> & <r2> & <r2> \\
 \end{table}
 ```
 
-Key formatting rules for English TOP5 journals:
-- AER style: clean, minimal formatting, double `\toprule\toprule` and `\bottomrule\bottomrule`
-- Use `booktabs` package (no vertical lines)
-- Significance stars as superscripts: $^{***}$, $^{**}$, $^{*}$
-- Checkmarks (`\checkmark`) for FE indicators (preferred over "Yes/No" in AER)
-- 95% CIs in brackets on third row when space permits
-- `\begin{figurenotes}` environment for notes (AER house style)
-- Panel A/B separated by `\midrule\midrule`
-- Numbers with commas: 10,000
-- Column alignment: typically `c` for all result columns
-- 4 decimal places for coefficients (matching APE/TOP5 standard)
+英文 TOP5 期刊格式核心要点：
+- AER 风格：简洁、极简格式，双线 `\toprule\toprule` 和 `\bottomrule\bottomrule`
+- 使用 `booktabs` 包（无竖线）
+- 显著性星号为上标：$^{***}$、$^{**}$、$^{*}$
+- FE 指示符使用勾号（`\checkmark`）（AER 偏好，优于 "Yes/No"）
+- 95% 置信区间在方括号内，占据第三行（空间允许时）
+- 注释使用 `\begin{figurenotes}` 环境（AER 内部风格）
+- Panel A/B 之间用 `\midrule\midrule` 分隔
+- 千位逗号分隔：10,000
+- 列对齐：结果列通常使用 `c`
+- 系数保留 4 位小数（匹配 APE/TOP5 标准）
 
-### Stata `esttab` Command Template (AER Style)
+### Stata `esttab` 命令模板（AER 风格）
 
-For generating tables directly from Stata stored estimates:
+直接从 Stata 存储的估计结果生成表格：
 
 ```stata
 esttab m1 m2 m3 m4 m5 using "output/tables/tab_<name>.tex", ///
@@ -181,18 +181,18 @@ esttab m1 m2 m3 m4 m5 using "output/tables/tab_<name>.tex", ///
     substitute(\_ _)
 ```
 
-## Step 4: Table Type-Specific Formatting
+## 步骤 4：按表格类型的特定格式
 
-### Main Regression Table (`main`)
-- Show key independent variables with coefficients and SEs
-- Include control variable indicators (not coefficients)
-- Show FE indicators, N, R², cluster count
-- Show dependent variable mean
-- Panel A/B format if multiple outcome families
+### 主回归表 (`main`)
+- 展示核心自变量的系数和标准误
+- 包含控制变量指示符（不展示系数）
+- 展示 FE 指示符、N、R 方、聚类数
+- 展示因变量均值
+- 如果有多组结果变量则使用 Panel A/B 格式
 
-### First Stage Table (`first_stage`)
+### 第一阶段表 (`first_stage`)
 
-Following APE 0185 tab3 format:
+参照 APE 0185 tab3 格式：
 
 ```stata
 esttab fs_main using "output/tables/tab_first_stage.tex", ///
@@ -204,35 +204,35 @@ esttab fs_main using "output/tables/tab_first_stage.tex", ///
     title("First Stage: <Instrument> $\rightarrow$ <Endogenous Var>")
 ```
 
-Key first-stage table elements:
-- Instrument coefficients prominently displayed
-- F-statistic on excluded instruments in footer row
-- KP rk Wald F-statistic for heteroskedastic/clustered errors
-- Stock-Yogo (2005) / Lee et al. (2022) critical values in notes
-- Partial R-squared of excluded instruments
+第一阶段表核心要素：
+- 工具变量系数突出显示
+- 排除工具变量的 F 统计量在脚注行
+- 异方差/聚类下的 KP rk Wald F 统计量
+- Stock-Yogo (2005) / Lee et al. (2022) 临界值在注释中
+- 排除工具变量的偏 R 方
 
-### Robustness Summary Table (`robustness`)
-- One column per robustness specification
-- Show only the key treatment coefficient
-- Compact format with many columns
-- Group columns by robustness type with `\cmidrule`
-- Column headers: brief specification descriptions
+### 稳健性汇总表 (`robustness`)
+- 每种稳健性规范一列
+- 仅展示核心处理系数
+- 多列的紧凑格式
+- 按稳健性类型用 `\cmidrule` 分组列
+- 列标题：简要的规范描述
 
-### Descriptive Statistics Table (`descriptive`)
-- Rows: variables
-- Columns: N, Mean, SD, Min, P25, Median, P75, Max
-- No significance stars
-- Clean number formatting
+### 描述性统计表 (`descriptive`)
+- 行：变量
+- 列：N、均值、标准差、最小值、P25、中位数、P75、最大值
+- 无显著性星号
+- 整洁的数字格式
 
-### Balance Table (`balance`)
-- Rows: variables
-- Columns: Group 1 Mean, Group 2 Mean, Difference, t-stat or p-value
-- Stars on the difference column
-- Show N per group
+### 平衡表 (`balance`)
+- 行：变量
+- 列：组 1 均值、组 2 均值、差异、t 统计量或 p 值
+- 差异列标注星号
+- 展示各组 N
 
-### Multi-Estimator Comparison Table (`comparison`)
+### 多估计量比较表 (`comparison`)
 
-Following APE 0119 tab2 format:
+参照 APE 0119 tab2 格式：
 
 ```latex
 \toprule\toprule
@@ -252,25 +252,25 @@ Observations & <N> & <N> & <N> & <N> & <N> \\
 \bottomrule\bottomrule
 ```
 
-## Step 5: Number Formatting
+## 步骤 5：数值格式化
 
-Apply consistent formatting:
-- Coefficients: 4 decimal places (TOP5 standard for causal inference)
-- Standard errors: 4 decimal places (same as coefficients)
-- R-squared: 3 decimal places
-- Observations: integer with comma separators
-- Percentages: 1-2 decimal places
-- Large coefficients (>100): 2 decimal places
-- Small coefficients (<0.001): scientific notation or more decimal places
-- F-statistics: 2 decimal places
+应用一致的格式化：
+- 系数：4 位小数（TOP5 因果推断标准）
+- 标准误：4 位小数（与系数一致）
+- R 方：3 位小数
+- 观测值：整数，千位逗号分隔
+- 百分比：1-2 位小数
+- 大系数（>100）：2 位小数
+- 小系数（<0.001）：科学记数法或更多位小数
+- F 统计量：2 位小数
 
-## Nested LaTeX Tables via `\input{}` (Multi-Panel Published Paper Pattern)
+## 通过 `\input{}` 嵌套 LaTeX 表格（多面板已发表论文模式）
 
-Published papers often construct complex tables by nesting separate `.tex` files. The main table contains the core regression output, while a subsidiary `_Add.tex` file contains derived statistics (impulse responses, long-run effects) that are `\input{}`-ed into the main table's footer.
+已发表论文经常通过嵌套独立 `.tex` 文件来构建复杂表格。主表格包含核心回归输出，辅表 `_Add.tex` 包含衍生统计量（脉冲响应、长期效应），通过 `\input{}` 插入主表格的脚注区域。
 
-### Pattern: Main table + Add table
+### 模式：主表格 + 附加表格
 
-**Main table** (`TableMain.tex`) — generated by `estout`:
+**主表格** (`TableMain.tex`) — 由 `estout` 生成：
 ```stata
 #delimit ;
 estout e1 e2 e3 e4 e1gmm e2gmm e3gmm e4gmm e1md e2md e3md e4md
@@ -290,7 +290,7 @@ estout e1 e2 e3 e4 e1gmm e2gmm e3gmm e4gmm e1md e2md e3md e4md
 #delimit cr
 ```
 
-**Add table** (`TableMain_Add.tex`) — impulse response results:
+**附加表格** (`TableMain_Add.tex`) — 脉冲响应结果：
 ```stata
 #delimit ;
 estout e1_add e2_add e3_add e4_add e1gmm_add e2gmm_add e3gmm_add e4gmm_add
@@ -307,11 +307,11 @@ estout e1_add e2_add e3_add e4_add e1gmm_add e2gmm_add e3gmm_add e4gmm_add
 #delimit cr
 ```
 
-**How it works**: The `\input{results/TableMain_Add}` appears inside the `labels()` of the `stats()` option. When LaTeX compiles, it inserts the subsidiary table rows inline. This separates the core regression output from the derived statistics, making each component independently updatable.
+**工作原理**：`\input{results/TableMain_Add}` 出现在 `stats()` 选项的 `labels()` 中。LaTeX 编译时，会将辅表行内联插入。这将核心回归输出与衍生统计量分离，使每个部分可以独立更新。
 
-### `#delimit ;` for Complex estout Commands
+### 复杂 estout 命令中的 `#delimit ;`
 
-Long `estout` commands with many options are difficult to read with `///` continuation. Published Stata code uses `#delimit ;` to switch the line delimiter from newline to semicolon:
+长 `estout` 命令有许多选项时，使用 `///` 续行很难阅读。已发表 Stata 代码使用 `#delimit ;` 将行分隔符从换行符切换为分号：
 
 ```stata
 #delimit ;
@@ -329,70 +329,70 @@ estout m1 m2 m3 m4 m5 m6 m7 m8 m9
 #delimit cr
 ```
 
-**Important**: Always end with `#delimit cr` to restore normal newline-delimited mode.
+**重要**：最后务必用 `#delimit cr` 恢复正常的换行分隔模式。
 
-### `stardrop()` Option
+### `stardrop()` 选项
 
-The `stardrop()` option in `estout` removes significance stars from specified variables and instead attaches them only to the coefficient (not the standard error row). This gives cleaner output when stars should appear next to the point estimate:
+`estout` 中的 `stardrop()` 选项移除指定变量的标准误行上的显著性星号，仅在系数（点估计）旁附加星号。当星号应出现在点估计旁时，这能产生更整洁的输出：
 
 ```stata
 estout m1 m2 m3, cells(b(star fmt(3)) se(par)) ///
     stardrop(dem L.y L2.y) keep(dem L.y L2.y)
 ```
 
-### Multi-Estimator Table Layout (FE / GMM / HHK side-by-side)
+### 多估计量表格布局（FE / GMM / HHK 并列）
 
-For papers comparing multiple estimators with multiple lag specifications:
+在比较多个估计量和多个滞后规范的论文中：
 
-| Columns | FE (1-lag) | FE (2-lag) | FE (4-lag) | FE (8-lag) | GMM (1) | GMM (2) | GMM (4) | GMM (8) | HHK (1) | HHK (2) | HHK (4) | HHK (8) |
-|---------|------------|------------|------------|------------|---------|---------|---------|---------|---------|---------|---------|---------|
+| 列 | FE (1-lag) | FE (2-lag) | FE (4-lag) | FE (8-lag) | GMM (1) | GMM (2) | GMM (4) | GMM (8) | HHK (1) | HHK (2) | HHK (4) | HHK (8) |
+|----|-----------|-----------|-----------|-----------|---------|---------|---------|---------|---------|---------|---------|---------|
 
-This requires 12 stored estimates. Use `estout` with all 12 in order, and the LaTeX table header (constructed manually) groups them with `\multicolumn{4}{c}{Within Estimator}` etc.
+需要 12 个存储的估计结果。在 `estout` 中按顺序列出所有 12 个，LaTeX 表头（手动构建）用 `\multicolumn{4}{c}{Within Estimator}` 等进行分组。
 
-### Auxiliary p-value File Pattern
+### 辅助 p 值文件模式
 
-Some statistics (e.g., p-values from `test` commands) cannot be stored in `e()` scalars. Write them to a separate `.tex` file:
+某些统计量（如来自 `test` 命令的 p 值）无法存储在 `e()` 标量中。将其写入单独的 `.tex` 文件：
 
 ```stata
 file open myfile using "${project}/results/TableMain_lags.tex", write replace
 file write myfile "p-value lags 5 to 8"
 
-* After each model:
+* 在每个模型之后：
 xtreg y l(1/8).y dem yy*, fe vce(cluster wbcode2)
 test l5.y l6.y l7.y l8.y
 file write myfile " &&&& [" %7.3f (r(p)) "] "
 
-* Close when done
+* 完成后关闭
 file write myfile "\\"
 file close myfile
 ```
 
-Then `\input{results/TableMain_lags}` in the main table to include these p-values.
+然后在主表格中 `\input{results/TableMain_lags}` 引入这些 p 值。
 
-## Step 6: Save Output
+## 步骤 6：保存输出
 
-Save the generated .tex file:
-
-```
-output/tables/tab_<table_type>_<description>.tex
-```
-
-Print confirmation:
+保存生成的 .tex 文件：
 
 ```
-Table generated successfully!
+output/tables/tab_<表格类型>_<描述>.tex
+```
 
-Output: output/tables/tab_<name>.tex
-Format: <CN 三线表 / EN AER-style>
-Columns: <N>
-Panels: <N or "None">
+打印确认：
 
-To include in your paper:
+```
+表格生成成功！
+
+输出：output/tables/tab_<name>.tex
+格式：<CN 三线表 / EN AER 风格>
+列数：<N>
+面板数：<N 或"无">
+
+在论文中引用：
   \input{../output/tables/tab_<name>}
 
-Required LaTeX packages:
+需要的 LaTeX 包：
   \usepackage{booktabs}
   \usepackage{threeparttable}
-  \usepackage{multirow}    % if using multirow headers
-  \usepackage{amssymb}     % for \checkmark
+  \usepackage{multirow}    % 如使用多行标题
+  \usepackage{amssymb}     % 用于 \checkmark
 ```

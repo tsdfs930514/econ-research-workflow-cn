@@ -1,177 +1,177 @@
-# Orchestrator Protocol: Contractor Mode
+# 编排协议：承包商模式 (Orchestrator Protocol: Contractor Mode)
 
-All non-trivial tasks follow the **Spec - Plan - Implement - Verify - Review - Fix - Score - Report** cycle, with a maximum of 5 rounds through the Plan–Score loop.
+所有非平凡任务遵循 **规格 - 计划 - 实施 - 验证 - 评审 - 修复 - 评分 - 报告** 循环，计划至评分循环最多 5 轮。
 
-## "Just Do It" Mode
+## "直接执行"模式 (Just Do It Mode)
 
-For trivial tasks (simple fixes, single-file changes, formatting corrections): if the initial score >= 80 and there are no Critical findings, skip the multi-round review loop. Apply fixes directly and verify once.
+对于平凡任务（简单修复、单文件修改、格式调整）：如果初始评分 >= 80 且无严重发现，跳过多轮评审循环。直接应用修复并验证一次。
 
-Criteria for "Just Do It" mode:
-- Task affects <= 2 files
-- No identification strategy or data safety implications
-- First-round score >= 80 with zero Critical findings
-- User has not explicitly requested full review
-
----
-
-## Phase 0: Spec
-
-Triggered for non-trivial tasks meeting **any** of these criteria:
-- Affects >= 3 files
-- Involves identification strategy changes
-- Creates new skills, rules, or agents
-- Modifies the orchestrator protocol itself
-
-### Format
-
-Produce a requirements spec with:
-
-1. **MUST** requirements — non-negotiable deliverables and constraints
-2. **SHOULD** requirements — expected but negotiable with justification
-3. **MAY** requirements — optional enhancements if time/complexity permits
-4. **Acceptance criteria** — concrete, verifiable conditions for completion
-5. **Out of scope** — explicitly excluded items to prevent scope creep
-
-### Rules
-
-- The spec is written **once** per task. If the review loop (Phases 1–6) cycles back, it restarts at Phase 1, not Phase 0.
-- Skipped if the task qualifies for "Just Do It" mode.
-- The spec must not contradict `constitution.md`.
-- Present the spec for user approval before proceeding to Phase 1.
-
-**Exit criterion**: Spec approved by user or team lead.
+"直接执行"模式的条件：
+- 任务影响 <= 2 个文件
+- 不涉及识别策略或数据安全
+- 首轮评分 >= 80 且无严重 (Critical) 发现
+- 用户未明确要求完整评审
 
 ---
 
-## Phase 1: Plan
+## 阶段 0：规格 (Spec)
 
-1. Understand the research question and identification strategy.
-2. Identify required data sources, variables, and econometric methods.
-3. Draft an analysis plan with specific Stata/Python commands to be used.
-4. List all expected output files (datasets, tables, figures, logs).
-5. Present the plan for approval before proceeding.
+当非平凡任务满足以下**任一**条件时触发：
+- 影响 >= 3 个文件
+- 涉及识别策略变更
+- 创建新的技能、规则或代理
+- 修改编排协议本身
 
-**Exit criterion**: Plan approved by user or team lead.
+### 格式
+
+产出需求规格书，包含：
+
+1. **必须 (MUST)** 需求 — 不可协商的交付物和约束
+2. **应当 (SHOULD)** 需求 — 预期但有充分理由可协商
+3. **可以 (MAY)** 需求 — 时间/复杂度允许时的可选增强
+4. **验收标准** — 具体、可验证的完成条件
+5. **超出范围** — 明确排除的事项，防止范围蔓延
+
+### 规则
+
+- 规格书每个任务只编写**一次**。如果评审循环（阶段 1-6）回退，从阶段 1 重新开始，而非阶段 0。
+- 若任务符合"直接执行"模式则跳过。
+- 规格书不得违反 `constitution.md`。
+- 进入阶段 1 之前须提交规格书供用户审批。
+
+**退出条件**: 规格书获用户或团队负责人批准。
 
 ---
 
-## Phase 2: Implement
+## 阶段 1：计划 (Plan)
 
-1. Generate code files (`.do` for Stata, `.py` for Python).
-2. Execute Stata via CLI (Git Bash):
+1. 理解研究问题和识别策略。
+2. 确定所需数据源、变量和计量经济学方法。
+3. 起草分析计划，包含具体的 Stata/Python 命令。
+4. 列出所有预期输出文件（数据集、表格、图表、日志）。
+5. 提交计划供审批后再继续。
+
+**退出条件**: 计划获用户或团队负责人批准。
+
+---
+
+## 阶段 2：实施 (Implement)
+
+1. 生成代码文件（Stata 用 `.do`，Python 用 `.py`）。
+2. 通过 CLI（Git Bash）执行 Stata：
    ```
    bash .claude/scripts/run-stata.sh "<project_dir>" "code/stata/script.do"
    ```
-   Flag: 必须用 `-e`（自动退出），禁止用 `-b`（需手动确认）或 `/e`（Git Bash 路径冲突）
-3. Parse the resulting `.log` file for errors and warnings.
-4. Execute Python scripts:
+   注意：必须用 `-e`（自动退出），禁止用 `-b`（需手动确认）或 `/e`（Git Bash 路径冲突）
+3. 解析生成的 `.log` 文件，检查错误和警告。
+4. 执行 Python 脚本：
    ```
    python "script.py"
    ```
-5. Collect all outputs (tables, figures, datasets).
+5. 收集所有输出（表格、图表、数据集）。
 
-**Exit criterion**: Code runs without errors; all expected output files are generated.
-
----
-
-## Phase 3: Verify
-
-1. Check Stata `.log` files for errors, warnings, and unexpected messages.
-2. Verify that all expected output files exist and are non-empty.
-3. Cross-check Stata vs Python results: coefficient differences must be < 0.1%.
-4. Validate table formatting against the standards in `econometrics-standards.md`.
-5. Confirm that all required statistics (N, R-squared, clusters, dep var mean) are reported.
-
-**Exit criterion**: All verification checks pass.
+**退出条件**: 代码无错误运行；所有预期输出文件已生成。
 
 ---
 
-## Phase 4: Review
+## 阶段 3：验证 (Verify)
 
-For non-trivial tasks, invoke `/adversarial-review` which enforces critic/fixer separation across up to 5 rounds. This launches domain-specific critic agents that cannot edit files, ensuring independent evaluation.
+1. 检查 Stata `.log` 文件中的错误、警告和异常信息。
+2. 验证所有预期输出文件存在且非空。
+3. 交叉验证 Stata 与 Python 结果：系数差异必须 < 0.1%。
+4. 根据 `econometrics-standards.md` 中的标准验证表格格式。
+5. 确认所有必报统计量（N、R 方、聚类数、因变量均值）均已报告。
 
-| Critic Agent             | Scope                                      |
+**退出条件**: 所有验证检查通过。
+
+---
+
+## 阶段 4：评审 (Review)
+
+对于非平凡任务，调用 `/adversarial-review`，该技能在最多 5 轮中强制评审者/修复者分离。这将启动领域特定的评审者代理，评审者代理无法编辑文件，确保独立评价。
+
+| 评审者代理 (Critic Agent) | 职责范围 |
 |--------------------------|--------------------------------------------|
-| code-critic              | Code conventions, safety, reproducibility  |
-| econometrics-critic      | Identification, diagnostics, robustness    |
-| tables-critic            | Table formatting, reporting, compliance    |
+| code-critic              | 代码规范、安全性、可复现性 |
+| econometrics-critic      | 识别策略、诊断检验、稳健性 |
+| tables-critic            | 表格格式、报告、合规性 |
 
-Legacy reviewer agents remain available for lighter-weight reviews:
+旧版审查代理仍可用于轻量级审查：
 
-| Reviewer               | Scope                                      |
+| 审查者 (Reviewer)        | 职责范围 |
 |------------------------|--------------------------------------------|
-| econometrics-reviewer  | Methods, identification, robustness        |
-| code-reviewer          | Code quality, conventions, reproducibility |
-| tables-reviewer        | Table formatting, labeling, completeness   |
-| robustness-checker     | Missing robustness checks, sensitivity     |
+| econometrics-reviewer  | 方法、识别策略、稳健性 |
+| code-reviewer          | 代码质量、规范、可复现性 |
+| tables-reviewer        | 表格格式、标签、完整性 |
+| robustness-checker     | 遗漏的稳健性检验、敏感性分析 |
 
-Each critic/reviewer assigns a score from 0 to 100 and provides specific findings.
+每位评审者/审查者给出 0 到 100 的评分及具体发现。
 
-**Exit criterion**: All relevant reviews completed; scores and findings collected.
-
----
-
-## Phase 5: Fix
-
-For non-trivial tasks, `/adversarial-review` automatically launches the corresponding fixer agents (code-fixer, econometrics-fixer, tables-fixer) which:
-
-1. Receive the critic's findings list.
-2. Apply fixes in priority order (Critical → High → Medium → Low).
-3. Re-run affected analyses.
-4. Update output files (tables, figures, logs).
-5. Document every change with rationale.
-
-Fixers CANNOT score their own work — the critic re-evaluates after fixes.
-
-**Exit criterion**: All findings addressed; outputs regenerated.
+**退出条件**: 所有相关评审完成；评分和发现已收集。
 
 ---
 
-## Phase 6: Score
+## 阶段 5：修复 (Fix)
 
-Calculate the final quality score as the average of all reviewer scores.
+对于非平凡任务，`/adversarial-review` 自动启动相应的修复者代理（code-fixer、econometrics-fixer、tables-fixer），修复者将：
 
-| Score Range | Action                                        |
+1. 接收评审者的发现列表。
+2. 按优先级顺序应用修复（严重 → 高 → 中 → 低）。
+3. 重新运行受影响的分析。
+4. 更新输出文件（表格、图表、日志）。
+5. 记录每项修改及其理由。
+
+修复者**不得**为自己的工作评分——修复后由评审者重新评估。
+
+**退出条件**: 所有发现已处理；输出已重新生成。
+
+---
+
+## 阶段 6：评分 (Score)
+
+将所有审查者评分的平均值计算为最终质量评分。
+
+| 分数范围 | 操作 |
 |-------------|-----------------------------------------------|
-| >= 95       | Publication ready. Proceed to next task.      |
-| >= 90       | Minor fixes needed. One more round (Phase 5). |
-| >= 80       | Significant issues. Re-enter Phase 2.         |
-| < 80        | Major redo required. Re-enter Phase 1.        |
+| >= 95       | 可发表。继续下一任务。 |
+| >= 90       | 需小修。再进行一轮（阶段 5）。 |
+| >= 80       | 存在显著问题。重新进入阶段 2。 |
+| < 80        | 需要大幅重做。重新进入阶段 1。 |
 
-**Exit criterion**: Score >= 95, or maximum iterations reached.
-
----
-
-## Phase 7: Report
-
-After scoring (Phase 6), generate a synthesis report:
-
-1. Run `/synthesis-report` to collect all outputs into `docs/ANALYSIS_SUMMARY.md`
-2. Generate LaTeX version (`docs/ANALYSIS_SUMMARY.tex`) for compilation
-3. Update REPLICATION.md with actual data, scripts, and output mapping
-4. Log final score and status to MEMORY.md
-
-**Exit criterion**: `ANALYSIS_SUMMARY.md` exists and is complete.
+**退出条件**: 评分 >= 95，或达到最大迭代次数。
 
 ---
 
-## Loop Control
+## 阶段 7：报告 (Report)
 
-- **Maximum iterations**: 5 rounds through the cycle.
-- **Stagnation check**: If the score improves by less than 5 points between rounds, stop the loop and escalate to user with a summary of remaining issues and suggested manual interventions.
-- **Version preservation**: Always preserve ALL intermediate versions of code and output. Never overwrite without saving the prior version.
-- **Executable scoring**: After the final round, run `python scripts/quality_scorer.py <version_dir>` for an independent, automated quality score across 6 dimensions (100 pts total).
+评分（阶段 6）完成后，生成综合报告：
+
+1. 运行 `/synthesis-report`，将所有输出汇集到 `docs/ANALYSIS_SUMMARY.md`
+2. 生成 LaTeX 版本（`docs/ANALYSIS_SUMMARY.tex`）用于编译
+3. 更新 REPLICATION.md，填入实际数据、脚本和输出映射
+4. 将最终评分和状态记录到 MEMORY.md
+
+**退出条件**: `ANALYSIS_SUMMARY.md` 存在且内容完整。
 
 ---
 
-## Workflow Diagram
+## 循环控制
+
+- **最大迭代次数**: 循环最多 5 轮。
+- **停滞检查**: 如果两轮之间评分提升不足 5 分，则停止循环，向用户报告剩余问题摘要和建议的手动干预措施。
+- **版本保留**: 始终保留所有中间版本的代码和输出。未保存先前版本不得覆盖。
+- **可执行评分**: 最终轮次后，运行 `python scripts/quality_scorer.py <version_dir>` 进行独立的自动化质量评分（6 个维度，总分 100 分）。
+
+---
+
+## 工作流程图
 
 ```
-Spec --> Plan --> Implement --> Verify --> Review --> Fix --> Score --> Report
+规格 --> 计划 --> 实施 --> 验证 --> 评审 --> 修复 --> 评分 --> 报告
            ^                                                  |
            |                                                  |
            +--------------------------------------------------+
-                         (if score < 95, loop)
+                         （评分 < 95 则循环）
 ```
 
-Spec is executed once per task. The loop restarts at Plan (not Spec). After 5 iterations or upon reaching score >= 95, the cycle proceeds to Report (Phase 7) and the task is complete.
+规格每个任务只执行一次。循环从计划（而非规格）重新开始。5 次迭代后或评分达到 >= 95 时，流程进入报告（阶段 7），任务完成。

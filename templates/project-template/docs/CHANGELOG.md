@@ -1,27 +1,27 @@
-# Changelog
+# 变更日志 (Changelog)
 
-All notable changes to this research project are documented here.
+本研究项目的所有重要变更均记录于此。
 
 ## [v1] - [DATE]
-### Added
-- Initial project structure
-- Data cleaning pipeline
-- Main regression analysis
-- Descriptive statistics
+### 新增
+- 初始项目结构
+- 数据清洗流水线
+- 主回归分析
+- 描述性统计
 
-### Data
-- Source: [DATA SOURCE]
-- Sample period: [PERIOD]
-- Observations: [N]
+### 数据
+- 来源: [DATA SOURCE]
+- 样本期间: [PERIOD]
+- 观测值: [N]
 
 ---
-## Template for future versions:
+## 后续版本模板：
 ## [vN] - [DATE]
-### Added
-- [New analyses or features]
-### Changed
-- [Modified analyses or corrections]
-### Fixed
-- [Bug fixes or error corrections]
-### Reviewer Response
-- [Specific changes in response to referee comments]
+### 新增
+- [新增的分析或功能]
+### 变更
+- [修改的分析或更正]
+### 修复
+- [Bug 修复或错误更正]
+### 审稿回复
+- [针对审稿人意见的具体修改]

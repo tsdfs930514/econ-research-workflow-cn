@@ -1,272 +1,272 @@
 ---
-description: "Collect all analysis outputs and generate a structured synthesis report (Markdown + LaTeX)"
+description: "汇集所有分析输出，生成结构化综合报告（Markdown + LaTeX）"
 user_invocable: true
 ---
 
-# /synthesis-report — Synthesis Report Generation
+# /synthesis-report — 综合报告生成
 
-When the user invokes `/synthesis-report`, collect all analysis products from the current version directory and generate a comprehensive synthesis report.
+当用户调用 `/synthesis-report` 时，收集当前版本目录中的所有分析产出，生成全面的综合报告。
 
-## Outputs
+## 输出文件
 
-- `docs/ANALYSIS_SUMMARY.md` — Markdown version (git-trackable)
-- `docs/ANALYSIS_SUMMARY.tex` — LaTeX version (compilable to PDF)
+- `docs/ANALYSIS_SUMMARY.md` — Markdown 版本（可 git 追踪）
+- `docs/ANALYSIS_SUMMARY.tex` — LaTeX 版本（可编译为 PDF）
 
-## Report Structure
+## 报告结构
 
 ```
-1. Executive Summary (method, status, total score)
-2. Data & Sample (data sources, sample size, variable definitions)
-3. Main Results (main regression coefficients, SEs, significance, economic interpretation)
-4. Identification Diagnostics (method-specific diagnostics summary table)
-5. Robustness Summary (robustness check overview)
-6. Cross-Validation Results (Stata vs Python/R comparison table)
-7. Quality Assessment (6-dimension score + /adversarial-review score)
-8. Remaining Issues (unresolved findings)
-9. Replication Checklist (filled REPLICATION.md checklist)
-10. File Manifest (all output files + Table/Figure mapping)
+1. 概要（方法、状态、总评分）
+2. 数据与样本（数据来源、样本量、变量定义）
+3. 主要结果（主回归系数、标准误、显著性、经济学解读）
+4. 识别策略诊断（方法专属诊断汇总表）
+5. 稳健性汇总（稳健性检验概览）
+6. 交叉验证结果（Stata vs Python/R 比较表）
+7. 质量评估（6 维评分 + /adversarial-review 评分）
+8. 遗留问题（未解决的发现）
+9. 复现清单（已填写的 REPLICATION.md 清单）
+10. 文件清单（所有输出文件 + 表格/图表映射）
 ```
 
-## Step 1: Determine Target Version
+## 步骤 1：确定目标版本
 
-- Default: read the current version directory from CLAUDE.md (typically `v1/`)
-- User can specify: `/synthesis-report v2/` or `/synthesis-report path/to/directory`
-- Confirm the target directory exists and contains output files
+- 默认：从 CLAUDE.md 读取当前版本目录（通常为 `v1/`）
+- 用户可指定：`/synthesis-report v2/` 或 `/synthesis-report path/to/directory`
+- 确认目标目录存在且包含输出文件
 
-## Step 2: Scan Log Files for Key Statistics
+## 步骤 2：扫描日志文件提取关键统计量
 
-- Read all files in `output/logs/*.log`
-- Extract from each log:
-  - Main regression coefficients and standard errors
-  - R-squared values
-  - Number of observations and clusters
-  - F-statistics (overall and first-stage for IV)
-  - Diagnostic test results (parallel trends p-value, density test p-value, Bacon decomposition weights, etc.)
-  - Any `r(xxx)` errors or warnings
-- Organize extracted statistics by analysis type (main results, robustness, diagnostics)
+- 读取 `output/logs/*.log` 中的所有文件
+- 从每个日志中提取：
+  - 主回归系数和标准误
+  - R 方值
+  - 观测值数量和聚类数
+  - F 统计量（总体以及 IV 的第一阶段）
+  - 诊断检验结果（平行趋势 p 值、密度检验 p 值、Bacon 分解权重等）
+  - 任何 `r(xxx)` 错误或警告
+- 按分析类型组织提取的统计量（主要结果、稳健性、诊断）
 
-## Step 3: Collect Table Inventory
+## 步骤 3：收集表格清单
 
-- Read `output/tables/*.tex` to build a list of generated tables
-- For each table file, extract:
-  - Table title (from `\caption{}` or header comment)
-  - Type (main results, robustness, summary statistics, etc.)
-  - Key statistics shown (which coefficients, how many columns)
-- Map tables to their role in the paper (Table 1 = summary stats, Table 2 = main results, etc.)
+- 读取 `output/tables/*.tex` 以构建已生成表格的列表
+- 对每个表格文件，提取：
+  - 表格标题（来自 `\caption{}` 或文件头注释）
+  - 类型（主要结果、稳健性、描述性统计等）
+  - 展示的关键统计量（哪些系数、多少列）
+- 将表格映射到论文中的角色（表 1 = 描述性统计、表 2 = 主要结果等）
 
-## Step 4: Collect Figure Inventory
+## 步骤 4：收集图表清单
 
-- Read `output/figures/*` (PDF, PNG, EPS) to build a list of generated figures
-- For each figure, note:
-  - File name and format
-  - Type (event study, density test, coefficient plot, RDD plot, etc.)
-  - Associated analysis step
+- 读取 `output/figures/*`（PDF、PNG、EPS）以构建已生成图表的列表
+- 对每个图表，记录：
+  - 文件名和格式
+  - 类型（事件研究图、密度检验图、系数图、RDD 图等）
+  - 关联的分析步骤
 
-## Step 5: Collect Quality Score
+## 步骤 5：收集质量评分
 
-- If `docs/QUALITY_SCORE.md` exists, read the score breakdown directly
-- Otherwise, if `scripts/quality_scorer.py` exists, run `/score` to generate it
-- If neither exists, note "Quality score not yet generated" and recommend running `/score`
+- 如果 `docs/QUALITY_SCORE.md` 存在，直接读取评分明细
+- 否则，如果 `scripts/quality_scorer.py` 存在，运行 `/score` 生成评分
+- 如果两者都不存在，注明"尚未生成质量评分"并建议运行 `/score`
 
-## Step 6: Collect Cross-Validation Report
+## 步骤 6：收集交叉验证报告
 
-- Check for cross-validation output files:
+- 检查交叉验证输出文件：
   - `output/logs/cross_check_report*.txt`
   - `output/tables/tab_cross_check*.tex`
-- If found, extract:
-  - Overall PASS/FAIL status
-  - Max coefficient difference
-  - Any FAIL items with details
-- If not found, note "Cross-validation not yet performed" and recommend `/cross-check`
+- 如果找到，提取：
+  - 总体 PASS/FAIL 状态
+  - 最大系数差异
+  - 任何 FAIL 项目的详情
+- 如果未找到，注明"尚未执行交叉验证"并建议运行 `/cross-check`
 
-## Step 7: Generate docs/ANALYSIS_SUMMARY.md
+## 步骤 7：生成 docs/ANALYSIS_SUMMARY.md
 
-Create the Markdown report with this structure:
+以如下结构创建 Markdown 报告：
 
 ```markdown
-# Analysis Summary — [Project Name] (vN/)
+# 分析总结 — [项目名称] (vN/)
 
-Generated: YYYY-MM-DD HH:MM
+生成时间: YYYY-MM-DD HH:MM
 
 ---
 
-## 1. Executive Summary
+## 1. 概要
 
-- **Research Question**: [extracted from research_proposal.md or CLAUDE.md]
-- **Identification Strategy**: [DID / IV / RDD / Panel / SDID]
-- **Primary Dataset**: [data source and sample period]
-- **Key Finding**: [main coefficient, significance, economic interpretation]
-- **Quality Score**: XX/100 — [Publication Ready / Minor Revisions / Major Revisions / Redo]
-- **Pipeline Status**: [Complete / Partial — missing steps listed]
+- **研究问题**: [从 research_proposal.md 或 CLAUDE.md 提取]
+- **识别策略**: [DID / IV / RDD / Panel / SDID]
+- **主要数据集**: [数据来源和样本期]
+- **核心发现**: [主要系数、显著性、经济学解读]
+- **质量评分**: XX/100 — [可发表 / 小修 / 大修 / 重做]
+- **流水线状态**: [完成 / 部分完成 — 列出缺失步骤]
 
-## 2. Data & Sample
+## 2. 数据与样本
 
-| Item | Value |
-|------|-------|
-| Data Source | [source] |
-| Sample Period | [years] |
-| Total Observations | [N] |
-| Cross-sectional Units | [N firms/counties/etc.] |
-| Time Periods | [N years/quarters] |
-| Treatment Group Size | [N treated units] |
-| Control Group Size | [N control units] |
+| 项目 | 值 |
+|------|-----|
+| 数据来源 | [来源] |
+| 样本期 | [年份] |
+| 总观测值 | [N] |
+| 截面单位数 | [N 家企业/县等] |
+| 时间期数 | [N 年/季度] |
+| 处理组规模 | [N 处理单位] |
+| 对照组规模 | [N 对照单位] |
 
-### Key Variables
+### 核心变量
 
-| Variable | Role | Definition | Source |
-|----------|------|------------|--------|
-| [Y] | Dependent | [description] | [source] |
-| [D] | Treatment | [description] | [source] |
-| [X1..Xk] | Controls | [description] | [source] |
+| 变量 | 角色 | 定义 | 来源 |
+|------|------|------|------|
+| [Y] | 因变量 | [描述] | [来源] |
+| [D] | 处理变量 | [描述] | [来源] |
+| [X1..Xk] | 控制变量 | [描述] | [来源] |
 
-## 3. Main Results
+## 3. 主要结果
 
-| Specification | Coefficient | SE | p-value | N | R² | Significance |
-|--------------|-------------|-----|---------|---|-----|-------------|
-| Baseline | [b] | ([se]) | [p] | [N] | [R²] | [stars] |
-| With controls | [b] | ([se]) | [p] | [N] | [R²] | [stars] |
-| Preferred | [b] | ([se]) | [p] | [N] | [R²] | [stars] |
+| 设定 | 系数 | 标准误 | p 值 | N | R² | 显著性 |
+|------|------|--------|------|---|-----|--------|
+| 基准 | [b] | ([se]) | [p] | [N] | [R²] | [星号] |
+| 加控制变量 | [b] | ([se]) | [p] | [N] | [R²] | [星号] |
+| 偏好设定 | [b] | ([se]) | [p] | [N] | [R²] | [星号] |
 
-**Economic Interpretation**: [A one-unit increase in X is associated with a b-unit change in Y, which represents X% of the sample mean.]
+**经济学解读**: [X 每增加一个单位，Y 变化 b 个单位，相当于样本均值的 X%。]
 
-## 4. Identification Diagnostics
+## 4. 识别策略诊断
 
-[Method-specific diagnostics table — content varies by method]
+[方法专属诊断表——内容因方法而异]
 
-### DID Diagnostics
-| Test | Statistic | p-value | Result |
-|------|-----------|---------|--------|
-| Parallel trends (joint F-test) | F = | p = | PASS/FAIL |
-| Bacon decomposition (TWFE share) | | | |
+### DID 诊断
+| 检验 | 统计量 | p 值 | 结果 |
+|------|--------|------|------|
+| 平行趋势（联合 F 检验） | F = | p = | PASS/FAIL |
+| Bacon 分解（TWFE 份额） | | | |
 | CS-DiD ATT(simple) | | | |
 | HonestDiD (M = 0.05) | | | |
 
-### IV Diagnostics
-| Test | Statistic | Result |
-|------|-----------|--------|
-| First-stage F | | > 10? |
+### IV 诊断
+| 检验 | 统计量 | 结果 |
+|------|--------|------|
+| 第一阶段 F | | > 10? |
 | KP rk Wald F | | |
 | Anderson-Rubin | | |
-| LIML vs 2SLS gap | | |
-| Hansen J (if overidentified) | | |
+| LIML vs 2SLS 差距 | | |
+| Hansen J（过度识别时） | | |
 
-### RDD Diagnostics
-| Test | Statistic | p-value | Result |
-|------|-----------|---------|--------|
-| CJM density test | | | |
-| Optimal bandwidth | | | |
-| Donut RDD stable | | | |
-| Placebo cutoffs insignificant | | | |
+### RDD 诊断
+| 检验 | 统计量 | p 值 | 结果 |
+|------|--------|------|------|
+| CJM 密度检验 | | | |
+| 最优带宽 | | | |
+| 甜甜圈 RDD 稳定 | | | |
+| 安慰剂断点不显著 | | | |
 
-## 5. Robustness Summary
+## 5. 稳健性汇总
 
-| Check | Coefficient | SE | Significant? | Status |
-|-------|------------|-----|-------------|--------|
-| Baseline | [b] | ([se]) | Yes/No | REF |
-| Alt dep var | [b] | ([se]) | Yes/No | PASS/FAIL |
-| Drop outliers | [b] | ([se]) | Yes/No | PASS/FAIL |
-| Alt clustering | [b] | ([se]) | Yes/No | PASS/FAIL |
-| Subsample: early | [b] | ([se]) | Yes/No | PASS/FAIL |
-| Subsample: late | [b] | ([se]) | Yes/No | PASS/FAIL |
-| Winsorized 1/99 | [b] | ([se]) | Yes/No | PASS/FAIL |
+| 检验 | 系数 | 标准误 | 显著？ | 状态 |
+|------|------|--------|--------|------|
+| 基准 | [b] | ([se]) | 是/否 | 参照 |
+| 替代因变量 | [b] | ([se]) | 是/否 | PASS/FAIL |
+| 剔除极端值 | [b] | ([se]) | 是/否 | PASS/FAIL |
+| 替代聚类标准误 | [b] | ([se]) | 是/否 | PASS/FAIL |
+| 子样本: 前期 | [b] | ([se]) | 是/否 | PASS/FAIL |
+| 子样本: 后期 | [b] | ([se]) | 是/否 | PASS/FAIL |
+| 缩尾 1/99 | [b] | ([se]) | 是/否 | PASS/FAIL |
 | Oster delta | [delta] | — | > 1? | PASS/FAIL |
-| Wild cluster bootstrap | [b] | [CI] | — | PASS/FAIL |
+| 野蛮聚类自助法 | [b] | [CI] | — | PASS/FAIL |
 
-**Summary**: X/Y specifications maintain sign and significance.
+**小结**: X/Y 个设定保持方向和显著性一致。
 
-## 6. Cross-Validation Results
+## 6. 交叉验证结果
 
-| Statistic | Stata | Python | Rel. Diff | Status |
-|-----------|-------|--------|-----------|--------|
+| 统计量 | Stata | Python | 相对差异 | 状态 |
+|--------|-------|--------|----------|------|
 | coef(treatment) | [b] | [b] | [diff]% | PASS/FAIL |
 | se(treatment) | [se] | [se] | [diff]% | PASS/FAIL |
 | R-squared | [R²] | [R²] | [diff] | PASS/FAIL |
 | N | [N] | [N] | [diff] | PASS/FAIL |
 
-**Overall**: [PASS — all within tolerance / FAIL — items listed]
+**总体**: [PASS — 全部在容差范围内 / FAIL — 列出不合格项]
 
-## 7. Quality Assessment
+## 7. 质量评估
 
-### Automated Score (quality_scorer.py)
+### 自动化评分 (quality_scorer.py)
 
-| Dimension | Score | Max | Details |
-|-----------|-------|-----|---------|
-| Code Conventions | /15 | 15 | |
-| Log Cleanliness | /15 | 15 | |
-| Output Completeness | /15 | 15 | |
-| Cross-Validation | /15 | 15 | |
-| Documentation | /15 | 15 | |
-| Method Diagnostics | /25 | 25 | |
-| **TOTAL** | **/100** | **100** | |
+| 维度 | 得分 | 满分 | 详情 |
+|------|------|------|------|
+| 代码规范 | /15 | 15 | |
+| 日志清洁度 | /15 | 15 | |
+| 输出完整性 | /15 | 15 | |
+| 交叉验证 | /15 | 15 | |
+| 文档完整性 | /15 | 15 | |
+| 方法诊断检验 | /25 | 25 | |
+| **总分** | **/100** | **100** | |
 
-**Status**: [Publication Ready / Minor Revisions / Major Revisions / Redo]
+**状态**: [可发表 / 小修 / 大修 / 重做]
 
-### Adversarial Review Score (if available)
+### 对抗式审查评分（如有）
 
-| Critic | Score | Key Findings |
-|--------|-------|-------------|
-| code-critic | /100 | [summary] |
-| econometrics-critic | /100 | [summary] |
-| tables-critic | /100 | [summary] |
+| 评审者 | 评分 | 主要发现 |
+|--------|------|----------|
+| code-critic | /100 | [摘要] |
+| econometrics-critic | /100 | [摘要] |
+| tables-critic | /100 | [摘要] |
 
-## 8. Remaining Issues
+## 8. 遗留问题
 
-| # | Source | Severity | Description | Suggested Fix |
-|---|--------|----------|-------------|--------------|
-| 1 | [critic/scorer] | Critical/High/Medium/Low | [description] | [fix] |
+| # | 来源 | 严重程度 | 描述 | 建议修复 |
+|---|------|----------|------|----------|
+| 1 | [评审者/评分器] | 严重/高/中/低 | [描述] | [修复方案] |
 | 2 | | | | |
 
-## 9. Replication Checklist
+## 9. 复现清单
 
-- [ ] Raw data files present in `data/raw/`
-- [ ] All .do files run without errors
-- [ ] All .py cross-validation scripts run
-- [ ] master.do reproduces all results end-to-end
-- [ ] REPLICATION.md documents all steps
-- [ ] _VERSION_INFO.md is current
-- [ ] Output-to-table mapping is complete
-- [ ] All packages and versions documented
+- [ ] 原始数据文件存在于 `data/raw/`
+- [ ] 所有 .do 文件运行无错误
+- [ ] 所有 .py 交叉验证脚本可运行
+- [ ] master.do 可端到端复现所有结果
+- [ ] REPLICATION.md 记录了所有步骤
+- [ ] _VERSION_INFO.md 是最新的
+- [ ] 输出到表格的映射已完成
+- [ ] 所有依赖包和版本已记录
 
-## 10. File Manifest
+## 10. 文件清单
 
-### Code Files
-| File | Description | Status |
-|------|-------------|--------|
-| `code/stata/01_*.do` | [description] | [runs clean / has errors] |
+### 代码文件
+| 文件 | 描述 | 状态 |
+|------|------|------|
+| `code/stata/01_*.do` | [描述] | [运行正常 / 有错误] |
 | ... | | |
 
-### Output Files
-| File | Type | Mapped To |
-|------|------|-----------|
-| `output/tables/tab_main_results.tex` | Main results | Table 2 |
-| `output/figures/fig_event_study.pdf` | Event study | Figure 1 |
+### 输出文件
+| 文件 | 类型 | 映射至 |
+|------|------|--------|
+| `output/tables/tab_main_results.tex` | 主要结果 | 表 2 |
+| `output/figures/fig_event_study.pdf` | 事件研究图 | 图 1 |
 | ... | | |
 
-### Documentation
-| File | Status |
-|------|--------|
-| `REPLICATION.md` | [complete / partial / missing] |
-| `_VERSION_INFO.md` | [complete / partial / missing] |
-| `docs/QUALITY_SCORE.md` | [complete / missing] |
+### 文档
+| 文件 | 状态 |
+|------|------|
+| `REPLICATION.md` | [完整 / 部分 / 缺失] |
+| `_VERSION_INFO.md` | [完整 / 部分 / 缺失] |
+| `docs/QUALITY_SCORE.md` | [完整 / 缺失] |
 ```
 
-## Step 8: Generate docs/ANALYSIS_SUMMARY.tex
+## 步骤 8：生成 docs/ANALYSIS_SUMMARY.tex
 
-Create a LaTeX version that:
-- Uses `\documentclass{article}` with `booktabs`, `longtable`, `hyperref`, `geometry` packages
-- Converts all Markdown tables to LaTeX `tabular` environments
-- Uses `\input{}` to reference existing table .tex files from `output/tables/` where possible (avoid duplicating table content)
-- Uses `\includegraphics{}` to reference existing figures from `output/figures/`
-- Includes a `\tableofcontents` for navigation
-- Is compilable with `pdflatex` (no special engines required)
+创建 LaTeX 版本：
+- 使用 `\documentclass{article}`，搭配 `booktabs`、`longtable`、`hyperref`、`geometry` 宏包
+- 将所有 Markdown 表格转换为 LaTeX `tabular` 环境
+- 尽可能使用 `\input{}` 引用 `output/tables/` 中的已有表格 .tex 文件（避免重复表格内容）
+- 使用 `\includegraphics{}` 引用 `output/figures/` 中的已有图表
+- 包含 `\tableofcontents` 用于导航
+- 可用 `pdflatex` 编译（无需特殊引擎）
 
-Structure:
+结构：
 ```latex
 \documentclass[12pt]{article}
 \usepackage{booktabs, longtable, hyperref, geometry, graphicx}
 \geometry{margin=1in}
 
-\title{Analysis Summary --- [Project Name] (vN/)}
+\title{分析总结 --- [项目名称] (vN/)}
 \date{\today}
 
 \begin{document}
@@ -274,38 +274,38 @@ Structure:
 \tableofcontents
 \newpage
 
-\section{Executive Summary}
+\section{概要}
 ...
 
-\section{Main Results}
-% Include existing table if available:
+\section{主要结果}
+% 如有已存在的表格则引用:
 % \input{../output/tables/tab_main_results.tex}
 ...
 
-\section{File Manifest}
+\section{文件清单}
 ...
 
 \end{document}
 ```
 
-## Step 9: Update REPLICATION.md
+## 步骤 9：更新 REPLICATION.md
 
-If `REPLICATION.md` exists in the version directory, update its Output-to-Table Mapping section with the actual file manifest generated in Step 7/8:
+如果版本目录中存在 `REPLICATION.md`，使用步骤 7/8 中生成的实际文件清单更新其输出-表格映射部分：
 
 ```markdown
-## Output-to-Table Mapping
+## 输出-表格映射
 
-| Paper Element | Source File | Script |
-|--------------|-------------|--------|
-| Table 1 (Summary Statistics) | `output/tables/tab_desc_stats.tex` | `code/stata/02_desc_stats.do` |
-| Table 2 (Main Results) | `output/tables/tab_main_results.tex` | `code/stata/03_reg_main.do` |
-| Figure 1 (Event Study) | `output/figures/fig_event_study.pdf` | `code/stata/03_reg_main.do` |
+| 论文元素 | 来源文件 | 生成脚本 |
+|----------|----------|----------|
+| 表 1（描述性统计） | `output/tables/tab_desc_stats.tex` | `code/stata/02_desc_stats.do` |
+| 表 2（主要结果） | `output/tables/tab_main_results.tex` | `code/stata/03_reg_main.do` |
+| 图 1（事件研究） | `output/figures/fig_event_study.pdf` | `code/stata/03_reg_main.do` |
 ```
 
-## Step 10: Record to MEMORY.md
+## 步骤 10：记录到 MEMORY.md
 
-Append to MEMORY.md:
+追加到 MEMORY.md：
 
 ```
-[LEARN] YYYY-MM-DD: Generated synthesis report for <target>. Score: XX/100, Status: [status]. Report at docs/ANALYSIS_SUMMARY.md.
+[LEARN] YYYY-MM-DD: 已为 <target> 生成综合报告。评分: XX/100，状态: [状态]。报告位于 docs/ANALYSIS_SUMMARY.md。
 ```

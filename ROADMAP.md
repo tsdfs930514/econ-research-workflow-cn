@@ -1,301 +1,301 @@
-# Roadmap
+# 路线图
 
-## Phase 1 — Core Quality Infrastructure
+## 第一阶段 — 核心质量基础设施
 
-**Status**: Implemented
+**状态**: 已实现
 
-- 6 new adversarial agents (3 critic-fixer pairs: code, econometrics, tables)
-- `/adversarial-review` skill orchestrating multi-round critic-fixer loops
-- Executable `quality_scorer.py` (6 dimensions, 100 pts, auto-detects methods)
-- `/score`, `/commit`, `/compile-latex`, `/context-status` skills
-- MEMORY.md activation with tagged entries and session logging
-- README.md with English main body + Chinese quick-start
-- Orchestrator protocol update with "Just Do It" mode
+- 6 个新的对抗式代理（3 对评审者-修复者配对：代码、计量、表格）
+- `/adversarial-review` 技能，编排多轮评审者-修复者循环
+- 可执行 `quality_scorer.py`（6 个维度，100 分，自动检测方法）
+- `/score`、`/commit`、`/compile-latex`、`/context-status` 技能
+- MEMORY.md 激活，含标记条目和会话日志
+- README.md，英文正文 + 中文快速入门
+- 编排协议更新，含"直接执行"模式
 
 ---
 
-## Phase 2 — Infrastructure (Implemented)
+## 第二阶段 — 基础设施（已实现）
 
-**Status**: Implemented
+**状态**: 已实现
 
-### Hooks (`settings.json`)
+### 钩子 (`settings.json`)
 
-3 lifecycle hooks in `.claude/settings.json`:
+`.claude/settings.json` 中的 3 个生命周期钩子：
 
-| Hook | Trigger | Action |
+| 钩子 | 触发条件 | 动作 |
 |------|---------|--------|
-| Session-start loader | `SessionStart` | Read MEMORY.md, display recent entries, last session, last quality score |
-| Pre-compact save | `PreCompact` | Prompt Claude to append session summary to MEMORY.md before compaction |
-| Post-Stata log check | `PostToolUse` (Bash) | Auto-parse .log for `r(xxx)` errors after Stata execution |
+| 会话启动加载器 | `SessionStart` | 读取 MEMORY.md，显示近期条目、上次会话和最新质量评分 |
+| 压缩前保存 | `PreCompact` | 提示 Claude 在上下文压缩前将会话摘要追加到 MEMORY.md |
+| Stata 运行后日志检查 | `PostToolUse` (Bash) | Stata 执行后自动解析 `.log` 文件中的 `r(xxx)` 错误 |
 
-Hook scripts: `.claude/hooks/session-loader.py`, `.claude/hooks/stata-log-check.py`
+钩子脚本：`.claude/hooks/session-loader.py`、`.claude/hooks/stata-log-check.py`
 
-### Path-Scoped Rules
+### 路径作用域规则
 
-4 rules scoped via `paths:` frontmatter; 1 always-on (2 more always-on rules added in Phase 3 and 5):
+4 条通过 `paths:` frontmatter 限定作用域的规则；1 条始终加载（第三和第五阶段又各增加 1 条始终加载的规则）：
 
-| Rule | `paths:` Pattern |
+| 规则 | `paths:` 模式 |
 |------|-----------------|
 | `stata-conventions.md` | `**/*.do` |
 | `python-conventions.md` | `**/*.py` |
-| `econometrics-standards.md` | `**/code/**`, `**/output/**` |
-| `replication-standards.md` | `**/REPLICATION.md`, `**/master.do`, `**/docs/**` |
-| `orchestrator-protocol.md` | *(always-on, no paths)* |
+| `econometrics-standards.md` | `**/code/**`、`**/output/**` |
+| `replication-standards.md` | `**/REPLICATION.md`、`**/master.do`、`**/docs/**` |
+| `orchestrator-protocol.md` | *（始终加载，无路径限制）* |
 
-### Exploration Sandbox
+### 探索沙盒
 
-- `/explore` skill — creates `explore/` workspace with relaxed quality thresholds (>= 60 vs 80)
-- `/promote` skill — graduates files from `explore/` to `vN/`, renumbers, runs `/score` to verify
+- `/explore` 技能 — 创建 `explore/` 工作空间，放宽质量阈值（>= 60 vs 80）
+- `/promote` 技能 — 将文件从 `explore/` 提升至 `vN/`，重新编号，运行 `/score` 验证
 
-### Session Continuity
+### 会话连续性
 
-- `/session-log` skill — explicit session start/end with MEMORY.md context loading and recording
-- `personal-memory.md` (gitignored) — machine-specific preferences (Stata path, editor, directories)
-
----
-
-## Phase 3 — Polish (Implemented)
-
-**Status**: Implemented
-
-### Socratic Research Tools
-
-- `/interview-me` — bilingual (EN/CN) Socratic questioning to formalize research ideas
-  - Walks through: research question → hypothesis → identification strategy → data requirements → expected results
-  - Asks one question at a time; sections are skippable
-  - Outputs structured research proposal to `vN/docs/research_proposal.md`
-
-- `/devils-advocate` — systematic pre-analysis challenges to identification strategy
-  - Universal threats (OVB, reverse causality, measurement error, selection, SUTVA)
-  - Method-specific threats (DID/IV/RDD/Panel/SDID)
-  - 3 alternative explanations per key result
-  - Falsification test recommendations
-  - Threat matrix with severity levels (Critical/High/Medium/Low, matching `econometrics-critic`)
-
-### Self-Extension Infrastructure
-
-- `/learn` — create new rules or skills from within sessions
-  - Guided creation: type → content → validate → preview → write
-  - Auto-generates properly formatted .md files in `.claude/rules/` or `.claude/skills/`
-  - Constitution guard: cannot create rules/skills violating `constitution.md`
-  - Logs `[LEARN]` entries to MEMORY.md
-
-### Governance
-
-- **`constitution.md`** — 5 immutable principles (always-on rule, no `paths:` frontmatter):
-  1. Raw data integrity (`data/raw/` never modified)
-  2. Full reproducibility (every result traceable from code + raw data)
-  3. Mandatory cross-validation (Stata ↔ Python, < 0.1%; relaxed in `explore/`)
-  4. Version preservation (`vN/` never deleted)
-  5. Score integrity (scores recorded faithfully)
-
-- **Spec-then-plan protocol** — Phase 0 added to orchestrator protocol:
-  - Triggered when task affects >= 3 files, changes identification strategy, creates skills/rules/agents, or modifies the protocol itself
-  - Format: MUST / SHOULD / MAY requirements + acceptance criteria + out of scope
-  - Written once per task; review loop restarts at Phase 1
+- `/session-log` 技能 — 显式的会话开始/结束，含 MEMORY.md 上下文加载和记录
+- `personal-memory.md`（已 gitignore）— 机器特定偏好设置（Stata 路径、编辑器、目录）
 
 ---
 
-## Phase 4 — Methodology Expansion & Consolidation (Implemented)
+## 第三阶段 — 打磨（已实现）
 
-**Status**: Implemented
+**状态**: 已实现
 
-### New Methodology Skills
+### 苏格拉底式研究工具
 
-4 standalone methodology skills added to cover gaps identified during replication stress testing:
+- `/interview-me` — 双语（中/英）苏格拉底式提问，将研究想法形式化
+  - 引导流程：研究问题 → 假设 → 识别策略 → 数据需求 → 预期结果
+  - 每次提一个问题；各部分可跳过
+  - 输出结构化研究提案至 `vN/docs/research_proposal.md`
 
-| Skill | Scope |
+- `/devils-advocate` — 对识别策略进行系统性预分析挑战
+  - 通用威胁（遗漏变量偏差、反向因果、测量误差、选择偏差、SUTVA）
+  - 方法特定威胁（DID/IV/RDD/Panel/SDID）
+  - 每个关键结果 3 个替代解释
+  - 伪造检验建议
+  - 威胁矩阵，含严重程度分级（严重/高/中/低，与 `econometrics-critic` 一致）
+
+### 自扩展基础设施
+
+- `/learn` — 在会话中创建新规则或技能
+  - 引导式创建：类型 → 内容 → 验证 → 预览 → 写入
+  - 自动生成格式正确的 .md 文件至 `.claude/rules/` 或 `.claude/skills/`
+  - 基本准则守卫：不得创建违反 `constitution.md` 的规则/技能
+  - 向 MEMORY.md 记录 `[LEARN]` 条目
+
+### 治理
+
+- **`constitution.md`** — 5 条不可变原则（始终加载的规则，无 `paths:` frontmatter）：
+  1. 原始数据完整性（`data/raw/` 永不修改）
+  2. 完全可复现性（每个结果可从代码 + 原始数据追溯）
+  3. 强制交叉验证（Stata ↔ Python，< 0.1%；在 `explore/` 中放宽）
+  4. 版本保留（`vN/` 永不删除）
+  5. 评分完整性（评分如实记录）
+
+- **规格优先协议** — 在编排协议中增加阶段 0：
+  - 当任务影响 >= 3 个文件、涉及识别策略变更、创建技能/规则/代理或修改协议本身时触发
+  - 格式：必须 / 应当 / 可以 需求 + 验收标准 + 超出范围
+  - 每个任务编写一次；评审循环从阶段 1 重新开始
+
+---
+
+## 第四阶段 — 方法扩展与整合（已实现）
+
+**状态**: 已实现
+
+### 新方法技能
+
+新增 4 个独立方法技能，覆盖复现压力测试中发现的空白：
+
+| 技能 | 范围 |
 |-------|-------|
-| `/run-bootstrap` | Pairs, wild cluster, residual, and teffects bootstrap inference pipelines |
-| `/run-placebo` | Timing, outcome, instrument, and permutation placebo test pipelines |
-| `/run-logit-probit` | Logit/probit, propensity score, treatment effects (RA/IPW/AIPW), conditional logit |
-| `/run-lasso` | LASSO, post-double-selection, rigorous LASSO, R `glmnet` matching pipeline |
+| `/run-bootstrap` | 配对、野蛮聚类、残差和处理效应自助法推断流水线 |
+| `/run-placebo` | 时间、结果、工具变量和置换安慰剂检验流水线 |
+| `/run-logit-probit` | Logit/probit、倾向得分、处理效应（RA/IPW/AIPW）、条件 logit |
+| `/run-lasso` | LASSO、双重选择后推断、严格 LASSO、R `glmnet` 匹配流水线 |
 
-### Skill Consolidation
+### 技能整合
 
-- Extracted advanced Stata patterns (impulse response, Helmert, HHK, k-class, bootstrap, spatial lags) from `run-panel.md` (665→371 lines) and `run-iv.md` (528→323 lines) into non-user-invocable reference file `advanced-stata-patterns.md` (443 lines)
-- Compressed Stata execution blocks in all 5 `run-*` files
-- Net reduction: 2,175→2,083 lines (-92 lines)
-- Total: **28 user-invocable skills + 1 reference guide**
+- 将高级 Stata 模式（脉冲响应、Helmert、HHK、k 类、自助法、空间滞后）从 `run-panel.md`（665→371 行）和 `run-iv.md`（528→323 行）提取至非用户调用的参考文件 `advanced-stata-patterns.md`（443 行）
+- 压缩所有 5 个 `run-*` 文件中的 Stata 执行块
+- 净减少：2,175→2,083 行（-92 行）
+- 合计：**28 个用户可调用技能 + 1 个参考指南**
 
-### Replication Package Stress Testing
+### 复现包压力测试
 
-6 replication packages analyzed to validate and improve skills:
+分析 6 个复现包以验证和改进技能：
 
-| Package | Paper | Skills Updated |
+| 复现包 | 论文 | 更新的技能 |
 |---------|-------|---------------|
-| Acemoglu et al. (2019) — DDCG | JPE, Democracy & Growth | `/run-panel`, `/run-iv`, `/make-table` |
-| Mexico Retail Entry | Economic Census | `/run-iv`, `/data-describe` |
-| SEC Comment Letters (mnsc.2021.4259) | Management Science | `/data-describe`, `/cross-check` |
-| Bond Market Liquidity (mnsc.2022.4646) | Management Science | `/cross-check`, `/run-panel` |
-| RTAs & Environment (jvae023) | JEEA 2024 | `/run-lasso` |
-| Culture & Development (data_programs) | — | `/run-bootstrap` |
+| Acemoglu et al. (2019) — DDCG | JPE，民主与增长 | `/run-panel`、`/run-iv`、`/make-table` |
+| 墨西哥零售进入 | 经济普查 | `/run-iv`、`/data-describe` |
+| SEC 评论函 (mnsc.2021.4259) | Management Science | `/data-describe`、`/cross-check` |
+| 债券市场流动性 (mnsc.2022.4646) | Management Science | `/cross-check`、`/run-panel` |
+| 区域贸易协定与环境 (jvae023) | JEEA 2024 | `/run-lasso` |
+| 文化与发展 (data_programs) | — | `/run-bootstrap` |
 
-### APE Reference Papers
+### APE 参考论文
 
-3 R-based replication packages archived in `references/ape-winners/ape-papers/`:
+3 个基于 R 的复现包存档于 `references/ape-winners/ape-papers/`：
 
-| Package | Design | Key R Packages |
+| 复现包 | 设计 | 关键 R 包 |
 |---------|--------|---------------|
-| apep_0119 (EERS & Electricity) | Staggered DID | `did`, `fixest`, `HonestDiD`, `fwildclusterboot` |
-| apep_0185 (Network MW Exposure) | Shift-share IV | `fixest`, exposure permutation inference |
-| apep_0439 (Cultural Borders) | Spatial RDD + Panel | `fixest`, `rdrobust`, permutation inference |
+| apep_0119（EERS 与电力） | 交错 DID | `did`、`fixest`、`HonestDiD`、`fwildclusterboot` |
+| apep_0185（网络 MW 暴露） | Shift-share IV | `fixest`、暴露置换推断 |
+| apep_0439（文化边界） | 空间 RDD + 面板 | `fixest`、`rdrobust`、置换推断 |
 
-These are R-only patterns that supplement Stata-primary skills. Methodology patterns recorded in MEMORY.md as `[LEARN]` entries.
+这些是 R 专用模式，作为 Stata 主导技能的补充。方法模式作为 `[LEARN]` 条目记录在 MEMORY.md 中。
 
 ---
 
-## Phase 5 — Real-Data Replication Testing & Skill Hardening (Implemented)
+## 第五阶段 — 真实数据复现测试与技能加固（已实现）
 
-**Status**: Implemented (2026-02-26)
+**状态**: 已实现 (2026-02-26)
 
-### End-to-End Replication Testing
+### 端到端复现测试
 
-All 9 `/run-*` skills tested against real published replication packages. 11 package × skill combinations run end-to-end through Stata:
+所有 9 个 `/run-*` 技能均使用真实已发表复现包进行测试。11 个复现包 × 技能组合端到端通过 Stata 运行：
 
-| # | Package × Skill | Status |
+| # | 复现包 × 技能 | 状态 |
 |---|----------------|--------|
-| 1 | DDCG → `/run-panel` (FE + GMM) | PASS |
-| 2 | DDCG → `/run-iv` (2SLS with regional democracy waves) | PASS |
-| 3 | Culture & Development → `/run-bootstrap` (pairs + wild cluster) | PASS |
-| 4 | jvae023 → `/run-lasso` (logistic LASSO PS → matching) | PASS |
-| 5 | DDCG → `/run-placebo` (timing + permutation) | PASS |
-| 6 | DDCG → `/run-logit-probit` (xtlogit, margins, teffects) | PASS |
-| 7 | SEC Comment Letters → `/run-panel` (cross-section absorbed FE) | PASS |
-| 8 | Mexico Retail → `/run-iv` (ivreghdfe, large-scale) | PASS |
-| 9 | jvae023 → `/run-did` (csdid on matched panel) | PASS |
-| 10 | Synthetic → `/run-rdd` (rdrobust, rddensity) | PASS |
-| 11 | DDCG → `/run-sdid` (SDID/DID/SC bootstrap VCE) | PASS |
+| 1 | DDCG → `/run-panel`（FE + GMM） | 通过 |
+| 2 | DDCG → `/run-iv`（2SLS，区域民主浪潮工具变量） | 通过 |
+| 3 | 文化与发展 → `/run-bootstrap`（配对 + 野蛮聚类） | 通过 |
+| 4 | jvae023 → `/run-lasso`（logistic LASSO 倾向得分 → 匹配） | 通过 |
+| 5 | DDCG → `/run-placebo`（时间 + 置换） | 通过 |
+| 6 | DDCG → `/run-logit-probit`（xtlogit、margins、teffects） | 通过 |
+| 7 | SEC 评论函 → `/run-panel`（截面吸收 FE） | 通过 |
+| 8 | 墨西哥零售 → `/run-iv`（ivreghdfe，大规模） | 通过 |
+| 9 | jvae023 → `/run-did`（匹配面板上的 csdid） | 通过 |
+| 10 | 合成数据 → `/run-rdd`（rdrobust、rddensity） | 通过 |
+| 11 | DDCG → `/run-sdid`（SDID/DID/SC bootstrap VCE） | 通过 |
 
-### Issues Found & Fixed (19 total)
+### 发现并修复的问题（共 19 个）
 
-| Issue | Category | Root Cause | Skill(s) Updated |
+| 问题 | 类别 | 根本原因 | 更新的技能 |
 |-------|----------|-----------|------------------|
-| #11 | DIAGNOSTIC | `estat bootstrap, bca` requires explicit `saving(, bca)` | `/run-bootstrap` |
-| #12 | COMPATIBILITY | `boottest` fails after non-reghdfe estimators | `/run-bootstrap`, `/run-did` |
-| #13 | SYNTAX | `bootstrap _b` saves as `_b_varname`, not `_bs_N` | `/run-bootstrap` |
-| #14 | DIAGNOSTIC | DWH `e(estatp)` unavailable with `xtivreg2 + partial()` | `/run-iv` |
-| #15 | EDGE-CASE | `teffects` commands fail on panel data (repeated obs) | `/run-logit-probit` |
-| #16 | EDGE-CASE | CV LASSO selects 0 variables in small samples | `/run-lasso` |
-| #17 | TEMPLATE-GAP | No fallback when LASSO selects 0 vars | `/run-lasso` |
-| #18 | COMPATIBILITY | `lasso logit` r(430) convergence with near-separation | `/run-lasso` |
-| #19 | EDGE-CASE | String panel IDs require `encode` before `xtset` | `/run-did` |
-| #20 | COMPATIBILITY | `csdid_stats` syntax varies across package versions | `/run-did` |
-| #21 | SYNTAX | Hardcoded variable names (`lgdp`) instead of user params | `/run-sdid` |
-| #22 | TEMPLATE-GAP | Significant timing placebo ≠ confounding (anticipation effects) | `/run-placebo` |
-| #23 | COMPATIBILITY | Old Stata syntax (`set mem`, `clear matrix`) in packages | `/run-panel` |
-| #24 | SYNTAX | `ereturn post` + `estimates store` fails after `sdid` | `/run-sdid` |
-| #25 | EDGE-CASE | `vce(jackknife)` requires ≥2 treated units per period | `/run-sdid` |
-| #26 | PROCESS | Hook-reported errors ignored; log overwritten before verification | New rule: `stata-error-verification.md` |
-| #27 | TEMPLATE-GAP | 8-lag model needs `vareffects8` program (not implemented) | `/run-panel` |
-| #28 | SYNTAX | `/` in Stata local macro label caused parsing failure | `/run-panel` |
-| #29 | SYNTAX | `levelsof` returns numeric codes for value-labeled vars; loop used as string | `/run-panel` |
+| #11 | 诊断 | `estat bootstrap, bca` 需要显式 `saving(, bca)` | `/run-bootstrap` |
+| #12 | 兼容性 | `boottest` 在非 reghdfe 估计量后失败 | `/run-bootstrap`、`/run-did` |
+| #13 | 语法 | `bootstrap _b` 保存为 `_b_varname` 而非 `_bs_N` | `/run-bootstrap` |
+| #14 | 诊断 | DWH `e(estatp)` 在 `xtivreg2 + partial()` 时不可用 | `/run-iv` |
+| #15 | 边界情况 | `teffects` 命令在面板数据上失败（重复观测） | `/run-logit-probit` |
+| #16 | 边界情况 | CV LASSO 在小样本中选择 0 个变量 | `/run-lasso` |
+| #17 | 模板缺口 | LASSO 选择 0 个变量时无回退方案 | `/run-lasso` |
+| #18 | 兼容性 | `lasso logit` r(430) 近分离导致收敛失败 | `/run-lasso` |
+| #19 | 边界情况 | 字符串面板 ID 在 `xtset` 前需要 `encode` | `/run-did` |
+| #20 | 兼容性 | `csdid_stats` 语法因包版本不同而变化 | `/run-did` |
+| #21 | 语法 | 硬编码变量名 (`lgdp`) 而非使用用户参数 | `/run-sdid` |
+| #22 | 模板缺口 | 显著的时间安慰剂 ≠ 混淆（预期效应） | `/run-placebo` |
+| #23 | 兼容性 | 旧 Stata 语法（`set mem`、`clear matrix`）出现在复现包中 | `/run-panel` |
+| #24 | 语法 | `ereturn post` + `estimates store` 在 `sdid` 后失败 | `/run-sdid` |
+| #25 | 边界情况 | `vce(jackknife)` 要求每个处理期至少有 2 个处理单元 | `/run-sdid` |
+| #26 | 流程 | 钩子报告的错误被忽略；验证前日志被覆盖 | 新规则：`stata-error-verification.md` |
+| #27 | 模板缺口 | 8 阶滞后模型需要 `vareffects8` 程序（未实现） | `/run-panel` |
+| #28 | 语法 | Stata 本地宏标签中的 `/` 导致解析失败 | `/run-panel` |
+| #29 | 语法 | `levelsof` 对值标签变量返回数字代码；循环按字符串使用 | `/run-panel` |
 
-### Defensive Programming Patterns Added
+### 新增防御性编程模式
 
-Codified 8 defensive patterns in `stata-conventions.md`:
+在 `stata-conventions.md` 中编纂了 8 个防御性模式：
 
-1. **Community package guards**: `cap noisily` + `cap ssc install` for all SSC commands
-2. **String panel ID check**: `confirm string variable` + `encode` before `xtset`
-3. **e-class availability check**: Test scalars before use (`e(estatp) != .`)
-4. **Local macros for non-standard estimators**: Use locals instead of `estimates store` for `sdid`
-5. **Continuous vs categorical inspection**: `summarize` not `tab` for continuous variables
-6. **Negative Hausman handling**: Check `r(chi2) < 0` and interpret correctly
-7. **Old Stata syntax stripping**: Omit deprecated `set mem`, `clear matrix` when adapting old code
-8. **Bootstrap variable naming**: Use `ds` to discover `_b_varname` pattern
+1. **社区包保护**：对所有 SSC 命令使用 `cap noisily` + `cap ssc install`
+2. **字符串面板 ID 检查**：`confirm string variable` + 在 `xtset` 前 `encode`
+3. **e 类可用性检查**：使用前测试标量（`e(estatp) != .`）
+4. **SDID 本地宏**：对 `sdid` 使用本地宏而非 `estimates store`
+5. **连续 vs 分类变量检查**：对连续变量使用 `summarize` 而非 `tab`
+6. **负 Hausman 值处理**：检查 `r(chi2) < 0` 并正确解读
+7. **旧 Stata 语法剥离**：改编旧代码时省略已弃用的 `set mem`、`clear matrix`
+8. **Bootstrap 变量命名**：使用 `ds` 发现 `_b_varname` 模式
 
-### Cross-Validation Results
+### 交叉验证结果
 
-| Package | Method | Stata vs Python Diff |
+| 复现包 | 方法 | Stata vs Python 差异 |
 |---------|--------|---------------------|
-| DDCG Panel FE | reghdfe vs pyfixest | 0.0000% — PASS |
-| DDCG IV 2SLS | ivreghdfe vs pyfixest | 0.0000% — PASS |
+| DDCG 面板 FE | reghdfe vs pyfixest | 0.0000% — 通过 |
+| DDCG IV 2SLS | ivreghdfe vs pyfixest | 0.0000% — 通过 |
 
-### Regression Verification
+### 回归验证
 
-Re-ran original test suite (test1-5) after all skill updates: **5/5 PASS with zero r(xxx) errors**. No regressions introduced.
+在所有技能更新后重新运行原始测试套件（test1-5）：**5/5 通过，零 r(xxx) 错误**。未引入回归问题。
 
-### Stata Error Verification Rule
+### Stata 错误验证规则
 
-Added `stata-error-verification.md` as a new always-on rule (Issue #26). Enforces that Claude must read hook output before re-running scripts, preventing log-overwrite false positives discovered during DDCG replication.
+新增 `stata-error-verification.md` 作为始终加载的规则（问题 #26）。强制要求 Claude 在重新运行脚本前必须读取钩子输出，防止 DDCG 复现中发现的日志覆盖导致的误判。
 
-### Files Modified
+### 修改的文件
 
-- 9 skill files: `run-did.md` through `run-sdid.md` (defensive patterns + issue notes)
-- `advanced-stata-patterns.md` (SDID local macros pattern added)
-- `stata-conventions.md` (comprehensive defensive programming section added)
-- `stata-error-verification.md` (new always-on rule for error verification protocol)
-- `ISSUES_LOG.md` (19 issues documented with root cause and fix)
-- `MEMORY.md` (session log and skill update entries)
+- 9 个技能文件：`run-did.md` 到 `run-sdid.md`（防御性模式 + 问题注记）
+- `advanced-stata-patterns.md`（新增 SDID 本地宏模式）
+- `stata-conventions.md`（新增全面的防御性编程章节）
+- `stata-error-verification.md`（新的始终加载规则，用于错误验证协议）
+- `ISSUES_LOG.md`（记录 19 个问题及根本原因和修复方案）
+- `MEMORY.md`（会话日志和技能更新条目）
 
 ---
 
-## Phase 6 — Workflow Completion: Pipeline Orchestration, Agent Rewiring, Synthesis Report (Implemented)
+## 第六阶段 — 工作流完善：流水线编排、代理重连、综合报告（已实现）
 
-**Status**: Implemented (2026-02-27)
+**状态**: 已实现 (2026-02-27)
 
-### Pipeline Orchestration
+### 流水线编排
 
-- `/run-pipeline` skill — auto-detects econometric method(s) from research plan text, `research_proposal.md`, or paper PDF, generates an ordered skill execution plan, and runs it end-to-end
-  - Supports `--quick` (skip confirmation) and `--replication <paper.pdf>` (extract methods from published paper) flags
-  - Method detection: DID, IV, RDD, Panel, SDID, Bootstrap, Placebo, Logit-Probit, LASSO
-  - Multi-method support: primary analysis + robustness alternatives
-  - Error handling: pauses on Stata `r(xxx)` errors, offers fix/skip/abort
-  - Automatic `/synthesis-report` at the end
+- `/run-pipeline` 技能 — 从研究计划文本、`research_proposal.md` 或论文 PDF 中自动检测计量方法，生成有序的技能执行计划，并端到端运行
+  - 支持 `--quick`（跳过确认）和 `--replication <paper.pdf>`（从已发表论文提取方法）标志
+  - 方法检测：DID、IV、RDD、Panel、SDID、Bootstrap、Placebo、Logit-Probit、LASSO
+  - 多方法支持：主分析 + 稳健性替代方案
+  - 错误处理：遇到 Stata `r(xxx)` 错误时暂停，提供修复/跳过/中止选项
+  - 结束时自动运行 `/synthesis-report`
 
-### Synthesis Report
+### 综合报告
 
-- `/synthesis-report` skill — collects all analysis outputs (logs, tables, figures, scores, cross-validation) into a structured comprehensive report
-  - Outputs: `docs/ANALYSIS_SUMMARY.md` (Markdown) + `docs/ANALYSIS_SUMMARY.tex` (LaTeX)
-  - 10-section structure: Executive Summary, Data & Sample, Main Results, Identification Diagnostics, Robustness Summary, Cross-Validation, Quality Assessment, Remaining Issues, Replication Checklist, File Manifest
-  - Updates REPLICATION.md Output-to-Table Mapping
+- `/synthesis-report` 技能 — 汇集所有分析输出（日志、表格、图表、评分、交叉验证）生成结构化综合报告
+  - 输出：`docs/ANALYSIS_SUMMARY.md`（Markdown）+ `docs/ANALYSIS_SUMMARY.tex`（LaTeX）
+  - 10 节结构：摘要、数据与样本、主要结果、识别诊断、稳健性总结、交叉验证、质量评估、遗留问题、复现清单、文件清单
+  - 更新 REPLICATION.md 的输出-表格映射
 
-### Legacy Agent Rewiring
+### 旧版代理重连
 
-3 legacy agents wired into active skills:
+3 个旧版代理接入活跃技能：
 
-| Agent | Wired Into | Role |
+| 代理 | 接入技能 | 角色 |
 |-------|-----------|------|
-| `paper-reviewer` | `/review-paper` | Executes 3 reviewer personas via Task tool |
-| `robustness-checker` | `/robustness` | Identifies missing robustness checks before .do generation |
-| `cross-checker` | `/cross-check` | Independent diagnosis of Stata vs Python discrepancies |
+| `paper-reviewer` | `/review-paper` | 通过 Task 工具执行 3 个审稿人角色 |
+| `robustness-checker` | `/robustness` | 在生成 .do 文件前识别缺失的稳健性检验 |
+| `cross-checker` | `/cross-check` | 独立诊断 Stata 与 Python 之间的差异 |
 
-3 legacy agents deprecated (superseded by adversarial critic-fixer pairs):
+3 个旧版代理已弃用（被对抗式评审者-修复者配对取代）：
 
-| Agent | Superseded By |
+| 代理 | 被取代者 |
 |-------|--------------|
 | `code-reviewer` | `code-critic` |
 | `econometrics-reviewer` | `econometrics-critic` |
 | `tables-reviewer` | `tables-critic` |
 
-### Orchestrator Protocol Update
+### 编排协议更新
 
-- Added **Phase 7: Report** after Phase 6 (Score)
-- Workflow: Spec → Plan → Implement → Verify → Review → Fix → Score → Report
-- Exit criterion: `ANALYSIS_SUMMARY.md` exists and is complete
+- 在阶段 6（评分）之后新增**阶段 7：报告**
+- 工作流：规格 → 计划 → 实施 → 验证 → 评审 → 修复 → 评分 → 报告
+- 退出条件：`ANALYSIS_SUMMARY.md` 存在且内容完整
 
-### Score Persistence
+### 评分持久化
 
-- `/score` now generates `docs/QUALITY_SCORE.md` with full dimension breakdown
-- Enables `/synthesis-report` to read scores directly without re-running the scorer
+- `/score` 现在生成 `docs/QUALITY_SCORE.md`，含完整的维度细分
+- 使 `/synthesis-report` 可直接读取评分，无需重新运行评分器
 
-### Files Changed
+### 变更的文件
 
-- 2 new skills: `synthesis-report.md`, `run-pipeline.md`
-- 4 modified skills: `score.md`, `review-paper.md`, `robustness.md`, `cross-check.md`
-- 3 deprecated agents: `code-reviewer.md`, `econometrics-reviewer.md`, `tables-reviewer.md`
-- 1 modified rule: `orchestrator-protocol.md`
-- 4 updated docs: `README.md`, `CLAUDE.md`, `ROADMAP.md`, `WORKFLOW_QUICK_REF.md`
+- 2 个新技能：`synthesis-report.md`、`run-pipeline.md`
+- 4 个修改的技能：`score.md`、`review-paper.md`、`robustness.md`、`cross-check.md`
+- 3 个弃用的代理：`code-reviewer.md`、`econometrics-reviewer.md`、`tables-reviewer.md`
+- 1 个修改的规则：`orchestrator-protocol.md`
+- 4 个更新的文档：`README.md`、`CLAUDE.md`、`ROADMAP.md`、`WORKFLOW_QUICK_REF.md`
 
 ---
 
-## Timeline
+## 时间线
 
-| Phase | Target | Depends On |
+| 阶段 | 目标 | 依赖 |
 |-------|--------|------------|
-| Phase 1 | Done | — |
-| Phase 2 | Done | Phase 1 stable |
-| Phase 3 | Done | Phase 2 hooks working reliably |
-| Phase 4 | Done | Phase 3 complete; replication packages available |
-| Phase 5 | Done | Phase 4 complete; real replication data available |
-| Phase 6 | Done | Phase 5 complete; workflow structure stable |
+| 第一阶段 | 完成 | — |
+| 第二阶段 | 完成 | 第一阶段稳定 |
+| 第三阶段 | 完成 | 第二阶段钩子可靠运行 |
+| 第四阶段 | 完成 | 第三阶段完成；复现包可用 |
+| 第五阶段 | 完成 | 第四阶段完成；真实复现数据可用 |
+| 第六阶段 | 完成 | 第五阶段完成；工作流结构稳定 |

@@ -1,102 +1,102 @@
 ---
-description: "Run the executable quality scorer on the current version directory"
+description: "对当前版本目录运行可执行质量评分器"
 user_invocable: true
 ---
 
-# /score — Quality Scoring
+# /score — 质量评分
 
-When the user invokes `/score`, run the `quality_scorer.py` script on the current version directory and present the results.
+当用户调用 `/score` 时，对当前版本目录运行 `quality_scorer.py` 脚本并展示结果。
 
-## Step 1: Determine Target
+## 步骤 1：确定目标
 
-- Default: the current version directory (read from CLAUDE.md, typically `v1/`)
-- User can specify: `/score v2/` or `/score path/to/directory`
+- 默认：当前版本目录（从 CLAUDE.md 读取，通常为 `v1/`）
+- 用户可指定：`/score v2/` 或 `/score path/to/directory`
 
-## Step 2: Run the Scorer
+## 步骤 2：运行评分器
 
-Execute:
+执行：
 
 ```bash
 python scripts/quality_scorer.py <target_dir> --verbose
 ```
 
-If the script is not found at the project root, try:
+如果在项目根目录未找到脚本，尝试：
 
 ```bash
 python "F:/Learning/econ-research-workflow/scripts/quality_scorer.py" <target_dir> --verbose
 ```
 
-## Step 3: Display Results
+## 步骤 3：展示结果
 
-Present the output in a readable format:
+以易读格式呈现输出：
 
 ```
-Quality Score Report for v1/
+v1/ 质量评分报告
 ═══════════════════════════════════════════
 
-  Code Conventions     12/15  ████████████░░░
-  Log Cleanliness      15/15  ███████████████
-  Output Completeness  10/15  ██████████░░░░░
-  Cross-Validation      0/15  ░░░░░░░░░░░░░░░
-  Documentation        12/15  ████████████░░░
-  Method Diagnostics   20/25  ████████████████████░░░░░
+  代码规范         12/15  ████████████░░░
+  日志清洁度       15/15  ███████████████
+  输出完整性       10/15  ██████████░░░░░
+  交叉验证          0/15  ░░░░░░░░░░░░░░░
+  文档完整性       12/15  ████████████░░░
+  方法诊断检验     20/25  ████████████████████░░░░░
 
-  TOTAL                69/100
+  总分              69/100
 
-  Status: MAJOR REVISIONS NEEDED (< 80)
+  状态: 需要大幅修改 (< 80)
 ```
 
-## Step 4: Recommendations
+## 步骤 4：建议
 
-Based on the total score:
+根据总分给出建议：
 
-| Score | Status | Recommendation |
-|-------|--------|----------------|
-| >= 95 | Publication Ready | No further action needed |
-| >= 90 | Minor Revisions | Fix the specific items flagged, then re-score |
-| >= 80 | Major Revisions | Run `/adversarial-review` on failing domains |
-| < 80 | Redo | Generate a prioritized fix list (Critical items first) |
+| 分数 | 状态 | 建议 |
+|------|------|------|
+| >= 95 | 可发表 | 无需进一步操作 |
+| >= 90 | 小修 | 修复标记的具体问题，然后重新评分 |
+| >= 80 | 大修 | 对不合格维度运行 `/adversarial-review` |
+| < 80 | 重做 | 生成按优先级排列的修复清单（严重问题优先） |
 
-### If score < 80:
+### 评分 < 80 时：
 
-Generate a prioritized fix list from the scorer output:
-1. List all failing checks grouped by dimension
-2. Mark which can be fixed automatically (missing headers, logging) vs manually (missing cross-validation script)
-3. Suggest running `/adversarial-review` for domains scoring below 12/15
+从评分器输出中生成按优先级排列的修复清单：
+1. 列出所有不合格检查项，按维度分组
+2. 标注哪些可以自动修复（缺少文件头、日志记录）vs 需要手动修复（缺少交叉验证脚本）
+3. 对低于 12/15 的维度建议运行 `/adversarial-review`
 
-### If specific dimensions score 0:
+### 特定维度得分为 0 时：
 
-- **Cross-Validation = 0**: Suggest running `/cross-check` to create the Python validation script
-- **Method Diagnostics = 0**: Suggest running the relevant `/run-*` skill to add diagnostics
-- **Documentation = 0**: Suggest creating REPLICATION.md and _VERSION_INFO.md
+- **交叉验证 = 0**：建议运行 `/cross-check` 创建 Python 验证脚本
+- **方法诊断检验 = 0**：建议运行相关的 `/run-*` 技能添加诊断检验
+- **文档完整性 = 0**：建议创建 REPLICATION.md 和 _VERSION_INFO.md
 
-## Step 5: Persist Score to docs/QUALITY_SCORE.md
+## 步骤 5：将评分持久化到 docs/QUALITY_SCORE.md
 
-Generate (or overwrite) `docs/QUALITY_SCORE.md` with the full score breakdown so that `/synthesis-report` and other skills can read it directly:
+生成（或覆盖）`docs/QUALITY_SCORE.md`，包含完整的评分明细，以便 `/synthesis-report` 和其他技能可直接读取：
 
 ```markdown
-# Quality Score — vN/
-Generated: YYYY-MM-DD HH:MM
+# 质量评分 — vN/
+生成时间: YYYY-MM-DD HH:MM
 
-| Dimension | Score | Max | Details |
-|-----------|-------|-----|---------|
-| Code Conventions | XX | 15 | [specific checks passed/failed] |
-| Log Cleanliness | XX | 15 | [specific checks passed/failed] |
-| Output Completeness | XX | 15 | [specific checks passed/failed] |
-| Cross-Validation | XX | 15 | [specific checks passed/failed] |
-| Documentation | XX | 15 | [specific checks passed/failed] |
-| Method Diagnostics | XX | 25 | [specific checks passed/failed] |
-| **TOTAL** | **XX** | **100** | |
+| 维度 | 得分 | 满分 | 详情 |
+|------|------|------|------|
+| 代码规范 | XX | 15 | [具体检查项通过/未通过] |
+| 日志清洁度 | XX | 15 | [具体检查项通过/未通过] |
+| 输出完整性 | XX | 15 | [具体检查项通过/未通过] |
+| 交叉验证 | XX | 15 | [具体检查项通过/未通过] |
+| 文档完整性 | XX | 15 | [具体检查项通过/未通过] |
+| 方法诊断检验 | XX | 25 | [具体检查项通过/未通过] |
+| **总分** | **XX** | **100** | |
 
-Status: [Publication Ready / Minor Revisions / Major Revisions / Redo]
+状态: [可发表 / 小修 / 大修 / 重做]
 ```
 
-Ensure the `docs/` directory exists before writing (create it if needed).
+写入前确保 `docs/` 目录存在（如需则创建）。
 
-## Step 6: Record Score to MEMORY.md
+## 步骤 6：记录评分到 MEMORY.md
 
-If MEMORY.md exists, append a line:
+如果 MEMORY.md 存在，追加一行：
 
 ```
-[LEARN] YYYY-MM-DD: Quality score for <target>: XX/100 (Code: XX/15, Logs: XX/15, Output: XX/15, CrossVal: XX/15, Docs: XX/15, Diagnostics: XX/25)
+[LEARN] YYYY-MM-DD: <target> 质量评分: XX/100 (代码: XX/15, 日志: XX/15, 输出: XX/15, 交叉验证: XX/15, 文档: XX/15, 诊断: XX/25)
 ```

@@ -1,120 +1,120 @@
 ---
-description: "Session start/end manager with MEMORY.md context loading and recording"
+description: "会话启动/结束管理器，集成 MEMORY.md 上下文加载与记录"
 user_invocable: true
 ---
 
-# /session-log — Session Continuity Manager
+# /session-log — 会话连续性管理器
 
-Manage session start/end with MEMORY.md integration for continuity across Claude Code sessions.
+管理会话的启动与结束，通过 MEMORY.md 实现跨 Claude Code 会话的连续性。
 
-## Activation
+## 启动
 
-When the user runs `/session-log`, check for a subcommand:
+当用户运行 `/session-log` 时，检查子命令：
 
-- `/session-log start` — Begin a session with context loading
-- `/session-log end` — Close a session with summary recording
+- `/session-log start` — 启动会话并加载上下文
+- `/session-log end` — 结束会话并记录摘要
 
-If no subcommand, prompt the user to choose.
+如果没有子命令，提示用户选择。
 
 ---
 
 ## `/session-log start`
 
-### Steps
+### 步骤
 
-1. **Read MEMORY.md** and display a context dashboard:
+1. **读取 MEMORY.md** 并显示上下文面板：
 
 ```
-SESSION START
+会话启动
 =============
 
-Project: [from CLAUDE.md Project Identity]
-Active Version: v1/
+项目: [来自 CLAUDE.md 项目信息]
+当前版本: v1/
 
---- Recent Decisions ---
-[Last 3 entries from Project Decisions Log]
+--- 近期决策 ---
+[项目决策日志的最后 3 条记录]
 
---- Recent Issues ---
-[Last 3 entries from Data Issues Encountered]
+--- 近期问题 ---
+[数据问题记录的最后 3 条]
 
---- Last Session ---
-Date: YYYY-MM-DD
-Summary: [from Session Log table]
+--- 上次会话 ---
+日期: YYYY-MM-DD
+摘要: [来自会话日志表]
 
---- Current Quality Score ---
-[Last known score, or "No score recorded yet"]
+--- 当前质量评分 ---
+[最近一次评分，或"尚未记录评分"]
 
---- Pending Items ---
-[Any unresolved items from Reviewer Feedback Tracker]
+--- 待处理事项 ---
+[审稿人反馈跟踪中的未解决事项]
 ```
 
-2. **Check personal-memory.md** (if it exists) and load machine-specific preferences.
+2. **检查 personal-memory.md**（如存在）并加载机器特定的偏好设置。
 
-3. **Note session start time** for the end-of-session summary.
+3. **记录会话启动时间**，用于结束时的摘要。
 
-4. **Remind the user** of available workflows:
+4. **提醒用户**可用的工作流：
 ```
-Ready to work. Common next steps:
-  /context-status  — Full project state overview
-  /run-did         — Start DID analysis
-  /explore         — Open exploration sandbox
-  /adversarial-review — Run QA on existing work
+已准备就绪。常用后续步骤：
+  /context-status  — 项目全景概览
+  /run-did         — 启动 DID 分析
+  /explore         — 打开探索沙盒
+  /adversarial-review — 对已有工作进行质量检查
 ```
 
 ---
 
 ## `/session-log end`
 
-### Steps
+### 步骤
 
-1. **Prompt the user** to record key items from this session:
+1. **提示用户**记录本次会话的关键事项：
 
 ```
-Session wrap-up. Please confirm or edit:
+会话收尾。请确认或编辑：
 
-Key decisions made this session:
-  [Auto-detected from conversation, or ask user]
+本次会话的关键决策：
+  [从对话中自动检测，或询问用户]
 
-Issues encountered:
-  [Auto-detected, or ask user]
+遇到的问题：
+  [自动检测，或询问用户]
 
-New learnings:
-  [Auto-detected, or ask user]
+新的经验：
+  [自动检测，或询问用户]
 
-Current quality score: [if /score was run]
+当前质量评分: [如果运行了 /score]
 ```
 
-2. **Append tagged entries** to MEMORY.md for each item:
+2. **追加标记条目**到 MEMORY.md：
 
 ```markdown
-- [DECISION] YYYY-MM-DD: description
-- [ISSUE] YYYY-MM-DD: description
-- [LEARN] YYYY-MM-DD: description
+- [DECISION] YYYY-MM-DD: 描述
+- [ISSUE] YYYY-MM-DD: 描述
+- [LEARN] YYYY-MM-DD: 描述
 ```
 
-Place entries in the appropriate sections (Project Decisions Log, Data Issues Encountered, etc.).
+将条目放入相应的章节（项目决策日志、数据问题记录等）。
 
-3. **Add session summary row** to the Session Log table:
+3. **添加会话摘要行**到会话日志表：
 
 ```markdown
-| YYYY-MM-DD | Brief summary of session activities, decisions, and outcomes |
+| YYYY-MM-DD | 本次会话活动、决策和结果的简要摘要 |
 ```
 
-4. **Confirm** the updates:
+4. **确认**更新：
 
 ```
-Session logged to MEMORY.md:
-  - X decision(s) recorded
-  - X issue(s) documented
-  - X learning(s) added
-  - Session summary appended
+已记录到 MEMORY.md：
+  - 记录了 X 条决策
+  - 记录了 X 个问题
+  - 记录了 X 条经验
+  - 已追加会话摘要
 
-See you next session. Run /session-log start to reload context.
+下次见。运行 /session-log start 重新加载上下文。
 ```
 
-## Notes
+## 注意事项
 
-- Never delete existing MEMORY.md entries — only append
-- If MEMORY.md doesn't exist, create it from the template (see MEMORY.md structure in the repo)
-- Tagged entries should be concise (1-2 sentences each)
-- The session summary row should capture the overall session narrative in one sentence
+- 永远不要删除 MEMORY.md 中的已有条目——只能追加
+- 如果 MEMORY.md 不存在，从模板创建（参见仓库中的 MEMORY.md 结构）
+- 标记条目应简洁（每条 1-2 句话）
+- 会话摘要行应用一句话概括整个会话的主要内容

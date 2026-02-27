@@ -1,201 +1,200 @@
 ---
-description: "Create new rules or skills from within a session (constitution-guarded)"
+description: "在会话中创建新规则或技能（受基本准则约束）"
 user_invocable: true
 ---
 
-# /learn — Self-Extension
+# /learn — 自扩展
 
-Create new rules or skills from within a session. Use this when you discover a convention, pattern, or workflow that should be codified for future sessions.
+在会话中创建新规则或技能。当发现某个约定、模式或工作流值得为未来会话固化时使用此技能。
 
-## Activation
+## 激活
 
-When the user runs `/learn`, begin the guided creation process below.
-
----
-
-## Step 1: Determine Type
-
-Ask the user:
-> What do you want to create — a **rule** (coding convention, standard, constraint) or a **skill** (slash-command workflow)?
-> 你想创建什么 —— **rule**（编码规范/标准/约束）还是 **skill**（斜杠命令工作流）？
-
-| Type | Purpose | Location | Loaded |
-|------|---------|----------|--------|
-| Rule | Standards, conventions, constraints | `.claude/rules/` | Automatically by path match or always-on |
-| Skill | Slash-command workflows | `.claude/skills/` | On user invocation (`/name`) |
+当用户运行 `/learn` 时，开始以下引导式创建流程。
 
 ---
 
-## Step 2: Gather Content
+## 步骤 1：确定类型
 
-### For Rules
+向用户询问：
+> 你想创建什么——**规则** (rule)（编码规范/标准/约束）还是**技能** (skill)（斜杠命令工作流）？
 
-Ask the following (one at a time):
-
-1. **Name**: What should this rule be called? (e.g., `latex-conventions`)
-   - Must be lowercase-kebab-case, no spaces
-   - File will be `.claude/rules/{name}.md`
-
-2. **Scope**: Should it apply always, or only to specific file types/paths?
-   - Always-on: no `paths:` frontmatter
-   - Path-scoped: provide glob patterns (e.g., `**/*.tex`, `**/paper/**`)
-
-3. **Content**: What are the standards, conventions, or constraints?
-   - Ask for specific do's and don'ts
-   - Ask for examples of correct and incorrect usage
-   - Ask for any exceptions
-
-### For Skills
-
-Ask the following (one at a time):
-
-1. **Name**: What should the slash command be? (e.g., `clean-data`)
-   - Must be lowercase-kebab-case, no spaces
-   - File will be `.claude/skills/{name}.md`
-
-2. **Trigger description**: What does this skill do in one sentence?
-
-3. **Steps**: Walk through the workflow steps:
-   - What is the input (user provides what)?
-   - What actions should be taken?
-   - What output is produced?
-   - Any conditional logic or branches?
+| 类型 | 用途 | 位置 | 加载方式 |
+|------|------|------|---------|
+| 规则 | 标准、规范、约束 | `.claude/rules/` | 按路径匹配自动加载或始终加载 |
+| 技能 | 斜杠命令工作流 | `.claude/skills/` | 用户调用时加载 (`/name`) |
 
 ---
 
-## Step 3: Generate File
+## 步骤 2：收集内容
 
-### Rule Template
+### 对于规则
+
+逐一询问以下问题：
+
+1. **名称**：这条规则叫什么？（如 `latex-conventions`）
+   - 必须为小写连字符格式（kebab-case），不含空格
+   - 文件为 `.claude/rules/{name}.md`
+
+2. **作用域**：始终生效，还是仅对特定文件类型/路径生效？
+   - 始终生效：不加 `paths:` 前置信息
+   - 路径限定：提供 glob 模式（如 `**/*.tex`、`**/paper/**`）
+
+3. **内容**：标准、规范或约束是什么？
+   - 询问具体的"要做"和"不要做"
+   - 询问正确和错误用法的示例
+   - 询问是否有例外情况
+
+### 对于技能
+
+逐一询问以下问题：
+
+1. **名称**：斜杠命令叫什么？（如 `clean-data`）
+   - 必须为小写连字符格式（kebab-case），不含空格
+   - 文件为 `.claude/skills/{name}.md`
+
+2. **触发描述**：这个技能用一句话做什么？
+
+3. **步骤**：梳理工作流步骤：
+   - 输入是什么（用户提供什么）？
+   - 应执行哪些操作？
+   - 产生什么输出？
+   - 有无条件逻辑或分支？
+
+---
+
+## 步骤 3：生成文件
+
+### 规则模板
 
 ```markdown
 ---
-[paths: ["glob1", "glob2"]]  # omit entire line for always-on
+[paths: ["glob1", "glob2"]]  # 始终生效则整行省略
 ---
 
-# {Title}
+# {标题}
 
-{Description of what this rule enforces.}
+{本规则约束什么的描述。}
 
-## Standards
+## 标准
 
-1. **{Standard name}**: {description}
-2. **{Standard name}**: {description}
+1. **{标准名称}**: {描述}
+2. **{标准名称}**: {描述}
 ...
 
-## Examples
+## 示例
 
-### Correct
-{example}
+### 正确
+{示例}
 
-### Incorrect
-{example}
+### 错误
+{示例}
 ```
 
-### Skill Template
+### 技能模板
 
 ```markdown
 ---
 user_invocable: true
 ---
 
-# /{name} — {Title}
+# /{name} — {标题}
 
-{One-line description.}
+{一句话描述。}
 
-## Activation
+## 激活
 
-When the user runs `/{name}`, perform the following:
+当用户运行 `/{name}` 时，执行以下操作：
 
-## Steps
+## 步骤
 
-### 1. {Step name}
+### 1. {步骤名称}
 
-{Description of what to do.}
+{操作描述。}
 
-### 2. {Step name}
+### 2. {步骤名称}
 
-{Description of what to do.}
+{操作描述。}
 
 ...
 
-## Notes
+## 注意事项
 
-- {Any caveats or edge cases.}
+- {注意事项或边界情况。}
 ```
 
 ---
 
-## Step 4: Validate
+## 步骤 4：验证
 
-Before writing the file, check:
+写入文件之前检查：
 
-1. **YAML frontmatter**: Well-formed (skills have `user_invocable: true`; rules have valid `paths:` globs or no frontmatter)
-2. **No duplicates**: No existing file in `.claude/rules/` or `.claude/skills/` with the same name
-3. **Valid glob patterns**: If path-scoped, globs use correct syntax (`**/*.ext`, `**/dir/**`)
-4. **Naming convention**: Lowercase-kebab-case filename
-5. **Constitution compliance**: The new rule/skill does NOT violate any principle in `constitution.md`:
-   - Does not permit modifying `data/raw/`
-   - Does not bypass cross-validation requirements (outside `explore/`)
-   - Does not allow deleting `vN/` directories
-   - Does not permit score fabrication
-   - Does not compromise reproducibility
+1. **YAML 前置信息**：格式正确（技能有 `user_invocable: true`；规则有有效的 `paths:` glob 或无前置信息）
+2. **无重复**：`.claude/rules/` 或 `.claude/skills/` 中不存在同名文件
+3. **有效 glob 模式**：如果限定路径，glob 语法正确（`**/*.ext`、`**/dir/**`）
+4. **命名规范**：小写连字符格式的文件名
+5. **基本准则合规**：新规则/技能不违反 `constitution.md` 中的任何原则：
+   - 不允许修改 `data/raw/`
+   - 不绕过交叉验证要求（`explore/` 之外）
+   - 不允许删除 `vN/` 目录
+   - 不允许评分造假
+   - 不损害可复现性
 
-If any validation fails, explain the issue and ask the user to correct it.
+如果任何验证失败，说明问题并请用户修正。
 
 ---
 
-## Step 5: Preview and Confirm
+## 步骤 5：预览与确认
 
-Display the full generated file content and ask:
+展示生成的完整文件内容并询问：
 
 ```
-Preview of .claude/{rules|skills}/{name}.md:
+预览 .claude/{rules|skills}/{name}.md：
 
 ---
-{frontmatter}
+{前置信息}
 ---
 
-{content}
+{内容}
 
 ---
 
-Options:
-  [yes]    — Write this file
-  [edit]   — Let me make changes (describe what to change)
-  [cancel] — Discard and exit
+选项：
+  [yes]    — 写入此文件
+  [edit]   — 让我修改（描述需要改什么）
+  [cancel] — 放弃并退出
 ```
 
 ---
 
-## Step 6: Write and Record
+## 步骤 6：写入并记录
 
-1. **Write the file** to the appropriate directory.
+1. **写入文件**到相应目录。
 
-2. **Append a `[LEARN]` entry** to MEMORY.md:
+2. **追加 `[LEARN]` 条目**到 MEMORY.md：
    ```
-   - [LEARN] YYYY-MM-DD: Created {rule|skill} `{name}` — {one-line description}
+   - [LEARN] YYYY-MM-DD: Created {rule|skill} `{name}` — {一句话描述}
    ```
 
-3. **Confirm** to the user:
+3. **确认**：
    ```
-   Created .claude/{rules|skills}/{name}.md
+   已创建 .claude/{rules|skills}/{name}.md
 
-   Logged to MEMORY.md: [LEARN] {description}
+   已记录到 MEMORY.md: [LEARN] {描述}
 
-   {For rules}: This rule is now active for {scope description}.
-   {For skills}: Use /{name} to invoke this skill.
+   {对于规则}: 此规则现已对 {作用域描述} 生效。
+   {对于技能}: 使用 /{name} 调用此技能。
    ```
 
 ---
 
-## Guards
+## 防护机制
 
-- **Cannot modify `constitution.md`**: If the user attempts to create a rule that would override or weaken any constitutional principle, refuse and explain which principle would be violated.
-- **Cannot overwrite existing files**: If a file with the same name already exists, ask the user to choose a different name or explicitly confirm overwrite.
-- **Cannot create agents**: This skill creates rules and skills only. Agent creation requires manual setup.
+- **不能修改 `constitution.md`**：如果用户试图创建会覆盖或削弱任何基本准则原则的规则，拒绝并说明会违反哪条原则。
+- **不能覆盖已有文件**：如果同名文件已存在，请用户选择不同名称或明确确认覆盖。
+- **不能创建代理**：本技能仅创建规则和技能。代理创建需要手动设置。
 
-## Notes
+## 注意事项
 
-- Keep generated files concise — match the style of existing rules/skills in the repo.
-- The user can run `/learn` multiple times in a session to create multiple items.
-- Created items take effect immediately in the current session (rules are auto-loaded; skills are available via `/name`).
+- 保持生成文件的简洁——与仓库中已有规则/技能的风格一致。
+- 用户可以在一次会话中多次运行 `/learn` 来创建多个条目。
+- 创建的条目在当前会话中立即生效（规则自动加载；技能可通过 `/name` 调用）。

@@ -1,116 +1,116 @@
-# MEMORY.md - Cross-Session Learning
+# MEMORY.md - 跨会话学习记录
 
-> **Instructions for Claude**: During every session, append new entries to the appropriate section below using the tagged format. Never delete existing entries — only add. Use the following tags:
+> **Claude 使用说明**: 每次会话期间，使用下方标记格式将新条目追加到相应章节。永远不要删除已有条目 — 只能新增。使用以下标签：
 >
-> - `[LEARN]` — New knowledge about the project, tools, or environment
-> - `[DECISION]` — Methodological or structural decisions made
-> - `[ISSUE]` — Problems encountered and their resolutions
-> - `[PREFERENCE]` — User preferences for formatting, style, or workflow
+> - `[LEARN]` — 关于项目、工具或环境的新知识
+> - `[DECISION]` — 方法论或结构性决策
+> - `[ISSUE]` — 遇到的问题及其解决方案
+> - `[PREFERENCE]` — 用户在格式、风格或工作流方面的偏好
 >
-> **Format**: `[TAG] YYYY-MM-DD: description`
+> **格式**: `[TAG] YYYY-MM-DD: 描述`
 >
-> At the end of each session, add a brief summary to the Session Log section.
+> 每次会话结束时，在会话日志章节添加简要摘要。
 
 ---
 
-## Project Decisions Log
+## 项目决策日志
 
-Track key methodological and structural decisions.
+记录关键的方法论和结构性决策。
 
-| Date | Decision | Rationale |
+| 日期 | 决策 | 理由 |
 |---|---|---|
 | | | |
 
-<!-- Example:
-| 2026-02-25 | Use Poisson regression for count outcome | Dependent variable is non-negative integer; OLS residuals showed overdispersion |
-| 2026-02-25 | Cluster SEs at county level | Treatment assigned at county level; within-county correlation expected |
+<!-- 示例:
+| 2026-02-25 | 对计数结果使用泊松回归 | 因变量为非负整数；OLS 残差显示过度离散 |
+| 2026-02-25 | 在县级聚类标准误 | 处理在县级分配；预期县内存在相关性 |
 -->
 
 ---
 
-## Data Issues Encountered
+## 数据问题记录
 
-Document data problems and how they were resolved.
+记录数据问题及解决方式。
 
-| Date | Issue | Resolution |
+| 日期 | 问题 | 解决方案 |
 |---|---|---|
 | | | |
 
-<!-- Example:
-| 2026-02-25 | 342 observations with negative income values | Confirmed data entry errors with source; dropped observations and noted in appendix |
-| 2026-02-25 | Missing state FIPS codes for 2018 observations | Merged supplementary crosswalk from Census Bureau |
+<!-- 示例:
+| 2026-02-25 | 342 个观测值出现负收入值 | 与数据源确认为录入错误；删除观测并在附录中说明 |
+| 2026-02-25 | 2018 年观测值缺少州 FIPS 代码 | 从人口普查局合并补充对照表 |
 -->
 
 ---
 
-## Reviewer Feedback Tracker
+## 审稿反馈追踪
 
-Track feedback from co-authors, referees, and seminar participants.
+记录来自合作者、审稿人和研讨会参与者的反馈。
 
-| Round | Reviewer | Key Points | Status |
+| 轮次 | 审稿人 | 要点 | 状态 |
 |---|---|---|---|
 | | | | |
 
-<!-- Example:
-| R&R Round 1 | Referee 1 | Add robustness check with alternative FE specification | Addressed in v2 |
-| R&R Round 1 | Referee 2 | Concerns about sample selection; requested Heckman correction | In progress |
-| Seminar | Prof. Smith | Suggested difference-in-differences as alternative identification | Noted for discussion |
+<!-- 示例:
+| 修改重投第 1 轮 | 审稿人 1 | 增加使用替代固定效应设定的稳健性检验 | 已在 v2 中处理 |
+| 修改重投第 1 轮 | 审稿人 2 | 对样本选择的担忧；要求 Heckman 校正 | 进行中 |
+| 研讨会 | Smith 教授 | 建议使用双重差分作为替代识别策略 | 已记录待讨论 |
 -->
 
 ---
 
-## Methodology Notes
+## 方法论笔记
 
-Record key methodological choices and their justifications.
+记录关键的方法论选择及其理由。
 
-| Method | Key Parameters | Justification |
+| 方法 | 关键参数 | 理由 |
 |---|---|---|
 | | | |
 
-<!-- Example:
-| Two-way Fixed Effects | Entity + Year FE | Control for time-invariant entity characteristics and common shocks |
-| Conley Standard Errors | Cutoff = 100km | Account for spatial correlation in outcome variable |
-| Winsorization | 1st and 99th percentiles | Reduce influence of extreme outliers in revenue data |
+<!-- 示例:
+| 双向固定效应 | 个体 + 年份 FE | 控制时间不变的个体特征和共同冲击 |
+| Conley 标准误 | 截断距离 = 100km | 考虑结果变量中的空间相关性 |
+| 缩尾处理 | 第 1 和第 99 百分位 | 降低收入数据中极端异常值的影响 |
 -->
 
 ---
 
-## Cross-Check Results
+## 交叉验证结果
 
-Log comparisons between Stata and Python outputs to ensure consistency.
+记录 Stata 与 Python 输出之间的比较，确保一致性。
 
-| Date | Comparison | Discrepancies Found |
+| 日期 | 比较内容 | 发现的差异 |
 |---|---|---|
 | | | |
 
-<!-- Example:
-| 2026-02-25 | Main regression Table 2 (Stata vs pyfixest) | None - coefficients match to 6 decimal places |
-| 2026-02-25 | Summary statistics Table 1 | Minor difference in median (Stata uses interpolation, Python uses midpoint); documented |
+<!-- 示例:
+| 2026-02-25 | 主回归表 2（Stata vs pyfixest） | 无 - 系数匹配到小数点后 6 位 |
+| 2026-02-25 | 描述性统计表 1 | 中位数有微小差异（Stata 使用插值，Python 使用中点）；已记录 |
 -->
 
 ---
 
-## LaTeX/Formatting Preferences
+## LaTeX/排版偏好
 
-Record learned formatting preferences for consistency.
+记录已了解的排版偏好，确保一致性。
 
-| Element | Preference | Notes |
+| 元素 | 偏好 | 备注 |
 |---|---|---|
 | | | |
 
-<!-- Example:
-| Table font size | \small | Journal requires compact tables |
-| Figure width | 0.8\textwidth | Consistent sizing across all figures |
-| Citation style | Author-year (natbib) | Required by target journal |
-| Number format | Comma separator for thousands | US convention |
-| Table notes | Minipage below table | Preferred by co-author |
+<!-- 示例:
+| 表格字号 | \small | 期刊要求紧凑表格 |
+| 图表宽度 | 0.8\textwidth | 所有图表保持统一尺寸 |
+| 引用格式 | 作者-年份 (natbib) | 目标期刊要求 |
+| 数字格式 | 千位逗号分隔 | 美国惯例 |
+| 表格脚注 | 表格下方 minipage | 合作者偏好 |
 -->
 
 ---
 
-## Learnings from Test Suite
+## 测试套件中的经验教训
 
-Issues discovered during the 5-test validation suite (2026-02-25). These inform defensive coding practices across all skills.
+5 项验证测试（2026-02-25）中发现的问题。这些经验指导所有技能的防御性编程实践。
 
 - [ISSUE] 2026-02-25: `boottest` does not work after `reghdfe` with multiple absorbed FE — wrap with `cap noisily` in /run-did
 - [ISSUE] 2026-02-25: `csdid` and `bacondecomp` are version-sensitive and may fail on dependency issues — always wrap with `cap noisily`
@@ -123,7 +123,7 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [ISSUE] 2026-02-25: `assert treated == post` fails when missing values present — add `if !missing(treated)` condition
 - [LEARN] 2026-02-25: In Git Bash, Stata flags must use dash prefix (`-e`) not slash prefix (`/e`, `/b`) — slash is interpreted as Unix path
 
-### Learnings from Replication Package 1: Acemoglu et al. (2019) — Democracy Does Cause Growth
+### 复现包 1 的经验教训：Acemoglu et al. (2019) — Democracy Does Cause Growth
 
 - [SKILL-UPDATE] 2026-02-25: `/run-panel` — Added `L(1/N).var` dynamic lag syntax documentation (not just `L.var`). Published papers routinely use 4 or 8 lags of the dependent variable.
 - [SKILL-UPDATE] 2026-02-25: `/run-panel` — Added Helmert / forward orthogonal deviations option for GMM (`orthogonal` option in xtabond2, or custom `helm` program pattern).
@@ -142,7 +142,7 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [LEARN] 2026-02-25: GMM diagnostics pattern — AR(2) p=0.514, Hansen J p=1.000 for 4-lag specification. AR(2) rejection at 1-lag (p=0.010) but not at 4-lag — confirms need for sufficient lags.
 - [LEARN] 2026-02-25: IV results from DDCG — 2SLS coef (1.149) > OLS coef (0.787), consistent with attenuation bias story. LIML (1.152) very close to 2SLS, confirming instrument strength.
 
-### Learnings from Replication Package 2: Mexico Retail Entry
+### 复现包 2 的经验教训：墨西哥零售进入
 
 - [ISSUE] 2026-02-25: Package 2 cannot run end-to-end — Economic Census input data (`Insumo1999-2019.dta`) not included in replication ZIP. Only `Data/Uploaded/` analysis files present. Data prep scripts (9 scripts) require external census data.
 - [LEARN] 2026-02-25: `e(rkf)` is the correct scalar for KP rk F-stat after `ivreghdfe` (not `e(widstat)` which is from `ivreg2`). Different commands store diagnostics in different scalars.
@@ -152,7 +152,7 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [LEARN] 2026-02-25: Large dataset pattern — `compress` called frequently to reduce memory; `gstats` from `gtools` package used instead of `sum` for efficiency on large datasets.
 - [SKILL-UPDATE] 2026-02-25: `/run-iv` — Noted that `e(rkf)` is the KP F scalar after `ivreghdfe`, while `e(widstat)` is from `ivreg2`. Both are valid but stored differently.
 
-### Learnings from Replication Package 3: SEC Comment Letters (mnsc.2021.4259)
+### 复现包 3 的经验教训：SEC 评论函 (mnsc.2021.4259)
 
 - [LEARN] 2026-02-25: Event study / CAR computation uses log-return formulation: `CAR = exp(sum(log(1+R_stock))) - exp(sum(log(1+R_market)))`. This avoids compounding errors vs simple return summation.
 - [LEARN] 2026-02-25: Event study windowing pattern: pre-event benchmark [-30,-16], pre-event [-15,-1] and [-5,-1], event [0,+5] and [0,+15]. Excess measures = event_window - benchmark.
@@ -162,7 +162,7 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [LEARN] 2026-02-25: Package provides both .sas7bdat and .dta for the final regression dataset — dual-format distribution enables cross-validation.
 - [SKILL-UPDATE] 2026-02-25: `/data-describe` — Confirmed .sas7bdat support pattern. Package 3 has 8 .sas7bdat files alongside 1 .dta file.
 
-### Learnings from Replication Package 4: Bond Market Liquidity (mnsc.2022.4646)
+### 复现包 4 的经验教训：债券市场流动性 (mnsc.2022.4646)
 
 - [LEARN] 2026-02-25: R `lfe::felm()` formula syntax: `y ~ X | fe1 + fe2 + fe3 | 0 | cluster1 + cluster2`. Part 3 = IVs (0 = none), Part 4 = clustering variables.
 - [LEARN] 2026-02-25: Multi-way clustering in R via `felm()` native syntax (e.g., `| cusip + date`) or via `multiwayvcov::cluster.vcov(lm_obj, cbind(var1, var2))`.
@@ -173,7 +173,7 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [SKILL-UPDATE] 2026-02-25: `/cross-check` — Added R `lfe::felm()` formula syntax documentation for R-based cross-validation.
 - [SKILL-UPDATE] 2026-02-25: `/run-panel` — Multi-way clustering confirmed: Stata `vce(cluster var1 var2)`, R `felm(... | 0 | cluster1 + cluster2)`.
 
-### Deep Skill Updates from Replication Package 1 (DDCG) — Advanced Stata Patterns
+### 复现包 1 (DDCG) 的深度技能更新 — 高级 Stata 模式
 
 - [SKILL-UPDATE] 2026-02-25: `/run-panel` — Added complete `vareffects` program: nlcom chain for computing cumulative impulse response functions (25-year dynamic effects) in panels with lagged dependent variables. Includes recursion formula: `effect_j = sum_{k=1}^{P} effect_{j-k} * lag_k + shortrun`.
 - [SKILL-UPDATE] 2026-02-25: `/run-panel` — Added complete `helm` program: Helmert / forward orthogonal deviation transformation implementation. Formula: `h_x = sqrt(n/(n+1)) * (x_t - forward_mean_t)`. Used as alternative to first-differencing for GMM.
@@ -194,14 +194,14 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [SKILL-UPDATE] 2026-02-25: `/make-table` — Added multi-estimator layout (FE/GMM/HHK × 4 lag specs = 12 columns).
 - [SKILL-UPDATE] 2026-02-25: `/make-table` — Added auxiliary p-value file pattern via `file open/write/close`.
 
-### Learnings from Phase 4-5 Full Replication (Mexico Retail + DDCG Expansion)
+### 第四至五阶段完整复现的经验教训（墨西哥零售 + DDCG 扩展）
 
 - [ISSUE] 2026-02-26: **CRITICAL VERIFICATION FAILURE** — After running `04_table3_growth.do`, the `run-stata.sh` hook reported `r(111)` errors. Instead of acknowledging the errors and fixing the script first, I re-ran the script (which overwrote the .log file), then grepped the NEW clean log and falsely claimed the original run was error-free. The user caught this: "很明显有error 你是否真的检查了？". **Root cause**: (1) Did not wait for / read the hook's error output before proceeding; (2) Re-running overwrites the log, destroying evidence of the first failure; (3) Grepping the overwritten log gives a false "clean" result. **Lesson**: ALWAYS read the hook output FIRST. If the hook reports errors, acknowledge them, fix the script, THEN re-run. Never claim "clean" based on a log that was overwritten by a re-run. See rule: `stata-error-verification.md`.
 - [ISSUE] 2026-02-26: `04_table3_growth.do` first run — `r(111)` "estimation result e4_add not found". 8-lag models need `vareffects8` program (not implemented). Fix: excluded 8-lag models from dynamic effects esttab.
 - [ISSUE] 2026-02-26: `05_table5_channels.do` first run — `r(198)` "FE Inv/cap:dem invalid name". The `/` in label macro caused Stata parsing failure. Fix: renamed label to `"InvPC"`, removed backtick-quoted locals from `di` statements.
 - [ISSUE] 2026-02-26: `07_figures.do` first run — `r(111)` "AFR not found". `levelsof region` returns numeric codes but loop used them as string comparisons. Fix: replaced per-region loop with `by(region, compact)` panel plot.
 
-### Learnings from New Replication Packages (jvae023 & data_programs)
+### 新复现包的经验教训（jvae023 和 data_programs）
 
 - [LEARN] 2026-02-25: jvae023 (Abman, Lundberg & Ruta, JEEA 2024 — RTAs & Environment) uses R `glmnet::cv.glmnet(x, y, family="binomial", nfolds=50)` for LASSO propensity score estimation, then 1:1 nearest-neighbor matching on LASSO P-score, then DiD event study on matched panel via `lfe::felm()`. This is the LASSO-for-matching workflow (not LASSO for coefficient selection).
 - [LEARN] 2026-02-25: jvae023 uses `lambda.min` vs `lambda.1se` selection in `cv.glmnet` — `lambda.min` minimizes CV error, `lambda.1se` gives more parsimonious model. For propensity score matching, `lambda.min` is preferred (want accurate P-score).
@@ -216,9 +216,9 @@ Issues discovered during the 5-test validation suite (2026-02-25). These inform 
 - [SKILL-UPDATE] 2026-02-25: `/run-lasso` — Added Step 7: R `glmnet` LASSO propensity score matching pipeline (jvae023 pattern): cv.glmnet → predict P-score → nearest-neighbor match → felm() DiD on matched panel. Also added IHS transformation and custom matched-sample SE note.
 - [SKILL-UPDATE] 2026-02-25: `/run-bootstrap` — Added compact `bs, reps(N): command` prefix syntax (data_programs pattern). Documented difference from full `bootstrap _b, reps() cluster() idcluster():` syntax.
 
-### Learnings from APE Reference Papers (apep_0119, apep_0185, apep_0439)
+### APE 参考论文的经验教训（apep_0119、apep_0185、apep_0439）
 
-These 3 R-based replication packages are archived in `references/ape-winners/ape-papers/`. All patterns below are R-only and supplement (but do not replace) Stata-primary skills.
+这 3 个基于 R 的复现包存档于 `references/ape-winners/ape-papers/`。以下所有模式均为 R 专用，作为 Stata 主导技能的补充（而非替代）。
 
 - [LEARN] 2026-02-26: R `fixest::feols()` is the dominant regression package across all 3 APE papers, replacing `lfe::felm()`. Syntax: `feols(y ~ x | fe1 + fe2, data=df, cluster=~id)`. Supports multi-way FE, clustering, and IV in a single call.
 - [LEARN] 2026-02-26: R `did::att_gt()` with `bstrap=TRUE, cband=TRUE, biters=1000` for Callaway-Sant'Anna with cluster bootstrap inference (apep_0119). Addresses small-cluster concerns (51 states). Aggregation via `aggte(type="simple"|"group"|"dynamic"|"calendar")`.
@@ -232,7 +232,7 @@ These 3 R-based replication packages are archived in `references/ape-winners/ape
 - [LEARN] 2026-02-26: Permutation inference for cross-sectional interaction coefficients (apep_0439, 500 iterations). Randomly shuffle treatment labels across municipalities, re-estimate interaction, compute two-sided p-value. Confirms that spatial clustering of language/religion doesn't mechanically generate observed interaction.
 - [LEARN] 2026-02-26: `fixest::etable()` for formatted multi-model regression tables in R (apep_0439). Supports custom `dict` for variable renaming, `headers` for column labels, `se.below=TRUE` for SE placement.
 
-### Learnings from 2026-02-26 Replication Test Suite (11 package × skill combinations)
+### 2026-02-26 复现测试套件的经验教训（11 个复现包 × 技能组合）
 
 - [ISSUE] 2026-02-26: `estat bootstrap, bca` fails with r(198) unless BCa CIs were explicitly saved during the bootstrap prefix command. Default to `estat bootstrap, percentile bc` only.
 - [ISSUE] 2026-02-26: `boottest` may fail with r(198) after plain `reg` (non-reghdfe estimator). Always wrap in `cap noisily` when estimator type is uncertain.
@@ -270,11 +270,11 @@ These 3 R-based replication packages are archived in `references/ape-winners/ape
 
 ---
 
-## Session Log
+## 会话日志
 
-<!-- Add a brief summary at the end of each Claude Code session -->
+<!-- 每次 Claude Code 会话结束时添加简要摘要 -->
 
-| Date | Session Summary |
+| 日期 | 会话摘要 |
 |---|---|
 | 2026-02-25 | Initial test suite run (5 tests). Identified 10 issues across DID, RDD, IV, Panel tests. All tests passing after fixes. Created ISSUES_LOG.md. |
 | 2026-02-25 | Phase 1 implementation: added 6 adversarial agents, 5 new skills, quality scorer, README, ROADMAP. Activated MEMORY.md. |

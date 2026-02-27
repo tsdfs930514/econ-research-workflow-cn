@@ -3,44 +3,44 @@ paths:
   - "**/*.py"
 ---
 
-# Python Code Conventions
+# Python 代码规范 (Python Code Conventions)
 
-These conventions apply to ALL Python scripts in this project.
+以下规范适用于本项目中的所有 Python 脚本。
 
-## Header Template
+## 文件头模板
 
-Every .py file MUST start with this docstring header:
+每个 .py 文件**必须**以如下 docstring 文件头开始：
 
 ```python
 """
 Project:      [Project Name]
 Version:      [vN]
 Script:       [filename.py]
-Purpose:      [Brief description]
+Purpose:      [简要说明]
 Author:       [Name]
 Created:      [Date]
 Dependencies: [packages]
 """
 ```
 
-## Regression Analysis
+## 回归分析
 
-Use `pyfixest` with `feols()` syntax for ALL regressions:
+所有回归**必须**使用 `pyfixest` 的 `feols()` 语法：
 
 ```python
 import pyfixest as pf
 
-# OLS with clustered SE
+# 带聚类标准误的 OLS
 model = pf.feols("y ~ x1 + x2 | firmid + year", data=df, vcov={"CRV1": "firmid"})
 model.summary()
 ```
 
-Do NOT use `statsmodels` or `linearmodels` for standard regression tasks. `pyfixest` is the default to maintain syntax parity with Stata.
+**不得**使用 `statsmodels` 或 `linearmodels` 进行标准回归任务。`pyfixest` 是默认选择，以保持与 Stata 的语法一致性。
 
-## Data Manipulation
+## 数据操作
 
-- Use `pandas` for standard data manipulation.
-- Use `polars` for large datasets where performance is critical.
+- 使用 `pandas` 进行标准数据操作。
+- 当性能要求较高时，对大型数据集使用 `polars`。
 
 ```python
 import pandas as pd
@@ -48,23 +48,23 @@ import pandas as pd
 df = pd.read_stata("data/clean/panel_cleaned.dta")
 ```
 
-## Output Alignment with Stata
+## 输出与 Stata 对齐
 
-Format regression output to match Stata `esttab` format:
-- Same number of decimal places (3 for coefficients, 3 for standard errors)
-- Same star notation: `*** p<0.01, ** p<0.05, * p<0.10`
-- Standard errors in parentheses below coefficients
+回归输出格式须与 Stata `esttab` 格式对齐：
+- 系数和标准误的小数位数一致（默认各 3 位）
+- 相同的星号标注：`*** p<0.01, ** p<0.05, * p<0.10`
+- 标准误以括号形式显示在系数下方
 
-This ensures cross-validation between Stata and Python results is straightforward.
+这确保了 Stata 与 Python 结果之间的交叉验证简单直接。
 
 ```python
-# Export tables matching Stata format
+# 导出与 Stata 格式匹配的表格
 model.to_latex("output/tables/results_python.tex", digits=3)
 ```
 
-## File Paths
+## 文件路径
 
-Use `pathlib.Path` for ALL file paths. Never use raw string concatenation for paths:
+所有文件路径**必须**使用 `pathlib.Path`。禁止使用原始字符串拼接：
 
 ```python
 from pathlib import Path
@@ -80,9 +80,9 @@ FIGURES = OUTPUT / "figures"
 LOGS = OUTPUT / "logs"
 ```
 
-## Logging
+## 日志记录
 
-Use Python's `logging` module. Save log output to `output/logs/`:
+使用 Python 的 `logging` 模块。日志输出保存到 `output/logs/`：
 
 ```python
 import logging
@@ -96,9 +96,9 @@ logger = logging.getLogger(__name__)
 logger.info("Script started")
 ```
 
-## Random Seeds
+## 随机种子
 
-Set random seeds for reproducibility before ANY randomization:
+在任何随机化操作之前**必须**设置随机种子以确保可复现性：
 
 ```python
 import numpy as np
@@ -108,13 +108,13 @@ np.random.seed(12345)
 random.seed(12345)
 ```
 
-If using PyTorch or TensorFlow, also set their seeds accordingly.
+如使用 PyTorch 或 TensorFlow，也需相应设置其随机种子。
 
-## Virtual Environment
+## 虚拟环境
 
-- Document ALL dependencies in `requirements.txt`.
-- Pin exact versions for reproducibility.
-- Update `requirements.txt` whenever a new package is added.
+- 所有依赖项记录在 `requirements.txt` 中。
+- 锁定精确版本以确保可复现性。
+- 每添加新包时更新 `requirements.txt`。
 
 ```
 pandas==2.1.0

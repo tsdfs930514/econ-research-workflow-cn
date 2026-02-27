@@ -1,55 +1,55 @@
 ---
-description: "Run complete IV/2SLS analysis pipeline with diagnostics"
+description: "运行完整的工具变量/两阶段最小二乘法（IV/2SLS）分析管道及诊断检验"
 user_invocable: true
 ---
 
-# /run-iv — Instrumental Variables / 2SLS Analysis Pipeline
+# /run-iv — 工具变量 / 2SLS 分析管道
 
-When the user invokes `/run-iv`, execute a complete IV analysis pipeline covering first stage, reduced form, 2SLS/LIML estimation, comprehensive diagnostics (KP F, AR CIs, DWH, Hansen J), distance-credibility analysis, and Python cross-validation.
+当用户调用 `/run-iv` 时，执行完整的 IV 分析管道，涵盖第一阶段、简约式、2SLS/LIML 估计、综合诊断检验（KP F 统计量、AR 置信区间、DWH 检验、Hansen J 检验）、距离-可信度分析以及 Python 交叉验证。
 
-## Stata Execution Command
+## Stata 执行命令
 
-Run .do files via the auto-approved wrapper: `bash .claude/scripts/run-stata.sh "<project_dir>" "code/stata/script.do"`. The wrapper handles `cd`, Stata execution (`-e` flag), and automatic log error checking. See `CLAUDE.md` for details.
+通过自动审批的封装脚本运行 .do 文件：`bash .claude/scripts/run-stata.sh "<project_dir>" "code/stata/script.do"`。该封装脚本处理 `cd`、Stata 执行（`-e` 标志）以及自动日志错误检查。详见 `CLAUDE.md`。
 
-## Required Stata Packages (install in this order)
+## 所需 Stata 包（按此顺序安装）
 
-The dependency order matters — `ranktest` must be installed before `ivreg2`, and `ivreg2` before `ivreghdfe`. Missing `ranktest` causes the `struct ms_vcvorthog undefined` error.
+安装顺序很重要 — `ranktest` 必须在 `ivreg2` 之前安装，`ivreg2` 必须在 `ivreghdfe` 之前。缺少 `ranktest` 会导致 `struct ms_vcvorthog undefined` 错误。
 
 ```stata
-ssc install ranktest, replace      // MUST be first
-ssc install ivreg2, replace        // depends on ranktest
+ssc install ranktest, replace      // 必须首先安装
+ssc install ivreg2, replace        // 依赖 ranktest
 ssc install reghdfe, replace
 ssc install ftools, replace
-ssc install ivreghdfe, replace     // depends on ivreg2 + reghdfe
+ssc install ivreghdfe, replace     // 依赖 ivreg2 + reghdfe
 ssc install estout, replace
 ssc install coefplot, replace
 ssc install weakiv, replace
 ssc install boottest, replace
 ```
 
-## Step 0: Gather Inputs
+## 第 0 步：收集输入信息
 
-Ask the user for the following before proceeding:
+在开始之前，向用户询问以下信息：
 
-- **Dataset**: path to .dta file
-- **Endogenous variable(s)**: variable(s) suspected of being endogenous
-- **Instrument(s)**: excluded instrument(s) for the endogenous variable(s)
-- **Outcome variable**: dependent variable Y
-- **Control variables**: exogenous covariates included in all stages
-- **Fixed effects**: FE to absorb (e.g., unit FE, time FE, unit x time FE)
-- **Cluster variable**: variable for clustered standard errors
-- **Alternative outcomes** (optional): for multi-outcome panels (Panel A/B)
+- **数据集**：.dta 文件路径
+- **内生变量**：疑似内生的变量
+- **工具变量**：内生变量的排除工具变量
+- **因变量**：结果变量 Y
+- **控制变量**：所有阶段中包含的外生协变量
+- **固定效应**：需要吸收的固定效应（如个体固定效应、时间固定效应、个体×时间固定效应）
+- **聚类变量**：聚类标准误所用变量
+- **替代因变量**（可选）：用于多结果面板（Panel A/B）
 
-Note whether the model is exactly identified (# instruments = # endogenous) or overidentified (# instruments > # endogenous).
+注明模型是恰好识别（工具变量数 = 内生变量数）还是过度识别（工具变量数 > 内生变量数）。
 
-**Data exploration note**: Use `summarize` and `codebook` to inspect variables — NOT `tab` for continuous variables. `tab` on a continuous variable generates one row per unique value, producing massive output and potentially crashing for large datasets (Issue #5). Reserve `tab` for categorical/binary variables with few distinct values.
+**数据探索提示**：使用 `summarize` 和 `codebook` 检查变量 — 不要对连续变量使用 `tab`。对连续变量使用 `tab` 会为每个唯一值生成一行，产生大量输出，对大数据集可能导致崩溃（Issue #5）。仅对取值较少的分类/二值变量使用 `tab`。
 
-## Step 1: First Stage & Reduced Form (Stata .do file)
+## 第 1 步：第一阶段与简约式（Stata .do 文件）
 
 ```stata
 /*==============================================================================
-  IV Analysis — Step 1: First Stage & Reduced Form
-  Reference: APE paper 0185 (Social Networks & Labor Markets)
+  IV 分析 — 第 1 步：第一阶段与简约式
+  参考文献：APE paper 0185 (Social Networks & Labor Markets)
 ==============================================================================*/
 clear all
 set more off
@@ -60,20 +60,20 @@ log using "output/logs/iv_01_firststage.log", replace
 
 use "DATASET_PATH", clear
 
-* --- First Stage Regression ---
+* --- 第一阶段回归 ---
 eststo clear
 eststo fs_main: reghdfe ENDOG_VAR INSTRUMENT(S) CONTROLS, ///
     absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
 
-* First-stage F-statistic on excluded instruments
+* 排除工具变量的第一阶段 F 统计量
 test INSTRUMENT(S)
 local fs_F = r(F)
 local fs_p = r(p)
 di "=== First-Stage F-statistic: `fs_F' (p = `fs_p') ==="
-* Rule of thumb: F > 10 (Stock-Yogo); F > 23 (Lee et al. 2022 tF)
-* For heteroskedastic/clustered: compare to Montiel Olea-Pflueger effective F
+* 经验法则：F > 10 (Stock-Yogo)；F > 23 (Lee et al. 2022 tF)
+* 对于异方差/聚类情形：与 Montiel Olea-Pflueger 有效 F 值比较
 
-* Partial R-squared of excluded instruments
+* 排除工具变量的偏 R 方
 reghdfe ENDOG_VAR CONTROLS, absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
 local r2_excl = e(r2)
 eststo fs_main
@@ -81,12 +81,12 @@ local r2_full = e(r2)
 local partial_r2 = `r2_full' - `r2_excl'
 di "Partial R-squared: `partial_r2'"
 
-* --- Reduced Form ---
+* --- 简约式 ---
 eststo rf_main: reghdfe OUTCOME_VAR INSTRUMENT(S) CONTROLS, ///
     absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
 di "Reduced form coefficient / FS coefficient ≈ 2SLS (Wald)"
 
-* --- First Stage Table (dedicated, following APE 0185 tab3 format) ---
+* --- 第一阶段表格（独立表格，遵循 APE 0185 tab3 格式）---
 esttab fs_main using "output/tables/tab_first_stage.tex", ///
     se(4) b(4) star(* 0.10 ** 0.05 *** 0.01) ///
     keep(INSTRUMENT(S)) label booktabs replace ///
@@ -98,14 +98,14 @@ esttab fs_main using "output/tables/tab_first_stage.tex", ///
 log close
 ```
 
-## Step 2: OLS Baseline & 2SLS Estimation (Stata .do file)
+## 第 2 步：OLS 基准与 2SLS 估计（Stata .do 文件）
 
-**Fallback strategy:** If `ivreghdfe` crashes (e.g., missing `ranktest`), fall back to `ivreg2` with manually generated FE dummies. If `ivreg2` is also unavailable, compute a manual Wald estimator (reduced form / first stage).
+**回退策略：** 如果 `ivreghdfe` 崩溃（如缺少 `ranktest`），回退到 `ivreg2` 并手动生成固定效应虚拟变量。如果 `ivreg2` 也不可用，则计算手工 Wald 估计量（简约式 / 第一阶段）。
 
 ```stata
 /*==============================================================================
-  IV Analysis — Step 2: OLS Baseline, 2SLS, and LIML
-  Fallback chain: ivreghdfe -> ivreg2 (+ FE dummies) -> manual Wald
+  IV 分析 — 第 2 步：OLS 基准、2SLS 和 LIML
+  回退链：ivreghdfe -> ivreg2（+ 固定效应虚拟变量）-> 手工 Wald
 ==============================================================================*/
 clear all
 set more off
@@ -118,17 +118,17 @@ use "DATASET_PATH", clear
 
 eststo clear
 
-* --- OLS Baseline ---
+* --- OLS 基准 ---
 eststo ols_base: reghdfe OUTCOME_VAR ENDOG_VAR CONTROLS, ///
     absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
 
-* --- 2SLS with ivreghdfe (preferred) ---
+* --- 使用 ivreghdfe 的 2SLS（首选）---
 cap noisily ivreghdfe OUTCOME_VAR CONTROLS ///
     (ENDOG_VAR = INSTRUMENT(S)), ///
     absorb(FIXED_EFFECTS) cluster(CLUSTER_VAR) first
 if _rc != 0 {
     di "ivreghdfe failed. Trying ivreg2 with FE dummies..."
-    * Generate FE dummies manually
+    * 手动生成固定效应虚拟变量
     quietly: tab UNIT_VAR, gen(_unit_fe)
     quietly: tab TIME_VAR, gen(_time_fe)
     cap which ivreg2
@@ -137,7 +137,7 @@ if _rc != 0 {
             (ENDOG_VAR = INSTRUMENT(S)), cluster(CLUSTER_VAR) first ffirst
     }
     else {
-        * Manual Wald = RF_coef / FS_coef
+        * 手工 Wald = 简约式系数 / 第一阶段系数
         di "ivreg2 not available. Computing manual Wald estimator."
     }
     cap drop _unit_fe* _time_fe*
@@ -148,7 +148,7 @@ else {
 local kp_f = e(widstat)
 di "Kleibergen-Paap rk Wald F: `kp_f'"
 
-* --- LIML (robust to weak instruments) ---
+* --- LIML（对弱工具变量稳健）---
 cap noisily ivreghdfe OUTCOME_VAR CONTROLS ///
     (ENDOG_VAR = INSTRUMENT(S)), ///
     absorb(FIXED_EFFECTS) cluster(CLUSTER_VAR) liml
@@ -156,9 +156,9 @@ if _rc == 0 {
     eststo iv_liml
 }
 di "LIML estimate: " _b[ENDOG_VAR]
-* Large LIML-2SLS gap indicates weak instrument concern
+* LIML 与 2SLS 差异较大表明存在弱工具变量问题
 
-* --- Main Results Table (Panel A/B format, following APE 0185 tab2) ---
+* --- 主要结果表（Panel A/B 格式，遵循 APE 0185 tab2）---
 esttab ols_base iv_2sls iv_liml using "output/tables/tab_iv_main.tex", ///
     se(4) b(4) star(* 0.10 ** 0.05 *** 0.01) ///
     mtitles("OLS" "2SLS" "LIML") ///
@@ -172,12 +172,12 @@ esttab ols_base iv_2sls iv_liml using "output/tables/tab_iv_main.tex", ///
 log close
 ```
 
-## Step 3: Comprehensive Diagnostics (Stata .do file)
+## 第 3 步：综合诊断检验（Stata .do 文件）
 
 ```stata
 /*==============================================================================
-  IV Analysis — Step 3: Diagnostics
-  KP F, DWH endogeneity, Hansen J, Anderson-Rubin CIs
+  IV 分析 — 第 3 步：诊断检验
+  KP F 统计量、DWH 内生性检验、Hansen J 检验、Anderson-Rubin 置信区间
 ==============================================================================*/
 clear all
 set more off
@@ -187,25 +187,25 @@ log using "output/logs/iv_03_diagnostics.log", replace
 
 use "DATASET_PATH", clear
 
-* --- Full diagnostics via ivreg2 (without multi-way FE) ---
-* Note: if multi-way FE needed, partial them out first
+* --- 通过 ivreg2 进行完整诊断（不含多维固定效应）---
+* 注意：如需多维固定效应，需先手动去除
 ivreg2 OUTCOME_VAR CONTROLS (ENDOG_VAR = INSTRUMENT(S)), ///
     cluster(CLUSTER_VAR) first ffirst endog(ENDOG_VAR)
 
-* Diagnostics are automatically reported by ivreg2:
-* - KP rk Wald F (weak instrument)
-* - KP rk LM (underidentification)
-* - Hansen J (overidentification, if overidentified)
-* - DWH endogeneity test
+* ivreg2 自动报告以下诊断：
+* - KP rk Wald F（弱工具变量）
+* - KP rk LM（不可识别）
+* - Hansen J（过度识别，仅当过度识别时）
+* - DWH 内生性检验
 
 di "============================================="
 di "IV DIAGNOSTICS SUMMARY"
 di "============================================="
 di "KP rk Wald F:        " e(widstat)
 di "KP rk LM (underid):  " e(idstat) " (p=" e(idp) ")"
-* NOTE: DWH endogeneity test p-value (e(estatp)) may be missing when
-* xtivreg2 is used with partial() option. This is a known limitation.
-* In that case, run a manual Hausman-type endogeneity test (Issue #14).
+* 注意：使用 xtivreg2 配合 partial() 选项时，DWH 内生性检验
+* p 值 (e(estatp)) 可能缺失。这是已知限制。
+* 此时需手动运行 Hausman 型内生性检验（Issue #14）。
 if e(estatp) != . {
     di "DWH endogeneity:     " e(estat) " (p=" e(estatp) ")"
 }
@@ -215,14 +215,14 @@ else {
 di "Hansen J (overid):   " e(j) " (p=" e(jp) ")"
 di "============================================="
 
-* --- Anderson-Rubin Confidence Set (weak-instrument robust) ---
-* Critical when F-stat is marginal (10-23 range)
+* --- Anderson-Rubin 置信集（对弱工具变量稳健）---
+* 当 F 统计量处于边界值（10-23 范围）时尤为关键
 cap weakiv
 if _rc == 0 {
     weakiv
 }
 else {
-    * Manual AR test: run reduced form, test coefficient = 0
+    * 手动 AR 检验：运行简约式，检验系数 = 0
     reghdfe OUTCOME_VAR INSTRUMENT(S) CONTROLS, ///
         absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
     test INSTRUMENT(S)
@@ -231,19 +231,19 @@ else {
     di "Anderson-Rubin F: `ar_F' (p = `ar_p')"
 }
 
-* --- Shock-robust SEs (Adao et al. 2019) for shift-share IVs ---
-* If instrument is Bartik/shift-share, add two-way clustering:
+* --- Bartik/份额偏移型 IV 的冲击稳健标准误（Adao et al. 2019）---
+* 如果工具变量是 Bartik/份额偏移型，添加双向聚类：
 * reghdfe OUTCOME_VAR TREAT CONTROLS, absorb(FE) vce(cluster CLUSTER1 CLUSTER2)
 
 log close
 ```
 
-## Step 4: Robustness & Distance-Credibility (Stata .do file)
+## 第 4 步：稳健性与距离-可信度分析（Stata .do 文件）
 
 ```stata
 /*==============================================================================
-  IV Analysis — Step 4: Robustness
-  Following APE 0185: distance-credibility tradeoff, LOSO, placebos
+  IV 分析 — 第 4 步：稳健性
+  遵循 APE 0185：距离-可信度权衡、LOSO、安慰剂检验
 ==============================================================================*/
 clear all
 set more off
@@ -254,8 +254,8 @@ log using "output/logs/iv_04_robustness.log", replace
 
 use "DATASET_PATH", clear
 
-* --- Leave-One-State/Group-Out (LOSO) ---
-* Check if results driven by a single influential unit
+* --- 逐一剔除州/组（LOSO）---
+* 检查结果是否由某个特定单位驱动
 levelsof CLUSTER_VAR, local(clusters)
 foreach c of local clusters {
     cap ivreghdfe OUTCOME_VAR CONTROLS (ENDOG_VAR = INSTRUMENT(S)) ///
@@ -265,13 +265,12 @@ foreach c of local clusters {
     }
 }
 
-* --- Placebo Instruments ---
-* If exclusion restriction is debatable, test alternative instruments
-* that should NOT affect the outcome
+* --- 安慰剂工具变量 ---
+* 如果排除性约束有争议，测试不应影响因变量的替代工具变量
 * eststo placebo: reghdfe OUTCOME_VAR PLACEBO_INSTRUMENT CONTROLS, ...
 
-* --- Reduced-Form Pre-Trend Test ---
-* If instrument varies over time, check for pre-trends in reduced form
+* --- 简约式前趋势检验 ---
+* 如果工具变量随时间变化，检查简约式中的前趋势
 
 * --- Wild Cluster Bootstrap ---
 reghdfe OUTCOME_VAR ENDOG_VAR CONTROLS, absorb(FIXED_EFFECTS) vce(cluster CLUSTER_VAR)
@@ -280,31 +279,31 @@ boottest ENDOG_VAR, cluster(CLUSTER_VAR) boottype(mammen) reps(999) seed(12345)
 log close
 ```
 
-## Step 5: Python Cross-Validation
+## 第 5 步：Python 交叉验证
 
 ```python
 """
-IV Cross-Validation: Stata vs Python (pyfixest)
+IV 交叉验证：Stata vs Python (pyfixest)
 """
 import pandas as pd
 import pyfixest as pf
 
 df = pd.read_stata("DATASET_PATH")
 
-# IV estimation via pyfixest
-# Syntax: Y ~ exog | FEs | endog ~ instrument
+# 通过 pyfixest 进行 IV 估计
+# 语法：Y ~ exog | FEs | endog ~ instrument
 model_iv = pf.feols("OUTCOME_VAR ~ CONTROLS | FIXED_EFFECTS | ENDOG_VAR ~ INSTRUMENT(S)",
                      data=df, vcov={"CRV1": "CLUSTER_VAR"})
 print("=== Python 2SLS ===")
 print(model_iv.summary())
 
-# OLS for comparison
+# OLS 对比
 model_ols = pf.feols("OUTCOME_VAR ~ ENDOG_VAR + CONTROLS | FIXED_EFFECTS",
                       data=df, vcov={"CRV1": "CLUSTER_VAR"})
 print("=== Python OLS ===")
 print(model_ols.summary())
 
-# Cross-validate
+# 交叉验证
 stata_coef = STATA_IV_COEF
 python_coef = model_iv.coef()["ENDOG_VAR"]
 pct_diff = abs(stata_coef - python_coef) / abs(stata_coef) * 100
@@ -315,19 +314,19 @@ print(f"  Diff:   {pct_diff:.4f}%")
 print(f"  Status: {'PASS' if pct_diff < 0.1 else 'FAIL'}")
 ```
 
-## Step 6: Diagnostics Summary
+## 第 6 步：诊断总结
 
-After all steps, provide:
+所有步骤完成后，提供以下内容：
 
-1. **Instrument Relevance**: KP F vs Stock-Yogo/Lee et al. critical values. Partial R-squared.
-2. **2SLS vs LIML**: If estimates diverge, weak instruments are a concern.
-3. **Instrument Validity**: Hansen J (if overidentified). Narrative on exclusion restriction.
-4. **Endogeneity**: DWH test result. If not rejected, OLS preferred for efficiency.
-5. **Weak Instrument Inference**: AR confidence set (important when F < 23).
-6. **LOSO Sensitivity**: Is any single cluster driving the result?
-7. **OLS vs IV Direction**: Attenuation bias (IV > OLS) or reverse?
-8. **Cross-Validation**: Stata vs Python match.
+1. **工具变量相关性**：KP F 值与 Stock-Yogo/Lee et al. 临界值的比较。偏 R 方。
+2. **2SLS vs LIML**：如果估计值偏离，说明存在弱工具变量问题。
+3. **工具变量有效性**：Hansen J 检验（仅过度识别时）。排除性约束的叙述性论证。
+4. **内生性**：DWH 检验结果。如不拒绝，OLS 因效率更高而更优。
+5. **弱工具变量推断**：AR 置信集（当 F < 23 时尤为重要）。
+6. **LOSO 敏感性**：是否有单个聚类驱动结果？
+7. **OLS vs IV 方向**：衰减偏误（IV > OLS）还是反向？
+8. **交叉验证**：Stata vs Python 匹配结果。
 
-## Advanced Patterns Reference
+## 高级模式参考
 
-For advanced IV patterns from published papers (xtivreg2 panel IV, shift-share/Bartik instruments, k-class estimation, spatial lags via `spmat`, bootstrap with `cluster()`/`idcluster()`, multiple endogenous variables, interaction FE), see `advanced-stata-patterns.md`.
+关于已发表论文中的高级 IV 模式（xtivreg2 面板 IV、份额偏移/Bartik 工具变量、k 类估计、通过 `spmat` 的空间滞后、带 `cluster()`/`idcluster()` 的 Bootstrap、多内生变量、交互固定效应），参见 `advanced-stata-patterns.md`。

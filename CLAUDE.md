@@ -1,74 +1,72 @@
-# CLAUDE.md - Project Configuration
-# This file is loaded at the start of every Claude Code session.
-# Fill in template fields marked with [PLACEHOLDER] for your project.
+# CLAUDE.md - 项目配置文件
+# 每次 Claude Code 会话启动时自动加载本文件。
+# 请将标有 [PLACEHOLDER] 的模板字段替换为你的项目信息。
 
 ---
 
-## Project Identity
+## 项目信息
 
-- **Project Name**: [PROJECT_NAME]
-- **Institution**: [INSTITUTION_NAME]
-- **Researcher(s)**: [RESEARCHER_NAMES]
-- **Current Version**: v1
-- **Created**: [DATE]
-- **Last Updated**: [DATE]
-
----
-
-## Active Version
-
-The current working version is **v1/**. All new code, output, and analysis
-should be placed under this version directory unless migrating to a new version.
-
-When creating a new version (e.g., v2/), copy the directory structure from the
-previous version and update this field.
+- **项目名称**: [PROJECT_NAME]
+- **机构**: [INSTITUTION_NAME]
+- **研究者**: [RESEARCHER_NAMES]
+- **当前版本**: v1
+- **创建日期**: [DATE]
+- **最后更新**: [DATE]
 
 ---
 
-## Directory Convention
+## 当前版本
 
-Each version follows the structure:
+当前工作版本为 **v1/**。所有新代码、输出和分析均应放在此版本目录下，除非正在迁移至新版本。
+
+创建新版本（如 v2/）时，请从上一版本复制目录结构，并更新此字段。
+
+---
+
+## 目录规范
+
+每个版本遵循如下结构：
 
 ```
 vN/
-  _VERSION_INFO.md        # Version metadata
+  _VERSION_INFO.md        # 版本元数据
   code/
-    stata/                # .do files
-    python/               # .py files
-    sas/                  # .sas files (if needed)
+    stata/                # .do 文件
+    python/               # .py 文件
+    sas/                  # .sas 文件（如需要）
   data/
-    raw/                  # Original, unmodified data (READ-ONLY)
-    clean/                # Cleaned and constructed datasets
-    temp/                 # Intermediate/temporary data
+    raw/                  # 原始数据（只读，禁止修改）
+    clean/                # 清洗后的数据集
+    temp/                 # 中间/临时数据
   output/
-    tables/               # LaTeX tables (.tex)
-    figures/              # Figures (.pdf/.png)
-    logs/                 # Stata .log / Python output
+    tables/               # LaTeX 表格 (.tex)
+    figures/              # 图表 (.pdf/.png)
+    logs/                 # Stata .log / Python 输出日志
   paper/
-    main_cn.tex           # Chinese paper
-    main_en.tex           # English paper
-    sections/             # Section .tex files
-    bib/                  # BibTeX files
+    main_cn.tex           # 中文论文
+    main_en.tex           # 英文论文
+    sections/             # 章节 .tex 文件
+    bib/                  # BibTeX 文件
 ```
 
 ---
 
-## Stata Configuration
+## Stata 配置
 
-- **Executable Path**: `D:\Stata18\StataMP-64.exe`
-- **Execution Command** (auto-approved wrapper):
+- **可执行文件路径**: `D:\Stata18\StataMP-64.exe`
+- **执行命令**（自动批准的封装脚本）：
   ```bash
   bash .claude/scripts/run-stata.sh "<project_dir>" "<do_file>"
   ```
-- **Example**:
+- **示例**：
   ```bash
   bash .claude/scripts/run-stata.sh "F:/Learning/econ-research-workflow/tests/test1-did/v1" "code/stata/01_did_analysis.do"
   ```
-- **Flag notes**:
-  - The wrapper uses `-e` (auto-exit) internally
-  - `-b` and `/e` are forbidden (see original rationale)
-  - Log checking is built into the wrapper — no manual `tail` needed
-- **Fallback** (if wrapper unavailable):
+- **参数说明**：
+  - 封装脚本内部使用 `-e`（自动退出）
+  - 禁止使用 `-b` 和 `/e`（详见原始说明）
+  - 日志检查已内置于封装脚本中——无需手动 `tail`
+- **备用方案**（封装脚本不可用时）：
   ```bash
   cd "<project_dir>"
   "D:\Stata18\StataMP-64.exe" -e do "<do_file>"
@@ -76,17 +74,17 @@ vN/
 
 ---
 
-## Python Configuration
+## Python 配置
 
-- **Core Packages**:
-  - `pyfixest` -- Fixed-effects regression and inference
-  - `pandas` -- Data manipulation and analysis
-  - `polars` -- High-performance DataFrame library
-  - `matplotlib` -- Plotting and visualization
-  - `stargazer` -- Regression table formatting
+- **核心包**：
+  - `pyfixest` -- 固定效应回归与推断
+  - `pandas` -- 数据操作与分析
+  - `polars` -- 高性能 DataFrame 库
+  - `matplotlib` -- 绑图与可视化
+  - `stargazer` -- 回归表格格式化
 
-- **Regression Cross-Validation**:
-  Use `feols()` from `pyfixest` to cross-validate Stata regression results:
+- **回归交叉验证 (Cross-Validation)**：
+  使用 `pyfixest` 的 `feols()` 对 Stata 回归结果进行交叉验证：
   ```python
   import pyfixest as pf
   result = pf.feols("y ~ x1 + x2 | fe1 + fe2", data=df)
@@ -95,11 +93,11 @@ vN/
 
 ---
 
-## Code Naming Conventions
+## 代码命名规范
 
-All scripts use a numbered prefix to indicate execution order.
+所有脚本使用数字前缀表示执行顺序。
 
-**Stata (.do files)**:
+**Stata (.do 文件)**：
 ```
 01_clean_data.do
 02_desc_stats.do
@@ -109,7 +107,7 @@ All scripts use a numbered prefix to indicate execution order.
 06_figures.do
 ```
 
-**Python (.py files)**:
+**Python (.py 文件)**：
 ```
 01_clean_data.py
 02_desc_stats.py
@@ -117,157 +115,155 @@ All scripts use a numbered prefix to indicate execution order.
 04_figures.py
 ```
 
-- Prefix numbers define the execution order within a version.
-- Use descriptive names after the number prefix.
-- Keep Stata and Python scripts in the same `code/` directory.
+- 前缀数字定义版本内的执行顺序。
+- 数字前缀后使用描述性名称。
+- Stata 和 Python 脚本放在同一 `code/` 目录下。
 
 ---
 
-## Skills Quick Reference
+## 技能快速参考
 
-| Skill | Description |
+| 技能 | 说明 |
 |---|---|
-| `/init-project` | Initialize a new research project with standardized directory structure |
-| `/data-describe` | Generate descriptive statistics and variable distributions (Stata + Python) |
-| `/run-did` | Run complete DID/TWFE/Callaway-Sant'Anna analysis pipeline (see `/run-sdid` for Synthetic DID) |
-| `/run-iv` | Run complete IV/2SLS analysis pipeline with diagnostics |
-| `/run-rdd` | Run complete RDD analysis pipeline with all diagnostics |
-| `/run-panel` | Run complete Panel FE/RE/GMM analysis pipeline |
-| `/run-sdid` | Run Synthetic DID analysis with unit/time weights and inference |
-| `/cross-check` | Cross-validate regression results between Stata, Python pyfixest, and R fixest |
-| `/robustness` | Run a comprehensive robustness test suite for regression results |
-| `/make-table` | Generate publication-quality LaTeX regression tables |
-| `/write-section` | Write a specific paper section in Chinese or English |
-| `/review-paper` | Simulate peer review with three reviewers giving structured feedback; optional APE-style multi-round deep review |
-| `/lit-review` | Generate structured literature review with BibTeX entries |
-| `/adversarial-review` | Run adversarial critic-fixer QA loop (code, econometrics, tables) |
-| `/score` | Run executable quality scorer (6 dimensions, 100 pts) on current version |
-| `/commit` | Smart git commit with type prefix and data safety warnings |
-| `/compile-latex` | Compile LaTeX paper with pdflatex/bibtex and error checking |
-| `/context-status` | Display current version, recent decisions, quality scores, git state |
-| `/explore` | Set up exploration sandbox with relaxed quality thresholds (>= 60) |
-| `/promote` | Graduate exploratory files to main pipeline with renumbering and quality check |
-| `/session-log` | Session start/end manager — load context, record decisions and learnings |
-| `/interview-me` | Bilingual Socratic research interview — formalizes ideas into structured proposals |
-| `/devils-advocate` | Pre-analysis identification strategy challenger — threat assessment, not code fixes |
-| `/learn` | Create new rules or skills from within a session (constitution-guarded) |
-| `/run-bootstrap` | Run bootstrap & resampling inference pipeline (pairs, wild cluster, residual, teffects) |
-| `/run-placebo` | Run placebo tests & randomization inference pipeline (timing, outcome, instrument, permutation) |
-| `/run-logit-probit` | Run logit/probit, propensity score, treatment effects (RA/IPW/AIPW), and conditional logit pipeline |
-| `/run-lasso` | Run LASSO, post-double-selection, and regularized regression pipeline for variable selection and causal inference |
-| `/run-pipeline` | Auto-detect methods from research plan and orchestrate full skill pipeline end-to-end |
-| `/synthesis-report` | Collect all analysis outputs and generate structured synthesis report (Markdown + LaTeX) |
+| `/init-project` | 初始化研究项目，创建标准化目录结构 |
+| `/data-describe` | 生成描述性统计和变量分布（Stata + Python） |
+| `/run-did` | 运行完整的 DID/TWFE/Callaway-Sant'Anna 分析流水线（合成 DID 请用 `/run-sdid`） |
+| `/run-iv` | 运行完整的 IV/2SLS 分析流水线及诊断检验 |
+| `/run-rdd` | 运行完整的 RDD 分析流水线及全部诊断检验 |
+| `/run-panel` | 运行完整的面板数据 FE/RE/GMM 分析流水线 |
+| `/run-sdid` | 运行合成 DID 分析，包括单位/时间权重与推断 |
+| `/cross-check` | Stata、Python pyfixest、R fixest 之间的回归结果交叉验证 |
+| `/robustness` | 对回归结果运行全面的稳健性检验套件 |
+| `/make-table` | 生成可发表的 LaTeX 回归表格 |
+| `/write-section` | 撰写论文特定章节（中文或英文） |
+| `/review-paper` | 模拟三位审稿人给出结构化反馈；可选 APE 风格多轮深度评审 |
+| `/lit-review` | 生成结构化文献综述及 BibTeX 条目 |
+| `/adversarial-review` | 运行对抗式评审者/修复者 QA 循环（代码、计量、表格） |
+| `/score` | 运行可执行质量评分器（6 个维度，满分 100 分） |
+| `/commit` | 智能 git commit，带类型前缀和数据安全警告 |
+| `/compile-latex` | 使用 pdflatex/bibtex 编译 LaTeX 论文并检查错误 |
+| `/context-status` | 显示当前版本、近期决策、质量评分、git 状态 |
+| `/explore` | 设置探索沙盒，放宽质量阈值（>= 60） |
+| `/promote` | 将探索性文件提升至主流水线，含重新编号和质量检查 |
+| `/session-log` | 会话启动/结束管理器——加载上下文、记录决策和经验 |
+| `/interview-me` | 双语苏格拉底式研究访谈——将想法形式化为结构化提案 |
+| `/devils-advocate` | 预分析识别策略挑战者——威胁评估，不涉及代码修复 |
+| `/learn` | 在会话中创建新规则或技能（受基本准则约束） |
+| `/run-bootstrap` | 运行自助法与重抽样推断流水线（配对、野蛮聚类、残差、处理效应） |
+| `/run-placebo` | 运行安慰剂检验与随机化推断流水线（时间、结果、工具变量、置换） |
+| `/run-logit-probit` | 运行 logit/probit、倾向得分、处理效应（RA/IPW/AIPW）和条件 logit 流水线 |
+| `/run-lasso` | 运行 LASSO、双重选择后推断和正则化回归流水线，用于变量选择与因果推断 |
+| `/run-pipeline` | 自动检测研究计划中的方法并端到端编排完整技能流水线 |
+| `/synthesis-report` | 汇集所有分析输出，生成结构化综合报告（Markdown + LaTeX） |
 
 ---
 
-## Hooks
+## 钩子 (Hooks)
 
-3 lifecycle hooks are configured in `.claude/settings.json`:
+`.claude/settings.json` 中配置了 3 个生命周期钩子：
 
-| Hook | Event | Action |
+| 钩子 | 事件 | 动作 |
 |------|-------|--------|
-| Session-start loader | `SessionStart` | Reads MEMORY.md, displays recent entries, last session, and last quality score |
-| Pre-compact save | `PreCompact` | Prompts Claude to append a session summary to MEMORY.md before context compaction |
-| Post-Stata log check | `PostToolUse` (Bash) | Parses `.log` files for `r(xxx)` errors after Stata execution |
+| 会话启动加载器 | `SessionStart` | 读取 MEMORY.md，显示近期条目、上次会话和最新质量评分 |
+| 压缩前保存 | `PreCompact` | 提示 Claude 在上下文压缩前将会话摘要追加到 MEMORY.md |
+| Stata 运行后日志检查 | `PostToolUse` (Bash) | Stata 执行后解析 `.log` 文件中的 `r(xxx)` 错误 |
 
-Hook scripts are located in `.claude/hooks/`:
-- `session-loader.py` — session start context loader
-- `stata-log-check.py` — automatic Stata error detection
+钩子脚本位于 `.claude/hooks/`：
+- `session-loader.py` — 会话启动上下文加载器
+- `stata-log-check.py` — Stata 错误自动检测
 
-### Always-On Rules
+### 始终加载的规则
 
-3 always-on rules (loaded in every session, no path scope):
+3 条始终加载的规则（每次会话均加载，不限路径作用域）：
 
-| Rule | Purpose |
+| 规则 | 用途 |
 |------|---------|
-| `constitution.md` | 5 immutable principles governing all workflow components |
-| `orchestrator-protocol.md` | Spec-Plan-Implement-Verify-Review-Fix-Score task cycle |
-| `stata-error-verification.md` | Mandatory hook output reading before re-running Stata scripts |
+| `constitution.md` | 5 条不可变基本准则，约束所有工作流组件 |
+| `orchestrator-protocol.md` | 规格-计划-实施-验证-评审-修复-评分 任务循环 |
+| `stata-error-verification.md` | Stata 脚本重新运行前必须读取钩子输出 |
 
 ---
 
-## Personal Preferences
+## 个人偏好
 
-Machine-specific preferences (Stata path, editor, directories) are stored in `personal-memory.md` at the project root. This file is **gitignored** and not shared via version control. Copy the template and fill in your local settings.
+机器特定的偏好设置（Stata 路径、编辑器、目录等）存储在项目根目录的 `personal-memory.md` 中。该文件已加入 **gitignore**，不通过版本控制共享。请复制模板并填入你的本地设置。
 
 ---
 
-## Quality Thresholds (Sant'Anna Scoring System)
+## 质量阈值（Sant'Anna 评分体系）
 
-All deliverables are scored on a 0-100 scale:
+所有交付物按 0-100 分制评分：
 
-| Score | Rating | Action |
+| 分数 | 等级 | 操作 |
 |---|---|---|
-| >= 95 | Publication Ready | No further changes needed |
-| >= 90 | Minor Revisions | Address small issues before submission |
-| >= 80 | Major Revisions | Significant rework required |
-| < 80 | Redo | Fundamental problems; start section over |
+| >= 95 | 可发表 | 无需进一步修改 |
+| >= 90 | 小修 | 提交前解决小问题 |
+| >= 80 | 大修 | 需要大幅修改 |
+| < 80 | 重做 | 存在根本性问题；从头开始 |
 
-Scoring criteria include: methodological rigor, code correctness, output
-formatting, robustness of results, and clarity of exposition.
+评分标准包括：方法论严谨性、代码正确性、输出格式、结果稳健性和表述清晰度。
 
-Use `/adversarial-review` for automated multi-round quality assurance with
-critic-fixer separation. Use `/score` for quantitative scoring.
+使用 `/adversarial-review` 进行自动化多轮质量保证（评审者/修复者分离），使用 `/score` 进行量化评分。
 
 ---
 
-## Quality Scoring
+## 质量评分
 
-The executable quality scorer (`scripts/quality_scorer.py`) evaluates projects on 6 dimensions:
+可执行质量评分器（`scripts/quality_scorer.py`）从 6 个维度评价项目：
 
-| Dimension | Points | Key Checks |
+| 维度 | 分值 | 关键检查项 |
 |-----------|--------|------------|
-| Code Conventions | 15 | .do headers, `set seed`, numbered naming, log pattern, `vce(cluster)` |
-| Log Cleanliness | 15 | No `r(xxx)` errors, no `variable not found`, no `command not found` |
-| Output Completeness | 15 | Tables (.tex), figures (.pdf/.png), and logs exist and are non-empty |
-| Cross-Validation | 15 | Python script exists, coefficient comparison, pass/fail threshold |
-| Documentation | 15 | REPLICATION.md with content, _VERSION_INFO.md, data sources documented |
-| Method Diagnostics | 25 | Auto-detected: DID pre-trends, IV first-stage F, RDD density test, Panel Hausman |
+| 代码规范 | 15 | .do 文件头、`set seed`、编号命名、日志模式、`vce(cluster)` |
+| 日志清洁度 | 15 | 无 `r(xxx)` 错误、无 `variable not found`、无 `command not found` |
+| 输出完整性 | 15 | 表格 (.tex)、图表 (.pdf/.png) 和日志存在且非空 |
+| 交叉验证 | 15 | Python 脚本存在、系数比较、通过/未通过阈值 |
+| 文档 | 15 | REPLICATION.md 有内容、_VERSION_INFO.md、数据来源已记录 |
+| 方法诊断 | 25 | 自动检测：DID 平行趋势、IV 第一阶段 F 值、RDD 密度检验、面板 Hausman 检验 |
 
-Run via: `python scripts/quality_scorer.py v1/` or use the `/score` skill.
-
----
-
-## Data Safety Rules
-
-1. **`data/raw/` is READ-ONLY.** Never modify, overwrite, or delete raw data files.
-2. All data transformations must read from `data/raw/` and write to `data/clean/` or `data/temp/`.
-3. Cleaning scripts must document every transformation applied.
-4. Keep a record of the original data source and download date in `docs/`.
-5. Before any destructive operation, confirm the target is NOT in `data/raw/`.
+运行方式：`python scripts/quality_scorer.py v1/` 或使用 `/score` 技能。
 
 ---
 
-## Paper Formats
+## 数据安全规则
 
-4 output styles supported via `/write-section` and `/init-project`:
+1. **`data/raw/` 为只读目录。** 永远不要修改、覆盖或删除原始数据文件。
+2. 所有数据转换必须从 `data/raw/` 读取，写入 `data/clean/` 或 `data/temp/`。
+3. 清洗脚本必须记录每一项数据转换操作。
+4. 在 `docs/` 中保留原始数据来源和下载日期的记录。
+5. 执行任何破坏性操作之前，确认目标不在 `data/raw/` 中。
 
-| Format | Template | Use Case |
+---
+
+## 论文格式
+
+通过 `/write-section` 和 `/init-project` 支持 4 种输出样式：
+
+| 格式 | 模板 | 适用场景 |
 |--------|----------|----------|
-| Chinese journals | `main_cn.tex` | 经济研究, 管理世界, 经济学季刊 submissions |
-| English TOP5 | `main_en.tex` | AER, QJE, JPE, Econometrica, REStud submissions |
-| NBER Working Paper | `main_nber.tex` | NBER WP series with JEL codes, acknowledgments, extended appendices |
-| SSRN Preprint | `main_ssrn.tex` | Rapid dissemination, "draft — comments welcome" format |
+| 中文期刊 | `main_cn.tex` | 经济研究、管理世界、经济学季刊投稿 |
+| 英文 TOP5 | `main_en.tex` | AER、QJE、JPE、Econometrica、REStud 投稿 |
+| NBER 工作论文 | `main_nber.tex` | NBER WP 系列，含 JEL 分类码、致谢、扩展附录 |
+| SSRN 预印本 | `main_ssrn.tex` | 快速传播，"草稿——欢迎评论"格式 |
 
 ---
 
-## Output Standards
+## 输出标准
 
-### Numerical Formatting
-- **Coefficients**: 3 decimal places by default (e.g., `0.123`); 4 decimal places for TOP5/AER causal inference tables (see `/make-table`)
-- **Standard Errors**: 3 decimal places by default, in parentheses (e.g., `(0.045)`); 4 for TOP5/AER
-- **Significance Stars**: `*** p<0.01`, `** p<0.05`, `* p<0.10`
-- **R-squared**: 3 decimal places
-- **Observations**: Comma-separated integers (e.g., `12,345`)
+### 数值格式
+- **系数**: 默认 3 位小数（如 `0.123`）；TOP5/AER 因果推断表格为 4 位小数（详见 `/make-table`）
+- **标准误**: 默认 3 位小数，括号内显示（如 `(0.045)`）；TOP5/AER 为 4 位
+- **显著性星号**: `*** p<0.01`, `** p<0.05`, `* p<0.10`
+- **R 方**: 3 位小数
+- **观测值**: 千位分隔整数（如 `12,345`）
 
-### Table Standards
-- Include dependent variable name in column headers.
-- Report number of observations and R-squared in every table.
-- Note fixed effects and clustering in table footer.
-- Use consistent column ordering across related tables.
+### 表格标准
+- 列标题中包含因变量名称。
+- 每张表格报告观测值数量和 R 方。
+- 表格脚注注明固定效应和聚类标准误。
+- 相关表格之间保持一致的列顺序。
 
-### Figure Standards
-- Label all axes with variable names and units.
-- Include titles and source notes.
-- Use high-resolution export (300+ DPI for raster, vector preferred).
-- Consistent color scheme across all figures in a version.
+### 图表标准
+- 所有坐标轴标注变量名称和单位。
+- 包含标题和数据来源注释。
+- 使用高分辨率导出（光栅图 300+ DPI，优先使用矢量图）。
+- 同一版本内所有图表使用一致的配色方案。

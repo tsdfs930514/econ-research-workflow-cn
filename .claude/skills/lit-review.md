@@ -1,72 +1,72 @@
 ---
-description: "Generate structured literature review with BibTeX entries"
+description: "生成结构化文献综述及 BibTeX 条目"
 user_invocable: true
 ---
 
-# /lit-review — Structured Literature Review Generator
+# /lit-review — 结构化文献综述生成器
 
-## Information Gathering
+## 信息收集
 
-Before starting, ask the user for:
+开始之前，向用户询问：
 
-1. **Research topic/question**: What is the specific research question or topic area?
-2. **Method**: DID / IV / RDD / Panel FE / other econometric approach
-3. **Key papers already known** (optional): Papers the user is already aware of, to avoid redundancy and to anchor the review
-4. **Scope**: Narrow (tightly focused on exact topic) or Broad (includes adjacent topics and broader methodological context)
-5. **Language**: CN (Chinese literature only) / EN (English literature only) / Both
+1. **研究主题/问题**：具体的研究问题或主题领域是什么？
+2. **方法**：DID / IV / RDD / 面板 FE / 其他计量经济学方法
+3. **已知核心文献**（可选）：用户已知的论文，以避免重复并作为综述的锚点
+4. **范围**：窄（紧密聚焦于精确主题）或宽（包含邻近主题和更广泛的方法论背景）
+5. **语言**：CN（仅中文文献）/ EN（仅英文文献）/ Both（两者都要）
 
-## Literature Organization
+## 文献组织
 
-Generate the review organized into three streams:
+按三条线索组织综述：
 
-### Stream 1: Methodological Stream
-Key papers that advance the econometric method being used:
-- Foundational/seminal papers establishing the method
-- Recent methodological innovations and refinements
-- Papers on diagnostics, testing, and best practices for the method
-- Critiques and limitations of the method
+### 线索 1：方法论线索
+推进所使用计量方法的核心论文：
+- 奠基性/开创性论文
+- 近期方法论创新和改进
+- 关于诊断检验、测试和最佳实践的论文
+- 对该方法的批评和局限性
 
-### Stream 2: Topical Stream
-Papers on the same substantive topic regardless of method:
-- Foundational work defining the research area
-- Major empirical findings in the field
-- Theoretical contributions relevant to the topic
-- Policy-relevant studies and their conclusions
+### 线索 2：主题线索
+不论方法，研究同一实质性主题的论文：
+- 定义该研究领域的奠基性工作
+- 该领域的主要实证发现
+- 与主题相关的理论贡献
+- 政策相关研究及其结论
 
-### Stream 3: Intersection Stream
-Papers using the same method on the same or closely related topic:
-- Direct precedents for the user's approach
-- Papers the user's work must cite and differentiate from
-- Studies using similar data or institutional settings
+### 线索 3：交叉线索
+使用相同方法研究相同或密切相关主题的论文：
+- 用户研究方案的直接先例
+- 用户必须引用并与之区分的论文
+- 使用类似数据或制度背景的研究
 
-## Entry Format
+## 条目格式
 
-For each paper referenced, provide:
+对每篇引用的论文，提供：
 
-| Field | Content |
-|---|---|
-| **Author(s)** | Full author list |
-| **Year** | Publication year |
-| **Journal** | Journal name (with impact factor tier if relevant) |
-| **Key Finding** | One-sentence summary of main result |
-| **Method** | Econometric method used |
-| **Data/Context** | Dataset, country, time period |
-| **Relevance** | How this paper relates to the user's research question |
+| 字段 | 内容 |
+|------|------|
+| **作者** | 完整作者列表 |
+| **年份** | 发表年份 |
+| **期刊** | 期刊名称（如相关，标注影响因子等级） |
+| **核心发现** | 一句话概述主要结果 |
+| **方法** | 使用的计量方法 |
+| **数据/背景** | 数据集、国家、时间范围 |
+| **相关性** | 该论文与用户研究问题的关系 |
 
-## Research Gap Identification
+## 研究空白识别
 
-After mapping the literature, identify:
+文献梳理完成后，识别：
 
-1. **Methodological gaps**: Has this method been applied to this topic before? If so, what variation or improvement does the user offer?
-2. **Empirical gaps**: Is there a data context (country, time period, population) not yet studied?
-3. **Theoretical gaps**: Is there a mechanism or channel not yet explored?
-4. **Policy gaps**: Are there policy-relevant questions the literature has not addressed?
+1. **方法论空白**：该方法是否已应用于该主题？如果是，用户提供了什么改进或变化？
+2. **实证空白**：是否存在尚未研究的数据背景（国家、时期、人群）？
+3. **理论空白**：是否存在尚未探索的机制或渠道？
+4. **政策空白**：文献是否有未解决的政策相关问题？
 
-Frame the user's potential contribution in terms of filling one or more of these gaps.
+将用户的潜在贡献定位为填补上述一个或多个空白。
 
-## BibTeX Generation
+## BibTeX 生成
 
-Generate BibTeX entries for all referenced papers in the following format:
+为所有引用的论文生成 BibTeX 条目，格式如下：
 
 ```bibtex
 @article{author2024title,
@@ -81,7 +81,7 @@ Generate BibTeX entries for all referenced papers in the following format:
 }
 ```
 
-For Chinese-language papers:
+对于中文论文：
 
 ```bibtex
 @article{author2024title,
@@ -96,33 +96,33 @@ For Chinese-language papers:
 }
 ```
 
-**Important disclaimer**: Include a clear note at the top of the BibTeX output:
+**重要免责声明**：在 BibTeX 输出顶部包含明确说明：
 
-> **VERIFICATION REQUIRED**: These BibTeX entries are generated from Claude's training data and may contain inaccurate volume numbers, page ranges, or DOIs. All entries should be verified against the actual publications via Google Scholar, CNKI, or the journal's website before use in a manuscript.
+> **需要核实**：这些 BibTeX 条目基于 Claude 的训练数据生成，卷号、页码或 DOI 可能不准确。在用于论文投稿之前，所有条目均应通过 Google Scholar、CNKI 或期刊网站进行核实。
 
-## Chinese Literature Sources
+## 中文文献来源
 
-For Chinese literature (when scope includes CN):
-- Include papers from CSSCI-indexed journals
-- Reference CNKI as the primary database
-- Cover key Chinese economics journals: 经济研究, 管理世界, 中国工业经济, 经济学(季刊), 金融研究, 中国社会科学, 世界经济
-- Use both Chinese and pinyin-romanized citation keys
+当范围包含 CN 时：
+- 包含 CSSCI 索引期刊论文
+- 以 CNKI 作为主要数据库
+- 涵盖核心中文经济学期刊：经济研究、管理世界、中国工业经济、经济学(季刊)、金融研究、中国社会科学、世界经济
+- 引用键同时使用中文和拼音罗马化形式
 
-## Output Files
+## 输出文件
 
-Generate two output sections:
+生成两部分输出：
 
-### 1. Literature Review Section (`lit_review.tex`)
-- LaTeX-formatted literature review text
-- Organized by the three streams above
-- Uses `\cite{}` commands matching the BibTeX keys
-- Ready to be `\input{}` into a main paper file
+### 1. 文献综述章节 (`lit_review.tex`)
+- LaTeX 格式的文献综述文本
+- 按上述三条线索组织
+- 使用 `\cite{}` 命令对应 BibTeX 键
+- 可直接通过 `\input{}` 引入主论文文件
 
-### 2. References (`references.bib`)
-- Complete BibTeX file with all entries
-- Sorted alphabetically by citation key
-- Includes the verification disclaimer as a comment at the top of the file
+### 2. 参考文献 (`references.bib`)
+- 包含所有条目的完整 BibTeX 文件
+- 按引用键字母顺序排列
+- 文件顶部以注释形式包含核实免责声明
 
-## Output Format
+## 输出格式
 
-Present the literature review in structured markdown first (for immediate reading), then provide the LaTeX and BibTeX file contents in code blocks that the user can save.
+首先以结构化 Markdown 呈现文献综述（便于即时阅读），然后在代码块中提供 LaTeX 和 BibTeX 文件内容供用户保存。

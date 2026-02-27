@@ -39,7 +39,7 @@ def main():
         log_files = glob.glob("output/logs/*.log")
 
     if not log_files:
-        print("[Stata Log Check] No .log files found in CWD or output/logs/.")
+        print("[Stata 日志检查] 当前目录和 output/logs/ 中均未找到 .log 文件。")
         return
 
     # Sort by modification time, most recent first
@@ -51,7 +51,7 @@ def main():
         with open(latest_log, "r", encoding="utf-8", errors="replace") as f:
             log_content = f.read()
     except OSError as e:
-        print(f"[Stata Log Check] Could not read {latest_log}: {e}")
+        print(f"[Stata 日志检查] 无法读取 {latest_log}: {e}")
         return
 
     # Find r(xxx) error patterns
@@ -60,15 +60,15 @@ def main():
 
     if errors_found:
         unique_errors = sorted(set(errors_found))
-        print(f"[Stata Log Check] WARNING: Errors found in {latest_log}:")
+        print(f"[Stata 日志检查] 警告: 在 {latest_log} 中发现错误:")
         for err_code in unique_errors:
             # Count occurrences
             count = errors_found.count(err_code)
-            print(f"  r({err_code}) - {count} occurrence(s)")
-        print(f"  Total: {len(errors_found)} error(s) across {len(unique_errors)} unique code(s).")
-        print(f"  Review the log file: {latest_log}")
+            print(f"  r({err_code}) - {count} 处")
+        print(f"  共计: {len(errors_found)} 个错误，涉及 {len(unique_errors)} 个不同错误代码。")
+        print(f"  请检查日志文件: {latest_log}")
     else:
-        print(f"[Stata Log Check] Clean: no r(xxx) errors in {latest_log}")
+        print(f"[Stata 日志检查] 通过: {latest_log} 中无 r(xxx) 错误")
 
 
 if __name__ == "__main__":

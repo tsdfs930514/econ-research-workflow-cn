@@ -1,76 +1,76 @@
 ---
-description: "Set up exploration sandbox with relaxed quality thresholds"
+description: "设置探索沙盒，放宽质量阈值"
 user_invocable: true
 ---
 
-# /explore — Exploration Sandbox
+# /explore — 探索沙盒
 
-Set up and work within an exploratory analysis workspace with relaxed quality thresholds. Intended for quick hypothesis testing, alternative specifications, and data exploration.
+设置并在探索性分析工作空间中工作，使用放宽的质量阈值。用于快速假设检验、替代规范和数据探索。
 
-## Activation
+## 激活
 
-When the user runs `/explore`, perform the following:
+当用户运行 `/explore` 时，执行以下操作：
 
-## Steps
+## 步骤
 
-### 1. Set Up Sandbox Directory
+### 1. 创建沙盒目录
 
-Create the `explore/` directory at the project root if it doesn't exist:
+如果不存在，在项目根目录创建 `explore/` 目录：
 
 ```
 explore/
-  code/          # Exploratory .do and .py files
-  output/        # Tables, figures, logs from exploratory runs
-  data/          # Temporary exploratory datasets
+  code/          # 探索性 .do 和 .py 文件
+  output/        # 探索性运行的表格、图表、日志
+  data/          # 临时探索性数据集
 ```
 
 ```bash
 mkdir -p explore/code explore/output explore/data
 ```
 
-### 2. Relaxed Quality Thresholds
+### 2. 放宽质量阈值
 
-Within the `explore/` workspace, apply relaxed quality standards:
+在 `explore/` 工作空间内，适用放宽的质量标准：
 
-| Criterion | Main Pipeline | Exploration |
-|-----------|--------------|-------------|
-| Quality score threshold | >= 80 | >= 60 |
-| Cross-validation required | Yes | No |
-| Full adversarial review | Yes | No |
-| Variable labels required | Yes | No |
-| Full header block | Yes | Abbreviated OK |
+| 标准 | 主流水线 | 探索模式 |
+|------|---------|---------|
+| 质量评分阈值 | >= 80 | >= 60 |
+| 要求交叉验证 | 是 | 否 |
+| 完整对抗式审查 | 是 | 否 |
+| 要求变量标签 | 是 | 否 |
+| 完整文件头 | 是 | 简化版即可 |
 
-### 3. File Naming
+### 3. 文件命名
 
-All exploratory files should be clearly marked:
-- Store everything under `explore/` (preferred), OR
-- Append `_EXPLORATORY` suffix to filenames if stored elsewhere (e.g., `03_alt_spec_EXPLORATORY.do`)
+所有探索性文件应明确标记：
+- 存储在 `explore/` 下（推荐），或
+- 在文件名后追加 `_EXPLORATORY` 后缀（如存储在其他位置时，如 `03_alt_spec_EXPLORATORY.do`）
 
-### 4. Workflow
+### 4. 工作流程
 
-1. Scaffold the `explore/` directory
-2. Inform the user that exploratory mode is active with relaxed thresholds
-3. Generate code in `explore/code/` — skip full headers, use abbreviated logging
-4. Run analyses and store output in `explore/output/`
-5. Do NOT automatically trigger `/adversarial-review` on exploratory work
-6. If the user wants to promote results to the main pipeline, use `/promote`
+1. 搭建 `explore/` 目录
+2. 通知用户探索模式已激活，质量阈值已放宽
+3. 在 `explore/code/` 中生成代码——跳过完整文件头，使用简化日志
+4. 运行分析并将输出存储在 `explore/output/`
+5. 不自动对探索性工作触发 `/adversarial-review`
+6. 如果用户希望将结果提升至主流水线，使用 `/promote`
 
-### 5. Display Status
+### 5. 显示状态
 
-After setup, display:
+设置完成后显示：
 
 ```
-Exploration sandbox active.
-  Directory: explore/
-  Quality threshold: >= 60 (relaxed from 80)
-  Cross-validation: optional
-  Adversarial review: not automatic
+探索沙盒已激活。
+  目录：explore/
+  质量阈值：>= 60（从 80 放宽）
+  交叉验证：可选
+  对抗式审查：不自动触发
 
-Use /promote to graduate files to the main pipeline.
+使用 /promote 将文件提升至主流水线。
 ```
 
-## Notes
+## 注意事项
 
-- Exploratory results are NOT publication-ready — they must pass `/promote` and `/score` before inclusion in the main analysis.
-- The `explore/` directory should be added to `.gitignore` if the user wants to keep it out of version control.
-- This skill does not modify any files in `vN/` directories.
+- 探索性结果不是可发表的——必须通过 `/promote` 和 `/score` 才能纳入主分析。
+- 如果用户希望将 `explore/` 目录排除在版本控制之外，应将其添加到 `.gitignore`。
+- 本技能不修改 `vN/` 目录中的任何文件。

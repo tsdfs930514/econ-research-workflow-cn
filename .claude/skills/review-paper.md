@@ -1,158 +1,158 @@
 ---
-description: "Simulate peer review with three reviewers giving structured feedback, with optional APE-style multi-round deep review"
+description: "模拟三位审稿人给出结构化反馈，可选 APE 风格多轮深度评审"
 user_invocable: true
 ---
 
-# /review-paper — Simulated Peer Review
+# /review-paper — 模拟同行评审
 
-## Information Gathering
+## 信息收集
 
-Before starting, ask the user for:
+开始之前，向用户询问：
 
-1. **Paper file path** (or paste key sections: introduction, methodology, results)
-2. **Target journal**: Chinese core (经济研究/管理世界/中国工业经济/etc.) or English top 5 (AER/QJE/JPE/Econometrica/RES)
-3. **Method used**: DID / IV / RDD / Panel FE / SDID / other
-4. **Review mode**:
-   - `standard` (default) — 3 simulated reviewers with distinct styles
-   - `ape` — APE-style multi-round review: internal deep review → structured revision plan
+1. **论文文件路径**（或粘贴核心章节：引言、方法论、结果）
+2. **目标期刊**：中文核心（经济研究/管理世界/中国工业经济/等）或英文 TOP5（AER/QJE/JPE/Econometrica/RES）
+3. **使用方法**：DID / IV / RDD / 面板 FE / SDID / 其他
+4. **评审模式**：
+   - `standard`（默认）— 3 位模拟审稿人，风格各异
+   - `ape` — APE 风格多轮评审：内部深度审查 → 结构化修改方案
 
-## Review Process
+## 评审流程
 
-### Standard Mode: Three Independent Reviewers
+### 标准模式：三位独立审稿人
 
-Use the Task tool to invoke the `paper-reviewer` agent for each of the 3 reviewer roles below. Each invocation should specify the reviewer persona (Supportive, Balanced, or Critical), the paper content, and the target journal. The agent returns a structured referee report.
+使用 Task 工具为以下 3 个审稿人角色分别调用 `paper-reviewer` 代理。每次调用须指定审稿人角色（支持型、平衡型或批判型）、论文内容和目标期刊。代理返回结构化审稿报告。
 
-Simulate **3 independent reviewers** with distinct evaluation styles:
+模拟**3 位独立审稿人**，评审风格各异：
 
-#### Reviewer 1 — The Supportive Reviewer
-- Focuses on strengths and potential of the paper
-- Suggests incremental improvements rather than fundamental rethinking
-- Gives benefit of the doubt on identification strategy
-- Tends toward constructive framing: "This could be strengthened by..." rather than "This fails to..."
-- More likely to recommend Minor Revision or Accept
+#### 审稿人 1 — 支持型审稿人
+- 关注论文的优点和潜力
+- 建议渐进式改进而非根本性重新思考
+- 对识别策略持较为宽容的态度
+- 倾向于建设性的表述："可以通过……进一步加强" 而非 "未能……"
+- 更可能建议小修或接受
 
-#### Reviewer 2 — The Balanced Reviewer
-- Fair and even-handed assessment
-- Weighs strengths and weaknesses equally
-- Provides practical, actionable suggestions
-- Evaluates whether the paper meets the bar for the target journal specifically
-- Recommendation reflects honest middle-ground assessment
+#### 审稿人 2 — 平衡型审稿人
+- 公正客观的评估
+- 同等权衡优缺点
+- 提供实用、可操作的建议
+- 具体评估论文是否达到目标期刊的门槛
+- 建议反映诚实的中间立场
 
-#### Reviewer 3 — The Critical Reviewer
-- Skeptical of identification strategy; looks for holes
-- Demands additional robustness checks and sensitivity analyses
-- Pushes hard on contribution novelty: "How does this advance beyond X (2020)?"
-- Questions data quality and sample selection
-- More likely to recommend Major Revision or Reject
+#### 审稿人 3 — 批判型审稿人
+- 对识别策略持怀疑态度，寻找漏洞
+- 要求额外的稳健性检验和敏感性分析
+- 强调贡献的新颖性："这在 X (2020) 之上有何推进？"
+- 质疑数据质量和样本选择
+- 更可能建议大修或拒稿
 
-### APE Mode: Multi-Round Deep Review
+### APE 模式：多轮深度评审
 
-Inspired by the APE paper competition review process (where AI reviewers systematically improved papers through multiple rounds):
+参照 APE 论文竞赛评审流程（AI 审稿人通过多轮系统地改进论文）：
 
-#### Round 1: Internal Deep Review
+#### 第一轮：内部深度审查
 
-Conduct a comprehensive internal review covering:
+进行全面的内部审查，覆盖：
 
-1. **Identification Strategy Audit**
-   - Is the identifying assumption clearly stated?
-   - Are all testable implications tested? (parallel trends, balance, manipulation, etc.)
-   - What are the main threats to identification? How well are they addressed?
-   - Is there a missing robustness check that a referee would ask for?
+1. **识别策略审计**
+   - 识别假设是否清楚陈述？
+   - 所有可检验的推论是否已经检验？（平行趋势、平衡、操纵、等等）
+   - 识别的主要威胁是什么？解决得如何？
+   - 是否缺少审稿人会要求的稳健性检验？
 
-2. **Code-Results Consistency Check**
-   - Do the described methods match what the code actually does?
-   - Are all statistics referenced in the text actually computed?
-   - Do table notes accurately describe the specification?
+2. **代码-结果一致性检查**
+   - 描述的方法是否与代码实际执行的一致？
+   - 论文中引用的所有统计量是否确实被计算了？
+   - 表格注释是否准确描述了规范？
 
-3. **Missing Analysis Detection**
-   - Method-specific checklist:
-     - **DID**: Bacon decomposition? HonestDiD? Wild cluster bootstrap (if few clusters)? Event study with pre-trend test?
-     - **IV**: Anderson-Rubin CIs? LIML comparison? LOSO? Oster bounds?
-     - **RDD**: Bandwidth sensitivity table? CER bandwidth? Kernel sensitivity? Placebo cutoffs? Density test?
-     - **SDID**: Unit/time weights analysis? Comparison with pure SC and DID?
-   - Is there a cross-validation between Stata and Python/R?
+3. **遗漏分析检测**
+   - 方法特定清单：
+     - **DID**：Bacon 分解？HonestDiD？Wild cluster bootstrap（聚类数少时）？含预趋势检验的事件研究？
+     - **IV**：Anderson-Rubin 置信区间？LIML 比较？LOSO？Oster 界限？
+     - **RDD**：带宽敏感性表？CER 带宽？核函数敏感性？安慰剂断点？密度检验？
+     - **SDID**：单位/时间权重分析？与纯 SC 和 DID 的比较？
+   - 是否有 Stata 和 Python/R 之间的交叉验证？
 
-4. **Presentation Quality**
-   - Tables: Do they follow TOP5 formatting standards?
-   - Figures: Clear labels, appropriate scales, publication-quality?
-   - Writing: Is the contribution clearly stated in the first paragraph?
+4. **呈现质量**
+   - 表格：是否遵循 TOP5 格式标准？
+   - 图表：标签是否清晰、比例尺是否恰当、质量是否可发表？
+   - 写作：贡献是否在第一段就清晰陈述？
 
-#### Round 2: Structured Revision Plan
+#### 第二轮：结构化修改方案
 
-Based on Round 1 findings, generate a prioritized revision plan:
+根据第一轮发现，生成按优先级排列的修改方案：
 
 ```
-Priority | Finding | Severity | Action Required
+优先级 | 发现 | 严重性 | 需要的操作
 ---------|---------|----------|----------------
-1        | Missing Bacon decomposition | High | Add bacondecomp to Step 3
-2        | Pre-trend test not formal | Medium | Add joint F-test on leads
-3        | Table 2 missing dep var mean | Low | Add scalar to esttab
+1        | 缺少 Bacon 分解 | 高 | 在步骤 3 中添加 bacondecomp
+2        | 预趋势检验不正式 | 中等 | 添加 leads 的联合 F 检验
+3        | 表 2 缺少因变量均值 | 低 | 在 esttab 中添加标量
 ...
 ```
 
-Severity levels:
-- **Critical**: Would likely lead to desk rejection (e.g., wrong SE, missing key test)
-- **High**: Referee would demand this in R&R (e.g., missing robustness check)
-- **Medium**: Improves paper quality substantially (e.g., better presentation)
-- **Low**: Nice to have (e.g., formatting polish)
+严重性等级：
+- **严重 (Critical)**：可能导致编辑部直接退稿（如标准误错误、缺少关键检验）
+- **高 (High)**：审稿人在 R&R 中会要求（如缺少稳健性检验）
+- **中等 (Medium)**：实质性提升论文质量（如更好的呈现方式）
+- **低 (Low)**：锦上添花（如格式微调）
 
-## Evaluation Dimensions
+## 评估维度
 
-Each reviewer scores the paper on a **1-10 scale** for each dimension:
+每位审稿人在以下维度上按 **1-10 分**评分：
 
-| Dimension | Description |
-|---|---|
-| **Contribution/Novelty** | Does the paper add something new to the literature? |
-| **Identification Strategy** | Is the causal identification credible? Are assumptions testable and tested? |
-| **Data Quality** | Is the data appropriate, well-described, and sufficient? |
-| **Econometric Execution** | Are estimations correctly implemented? Standard errors appropriate? Robustness sufficient? |
-| **Writing Quality** | Is the paper clearly written, well-organized, logically structured? |
-| **Tables/Figures Quality** | Are results well-presented, publication-ready, easy to interpret? |
-| **Literature Coverage** | Is the related work comprehensive and correctly positioned? |
-| **Replication Quality** | Is the code reproducible? Is documentation sufficient? (APE mode only) |
+| 维度 | 说明 |
+|------|------|
+| **贡献/新颖性** | 论文是否为文献增添了新内容？ |
+| **识别策略** | 因果识别是否可信？假设是否可检验且已检验？ |
+| **数据质量** | 数据是否恰当、描述充分、足够？ |
+| **计量执行** | 估计是否正确实施？标准误是否恰当？稳健性是否充分？ |
+| **写作质量** | 论文是否清晰、组织良好、逻辑严密？ |
+| **表格/图表质量** | 结果呈现是否专业、可发表、易于理解？ |
+| **文献覆盖** | 相关文献是否全面且定位准确？ |
+| **复现质量** | 代码是否可复现？文档是否充分？（仅 APE 模式） |
 
-## Reviewer Output Format
+## 审稿人输出格式
 
-For **each reviewer**, provide:
+**每位审稿人**提供：
 
-1. **Overall Recommendation**: Accept / Minor Revision / Major Revision / Reject
-2. **Aggregate Score**: weighted average of dimension scores
-3. **Top 3 Strengths**: specific, with references to sections/paragraphs
-4. **Top 3 Weaknesses**: specific, with references to sections/paragraphs
-5. **Specific Actionable Suggestions**: numbered list, each referencing the relevant section, paragraph, table, or equation
-6. **Questions for the Authors**: numbered list of clarification questions
-7. **Missing Robustness Checks** (if any): specific tests the reviewer would require
+1. **总体建议**：接受 / 小修 / 大修 / 拒稿
+2. **综合评分**：各维度评分的加权平均
+3. **三大优点**：具体到章节/段落的引用
+4. **三大缺点**：具体到章节/段落的引用
+5. **具体可操作建议**：编号列表，每条引用相关的章节、段落、表格或方程
+6. **给作者的问题**：编号列表
+7. **缺少的稳健性检验**（如有）：审稿人要求的具体检验
 
-## Journal-Specific Standards
+## 期刊特定标准
 
-### For Chinese Core Journals (经济研究 / 管理世界 / 中国工业经济)
-- **Policy relevance**: Does the paper speak to current Chinese economic policy concerns?
-- **Chinese institutional context**: Does it demonstrate deep understanding of China's institutional environment (户籍制度, 财政分权, 产业政策, etc.)?
-- **Theoretical framework**: Is there a formal or semi-formal theoretical model motivating the empirics?
-- **Data sources**: Are Chinese datasets (CFPS, CHIP, CSMAR, industrial enterprise database, etc.) used appropriately?
-- **Writing conventions**: 中文学术规范, proper citation format, 三线表
-- **Minimum robustness**: PSM-DID, placebo test, parallel trends, subsample
+### 中文核心期刊（经济研究 / 管理世界 / 中国工业经济）
+- **政策相关性**：论文是否回应当前中国经济政策关切？
+- **中国制度背景**：是否展现了对中国制度环境的深入理解（户籍制度、财政分权、产业政策等）？
+- **理论框架**：是否有正式或半正式的理论模型支撑实证分析？
+- **数据来源**：是否恰当使用了中国数据集（CFPS、CHIP、CSMAR、工业企业数据库等）？
+- **写作规范**：中文学术规范、正确的引用格式、三线表
+- **最低稳健性**：PSM-DID、安慰剂检验、平行趋势、子样本
 
-### For English Top 5 Journals (AER / QJE / JPE / Econometrica / RES)
-- **Clean identification**: Is there a credible natural experiment or design-based approach?
-- **Careful inference**: Are results interpreted cautiously? Is external validity discussed?
-- **Clear contribution**: Can the main contribution be stated in one sentence?
-- **Literature positioning**: Is the paper clearly situated relative to frontier work?
-- **Presentation**: AER-style formatting, booktabs tables, clear figure design
-- **Modern econometrics**: Heterogeneity-robust estimators for DID, weak-IV-robust inference, bandwidth sensitivity for RDD
-- **Replication package**: Code and data organized per AEA Data Editor standards
+### 英文 TOP5 期刊（AER / QJE / JPE / Econometrica / RES）
+- **清晰的识别**：是否有可信的自然实验或基于设计的方法？
+- **谨慎的推断**：结果解读是否审慎？是否讨论了外部有效性？
+- **清晰的贡献**：主要贡献能否用一句话概括？
+- **文献定位**：论文是否相对于前沿文献清楚定位？
+- **呈现**：AER 风格格式、booktabs 表格、清晰的图表设计
+- **现代计量方法**：DID 的异质性稳健估计量、弱工具变量稳健推断、RDD 的带宽敏感性
+- **复现包**：代码和数据按 AEA 数据编辑标准组织
 
-## Summary Report
+## 总结报告
 
-After all three reviews, generate a **Summary Section**:
+三份审稿报告完成后，生成**总结部分**：
 
-- **Aggregate scores** across all three reviewers (table format)
-- **Consensus areas**: where all reviewers agree (strengths or weaknesses)
-- **Disagreement areas**: where reviewers diverge, and why
-- **Priority revision list**: top 5 things the authors should address first, ranked by importance and frequency of mention
-- **Overall assessment**: synthesized recommendation considering all three perspectives
-- **Estimated revision scope**: What percentage of the paper needs rework?
+- **综合评分汇总**：三位审稿人的评分表格
+- **共识领域**：三位审稿人一致认同的方面（无论优缺点）
+- **分歧领域**：审稿人意见分歧之处及原因
+- **优先修改清单**：作者应首先解决的前 5 个问题，按重要性和提及频率排序
+- **总体评估**：综合三方观点的整体建议
+- **预计修改幅度**：论文需要返工的百分比
 
-## Output Format
+## 输出格式
 
-Output the complete review as a structured markdown report with clear headers for each reviewer and the summary section.
+将完整评审报告输出为结构化 Markdown，每位审稿人和总结部分各有清晰的标题。

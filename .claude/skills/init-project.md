@@ -1,80 +1,80 @@
 ---
-description: "Initialize a new economics research project with standardized directory structure"
+description: "初始化经济学研究项目，创建标准化目录结构"
 user_invocable: true
 ---
 
-# /init-project - Initialize Economics Research Project
+# /init-project — 初始化经济学研究项目
 
-When the user invokes `/init-project`, follow these steps:
+当用户调用 `/init-project` 时，按以下步骤操作：
 
-## Step 1: Gather Project Information
+## 步骤 1：收集项目信息
 
-Ask the user for the following (all required unless noted):
+向用户询问以下信息（除注明外均为必填）：
 
-1. **Project name** - A short identifier (e.g., `minimum-wage-employment`)
-2. **Institution** - University or research institute name
-3. **Researcher name** - Primary researcher's name
-4. **Brief description** - 1-2 sentence description of the research project
-5. **Working language** - Chinese (CN), English (EN), or both (default: both)
-6. **Paper format** (optional) - `journal` (default: AER/经济研究), `NBER`, `SSRN`, or `all`
-7. **Primary method** (optional) - DID, IV, RDD, Panel, or General
+1. **项目名称** — 简短标识符（如 `minimum-wage-employment`）
+2. **机构** — 大学或研究机构名称
+3. **研究者姓名** — 主要研究者姓名
+4. **简要描述** — 1-2 句话的研究项目描述
+5. **工作语言** — 中文 (CN)、英文 (EN) 或双语（默认：双语）
+6. **论文格式**（可选）— `journal`（默认：AER/经济研究）、`NBER`、`SSRN` 或 `all`
+7. **主要方法**（可选）— DID、IV、RDD、Panel 或 General
 
-## Step 2: Create Directory Structure
+## 步骤 2：创建目录结构
 
-Under the current working directory (or a specified root), create the project folder with the following structure:
+在当前工作目录（或指定的根目录）下创建项目文件夹，结构如下：
 
 ```
 <project-name>/
   v1/
     data/
-      raw/          # Original, untouched data files (READ-ONLY)
-      clean/        # Cleaned and processed datasets
-      temp/         # Intermediate temporary files
+      raw/          # 原始数据文件（只读，禁止修改）
+      clean/        # 清洗后的数据集
+      temp/         # 中间临时文件
     code/
-      stata/        # Stata .do files
-      python/       # Python .py scripts
-      r/            # R scripts (if needed)
+      stata/        # Stata .do 文件
+      python/       # Python .py 脚本
+      r/            # R 脚本（如需要）
     output/
-      tables/       # LaTeX table outputs
-      figures/      # Figures and plots
-      logs/         # Stata .log and other execution logs
+      tables/       # LaTeX 表格输出
+      figures/      # 图表
+      logs/         # Stata .log 和其他执行日志
     paper/
-      sections/     # Individual .tex section files
-      bib/          # Bibliography .bib files
-    docs/           # Project documentation
+      sections/     # 各章节 .tex 文件
+      bib/          # 参考文献 .bib 文件
+    docs/           # 项目文档
 ```
 
-## Step 3: Create master.do
+## 步骤 3：创建 master.do
 
-Create `<project-name>/v1/code/stata/master.do`:
+创建 `<project-name>/v1/code/stata/master.do`：
 
-**Execute master.do via:**
+**通过以下命令执行 master.do：**
 ```bash
 cd /path/to/project/v1
 "D:\Stata18\StataMP-64.exe" -e do "code/stata/master.do"
 ```
 
-`-e` flag 使 Stata 运行完毕后自动退出，日志文件自动生成在当前目录。
+`-e` 参数使 Stata 运行完毕后自动退出，日志文件自动生成在当前目录。
 
 ```stata
 /*==============================================================================
-Project:    <Project Name>
-Version:    v1
-Script:     master.do
-Purpose:    Master script — runs all analysis in sequence
-Author:     <Researcher Name>
-Created:    <Date>
-Modified:   <Date>
+项目：    <项目名称>
+版本：    v1
+脚本：    master.do
+用途：    主控脚本——按顺序运行所有分析
+作者：    <研究者姓名>
+创建：    <日期>
+修改：    <日期>
 ==============================================================================*/
 
 version 18
 clear all
 set more off
-cap set maxvar 32767    // MP/SE: max allowed; IC ignores silently
-cap set matsize 11000   // MP/SE: increase matrix size; IC uses lower max
+cap set maxvar 32767    // MP/SE：允许的最大值；IC 版本会静默忽略
+cap set matsize 11000   // MP/SE：增加矩阵大小；IC 版本使用较低上限
 set seed 12345
 
-* --- Set paths ---
+* --- 设置路径 ---
 global root     "."
 global data     "$root/data"
 global raw      "$data/raw"
@@ -86,14 +86,14 @@ global tables   "$output/tables"
 global figures  "$output/figures"
 global logs     "$output/logs"
 
-* --- Verify paths exist ---
+* --- 验证路径存在 ---
 cap mkdir "$clean"
 cap mkdir "$temp"
 cap mkdir "$tables"
 cap mkdir "$figures"
 cap mkdir "$logs"
 
-* --- Install required packages (uncomment on first run) ---
+* --- 安装所需包（首次运行时取消注释）---
 /*
 ssc install reghdfe
 ssc install ftools
@@ -101,24 +101,24 @@ ssc install estout
 ssc install coefplot
 ssc install winsor2
 ssc install boottest
-* Method-specific (uncomment as needed):
+* 方法特定（按需取消注释）：
 * ssc install csdid         // DID: Callaway-Sant'Anna
 * ssc install did_multiplegt // DID: de Chaisemartin-D'Haultfoeuille
 * ssc install did_imputation // DID: Borusyak-Jaravel-Spiess
-* ssc install bacondecomp   // DID: Goodman-Bacon decomposition
+* ssc install bacondecomp   // DID: Goodman-Bacon 分解
 * ssc install eventstudyinteract // DID: Sun-Abraham
-* ssc install honestdid     // DID: Rambachan-Roth sensitivity
-* ssc install sdid           // SDID: Synthetic DID
+* ssc install honestdid     // DID: Rambachan-Roth 敏感性分析
+* ssc install sdid           // SDID: 合成 DID
 * ssc install ivreghdfe      // IV
 * ssc install ivreg2         // IV
 * ssc install ranktest       // IV
-* ssc install weakiv         // IV: Anderson-Rubin CIs
+* ssc install weakiv         // IV: Anderson-Rubin 置信区间
 * net install rdrobust, from(https://raw.githubusercontent.com/rdpackages/rdrobust/master/stata) replace  // RDD
 * net install rddensity, from(https://raw.githubusercontent.com/rdpackages/rddensity/master/stata) replace  // RDD
 */
 
-* --- Run scripts in order ---
-* Uncomment each line as the script is ready
+* --- 按顺序运行脚本 ---
+* 在脚本就绪后逐行取消注释
 
 * do "$code/01_clean_data.do"
 * do "$code/02_desc_stats.do"
@@ -130,199 +130,198 @@ ssc install boottest
 di "=== Master script complete ==="
 ```
 
-## Step 4: Create _VERSION_INFO.md
+## 步骤 4：创建 _VERSION_INFO.md
 
-Create `<project-name>/v1/_VERSION_INFO.md` with:
+创建 `<project-name>/v1/_VERSION_INFO.md`：
 
 ```markdown
-# Version Information
+# 版本信息
 
-- **Version**: v1
-- **Created**: <current date YYYY-MM-DD>
-- **Project**: <project name>
-- **Researcher**: <researcher name>
-- **Institution**: <institution>
-- **Description**: <brief description>
+- **版本**: v1
+- **创建日期**: <当前日期 YYYY-MM-DD>
+- **项目**: <项目名称>
+- **研究者**: <研究者姓名>
+- **机构**: <机构名称>
+- **描述**: <简要描述>
 
-## Version History
+## 版本历史
 
-| Version | Date       | Description          |
-|---------|------------|----------------------|
-| v1      | <date>     | Initial version      |
+| 版本 | 日期 | 描述 |
+|------|------|------|
+| v1   | <日期> | 初始版本 |
 ```
 
-## Step 5: Create CLAUDE.md
+## 步骤 5：创建 CLAUDE.md
 
-Create `<project-name>/CLAUDE.md` with project-specific instructions:
+创建 `<project-name>/CLAUDE.md`，包含项目特定指令：
 
 ```markdown
-# CLAUDE.md - Project Instructions
+# CLAUDE.md - 项目指令
 
-## Project Overview
-- **Project**: <project name>
-- **Researcher**: <researcher name>
-- **Institution**: <institution>
-- **Description**: <brief description>
-- **Current Version**: v1
+## 项目概览
+- **项目**: <项目名称>
+- **研究者**: <研究者姓名>
+- **机构**: <机构名称>
+- **描述**: <简要描述>
+- **当前版本**: v1
 
-## Directory Conventions
-- All work happens inside `v1/` (increment version for major revisions)
-- Raw data is NEVER modified; all cleaning produces files in `data/clean/`
-- Every Stata .do file must have a corresponding .log file in `output/logs/`
-- Tables go in `output/tables/` as .tex files
-- Figures go in `output/figures/` as .pdf or .png
+## 目录规范
+- 所有工作在 `v1/` 内进行（大版本修订时递增版本号）
+- 原始数据永不修改；所有清洗产生的文件存放在 `data/clean/`
+- 每个 Stata .do 文件必须在 `output/logs/` 有对应的 .log 文件
+- 表格存放在 `output/tables/`，格式为 .tex
+- 图表存放在 `output/figures/`，格式为 .pdf 或 .png
 
-## Code Standards
-- Stata: Use `eststo`/`esttab` for regression output. Always `set more off`. Log all output.
-- Python: Use `pyfixest` for regression replication. Use `pandas` for data manipulation.
-- All scripts must be reproducible from raw data via `master.do`.
+## 代码规范
+- Stata：使用 `eststo`/`esttab` 输出回归结果。始终 `set more off`。记录所有输出。
+- Python：使用 `pyfixest` 进行回归复现。使用 `pandas` 进行数据处理。
+- 所有脚本必须能够通过 `master.do` 从原始数据复现。
 
-## Naming Conventions
-- Data files: `<description>_<date>.dta` or `.csv`
-- Do files: `<NN>_<description>.do` (e.g., `01_clean_data.do`, `02_main_regression.do`)
-- Tables: `tab_<description>.tex`
-- Figures: `fig_<description>.pdf`
+## 命名规范
+- 数据文件：`<描述>_<日期>.dta` 或 `.csv`
+- Do 文件：`<NN>_<描述>.do`（如 `01_clean_data.do`、`02_main_regression.do`）
+- 表格：`tab_<描述>.tex`
+- 图表：`fig_<描述>.pdf`
 
-## Stata Configuration
-- **Executable**: `D:\Stata18\StataMP-64.exe`
-- **Run command (Git Bash)**: `"D:\Stata18\StataMP-64.exe" -e do "code/stata/script.do"`
-- **Flag**: 必须用 `-e`（自动退出），禁止用 `-b`（需手动确认）或 `/e`（Git Bash 路径冲突）
+## Stata 配置
+- **可执行文件**: `D:\Stata18\StataMP-64.exe`
+- **运行命令（Git Bash）**: `"D:\Stata18\StataMP-64.exe" -e do "code/stata/script.do"`
+- **参数说明**: 必须用 `-e`（自动退出），禁止用 `-b`（需手动确认）或 `/e`（Git Bash 路径冲突）
 
-## Paper
-- Main files: `main_cn.tex` (Chinese) and/or `main_en.tex` (English)
-- Sections stored in `paper/sections/` and included via `\input{}`
+## 论文
+- 主文件：`main_cn.tex`（中文）和/或 `main_en.tex`（英文）
+- 章节存放在 `paper/sections/`，通过 `\input{}` 引入
 ```
 
-## Step 6: Create REPLICATION.md
+## 步骤 6：创建 REPLICATION.md
 
-Create `<project-name>/v1/REPLICATION.md` following AEA Data Editor standards:
+创建 `<project-name>/v1/REPLICATION.md`，遵循 AEA 数据编辑标准：
 
 ```markdown
-# Replication Package
+# 复现包
 
-## Overview
+## 概述
 
-This replication package contains all code and data necessary to reproduce the
-results in "<Paper Title>" by <Author(s)>.
+本复现包包含复现"<论文标题>"（<作者>）中所有结果所需的全部代码和数据。
 
-**Data Availability Statement**: [Describe data sources and access conditions]
+**数据可用性声明**: [描述数据来源和访问条件]
 
-## Data Sources
+## 数据来源
 
-| Data | Source | Access | Files |
-|------|--------|--------|-------|
-| [Dataset 1] | [Provider] | [Public/Restricted] | `data/raw/[filename]` |
-| [Dataset 2] | [Provider] | [Public/Restricted] | `data/raw/[filename]` |
+| 数据 | 来源 | 访问 | 文件 |
+|------|------|------|------|
+| [数据集 1] | [提供者] | [公开/限制] | `data/raw/[文件名]` |
+| [数据集 2] | [提供者] | [公开/限制] | `data/raw/[文件名]` |
 
-## Computational Requirements
+## 计算环境要求
 
-### Software
-- Stata 18/MP (required for all .do files)
-- Python 3.10+ with packages: pyfixest, pandas, numpy
+### 软件
+- Stata 18/MP（所有 .do 文件必需）
+- Python 3.10+ 及包：pyfixest、pandas、numpy
 
-### Stata Packages
-[List all required Stata packages with version numbers]
+### Stata 包
+[列出所有必需的 Stata 包及版本号]
 
-### Hardware
-- Approximate runtime: [X minutes/hours] on [machine description]
-- Memory requirements: [X GB RAM]
+### 硬件
+- 预计运行时间：[X 分钟/小时]，于 [机器描述]
+- 内存要求：[X GB RAM]
 
-## Instructions
+## 使用说明
 
-1. Set the root directory in `code/stata/master.do`
-2. Install required Stata packages (see `master.do` header)
-3. Run `master.do` to execute all analyses in sequence
-4. Output tables appear in `output/tables/`
-5. Output figures appear in `output/figures/`
+1. 在 `code/stata/master.do` 中设置根目录
+2. 安装必需的 Stata 包（见 `master.do` 头部）
+3. 运行 `master.do` 以按顺序执行所有分析
+4. 输出表格出现在 `output/tables/`
+5. 输出图表出现在 `output/figures/`
 
-## File Structure
+## 文件结构
 
 ```
 v1/
 ├── code/
 │   ├── stata/
-│   │   ├── master.do           # Master script (run this)
-│   │   ├── 01_clean_data.do    # Data preparation
-│   │   ├── 02_desc_stats.do    # Descriptive statistics
-│   │   ├── 03_main_regression.do # Main results
-│   │   ├── 04_robustness.do    # Robustness checks
+│   │   ├── master.do           # 主控脚本（运行此文件）
+│   │   ├── 01_clean_data.do    # 数据准备
+│   │   ├── 02_desc_stats.do    # 描述性统计
+│   │   ├── 03_main_regression.do # 主要结果
+│   │   ├── 04_robustness.do    # 稳健性检验
 │   │   └── ...
 │   └── python/
-│       └── cross_validation.py # Cross-validates Stata results
+│       └── cross_validation.py # 交叉验证 Stata 结果
 ├── data/
-│   ├── raw/                    # Original data (READ-ONLY)
-│   └── clean/                  # Processed data
+│   ├── raw/                    # 原始数据（只读）
+│   └── clean/                  # 处理后数据
 ├── output/
-│   ├── tables/                 # LaTeX tables
-│   ├── figures/                # PDF figures
-│   └── logs/                   # Execution logs
-└── REPLICATION.md              # This file
+│   ├── tables/                 # LaTeX 表格
+│   ├── figures/                # PDF 图表
+│   └── logs/                   # 执行日志
+└── REPLICATION.md              # 本文件
 ```
 
-## Output-to-Table Mapping
+## 输出-表格映射
 
-| Table/Figure | Script | Output File |
-|-------------|--------|-------------|
-| Table 1     | `02_desc_stats.do` | `output/tables/tab_descriptive.tex` |
-| Table 2     | `03_main_regression.do` | `output/tables/tab_main_results.tex` |
-| Figure 1    | `06_figures.do` | `output/figures/fig_event_study.pdf` |
-| ...         | ...    | ... |
+| 表格/图表 | 脚本 | 输出文件 |
+|----------|------|---------|
+| 表 1     | `02_desc_stats.do` | `output/tables/tab_descriptive.tex` |
+| 表 2     | `03_main_regression.do` | `output/tables/tab_main_results.tex` |
+| 图 1     | `06_figures.do` | `output/figures/fig_event_study.pdf` |
+| ...      | ...  | ... |
 
-## Data Provenance
+## 数据溯源
 
-For each raw data file, document:
-- **Source**: Where was it obtained?
-- **Date accessed**: When was it downloaded?
-- **DOI/URL**: Persistent identifier
-- **License**: Usage restrictions
-- **Checksum**: MD5 or SHA256 hash of the file
+对每个原始数据文件记录：
+- **来源**：从何处获取？
+- **获取日期**：何时下载？
+- **DOI/URL**：持久标识符
+- **许可证**：使用限制
+- **校验和**：文件的 MD5 或 SHA256 哈希值
 
-| File | Source | Date | DOI/URL | MD5 |
-|------|--------|------|---------|-----|
-| [file.dta] | [source] | [date] | [doi] | [hash] |
+| 文件 | 来源 | 日期 | DOI/URL | MD5 |
+|------|------|------|---------|-----|
+| [file.dta] | [来源] | [日期] | [doi] | [哈希值] |
 ```
 
-## Step 7: Create MEMORY.md
+## 步骤 7：创建 MEMORY.md
 
-Create `<project-name>/v1/MEMORY.md`:
+创建 `<project-name>/v1/MEMORY.md`：
 
 ```markdown
-# Project Memory
+# 项目记忆
 
-## Key Decisions
-<!-- Record important methodological and data decisions here -->
+## 关键决策
+<!-- 在此记录重要的方法论和数据决策 -->
 
-## Data Notes
-<!-- Record data sources, access dates, known issues -->
+## 数据笔记
+<!-- 记录数据来源、获取日期、已知问题 -->
 
-## Variable Definitions
-<!-- Key variable names and their definitions -->
+## 变量定义
+<!-- 核心变量名称及其定义 -->
 
-## Regression Specifications
-<!-- Track the main specifications used -->
+## 回归规范
+<!-- 记录使用的主要规范 -->
 
-## Issues & TODOs
-<!-- Track outstanding issues -->
+## 待办事项与问题
+<!-- 记录未解决的问题 -->
 ```
 
-## Step 8: Create docs/CHANGELOG.md
+## 步骤 8：创建 docs/CHANGELOG.md
 
-Create `<project-name>/v1/docs/CHANGELOG.md`:
+创建 `<project-name>/v1/docs/CHANGELOG.md`：
 
 ```markdown
-# Changelog
+# 更新日志
 
-## v1 - <current date>
-- Project initialized
-- Directory structure created
+## v1 — <当前日期>
+- 项目初始化
+- 目录结构已创建
 ```
 
-## Step 9: Create .gitignore
+## 步骤 9：创建 .gitignore
 
-Create `<project-name>/.gitignore`:
+创建 `<project-name>/.gitignore`：
 
 ```
-# Data files (may be large or restricted)
+# 数据文件（可能较大或有限制）
 *.dta
 *.csv
 *.xlsx
@@ -333,7 +332,7 @@ data/temp/*
 !data/raw/.gitkeep
 !data/temp/.gitkeep
 
-# Stata logs and temporary files
+# Stata 日志和临时文件
 *.log
 *.smcl
 *.gph
@@ -343,11 +342,11 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 
-# OS files
+# 系统文件
 .DS_Store
 Thumbs.db
 
-# LaTeX auxiliary files
+# LaTeX 辅助文件
 *.aux
 *.bbl
 *.blg
@@ -358,9 +357,9 @@ Thumbs.db
 *.toc
 ```
 
-## Step 10: Create Placeholder Main TeX Files
+## 步骤 10：创建占位用主 TeX 文件
 
-Create `<project-name>/v1/paper/main_cn.tex` (if CN or both):
+创建 `<project-name>/v1/paper/main_cn.tex`（如果选择 CN 或双语）：
 
 ```latex
 \documentclass[12pt,a4paper]{article}
@@ -400,7 +399,7 @@ Create `<project-name>/v1/paper/main_cn.tex` (if CN or both):
 \end{document}
 ```
 
-Create `<project-name>/v1/paper/main_en.tex` (if EN or both):
+创建 `<project-name>/v1/paper/main_en.tex`（如果选择 EN 或双语）：
 
 ```latex
 \documentclass[12pt,a4paper]{article}
@@ -441,7 +440,7 @@ Create `<project-name>/v1/paper/main_en.tex` (if EN or both):
 \end{document}
 ```
 
-Create `<project-name>/v1/paper/main_nber.tex` (if format is `NBER` or `all`):
+创建 `<project-name>/v1/paper/main_nber.tex`（如果格式为 `NBER` 或 `all`）：
 
 ```latex
 \documentclass[12pt,a4paper]{article}
@@ -454,7 +453,7 @@ Create `<project-name>/v1/paper/main_nber.tex` (if format is `NBER` or `all`):
 \usepackage{hyperref}
 \usepackage{caption}
 
-% --- NBER Working Paper Formatting ---
+% --- NBER 工作论文格式 ---
 \title{<Project Title>\thanks{We thank [acknowledgments: seminar participants, discussants, funding agencies]. Author1: [affiliation], [email]. Author2: [affiliation], [email].}}
 \author{<Author 1>\\ \textit{<Institution 1>} \and <Author 2>\\ \textit{<Institution 2>}}
 \date{This draft: \today}
@@ -464,7 +463,7 @@ Create `<project-name>/v1/paper/main_nber.tex` (if format is `NBER` or `all`):
 
 \begin{abstract}
 \noindent
-% Abstract: 100-200 words. Summarize research question, method, and key findings.
+% 摘要：100-200 词。概述研究问题、方法和主要发现。
 \end{abstract}
 
 \medskip
@@ -499,7 +498,7 @@ Create `<project-name>/v1/paper/main_nber.tex` (if format is `NBER` or `all`):
 \end{document}
 ```
 
-Create `<project-name>/v1/paper/main_ssrn.tex` (if format is `SSRN` or `all`):
+创建 `<project-name>/v1/paper/main_ssrn.tex`（如果格式为 `SSRN` 或 `all`）：
 
 ```latex
 \documentclass[12pt,a4paper]{article}
@@ -513,7 +512,7 @@ Create `<project-name>/v1/paper/main_ssrn.tex` (if format is `SSRN` or `all`):
 \usepackage{caption}
 \usepackage{fancyhdr}
 
-% --- SSRN Preprint Formatting ---
+% --- SSRN 预印本格式 ---
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{\thepage}
@@ -543,8 +542,8 @@ Create `<project-name>/v1/paper/main_ssrn.tex` (if format is `SSRN` or `all`):
 
 \begin{abstract}
 \noindent
-% Abstract: 150-250 words. Make it self-contained — many SSRN readers only see the abstract.
-% Clearly state: (1) research question, (2) method, (3) data, (4) key finding, (5) contribution.
+% 摘要：150-250 词。应当自成一体——很多 SSRN 读者只看摘要。
+% 明确说明：(1) 研究问题，(2) 方法，(3) 数据，(4) 核心发现，(5) 贡献。
 \end{abstract}
 
 \medskip
@@ -577,19 +576,19 @@ Create `<project-name>/v1/paper/main_ssrn.tex` (if format is `SSRN` or `all`):
 \end{document}
 ```
 
-Also create empty placeholder files:
+同时创建空白占位文件：
 - `<project-name>/v1/paper/bib/references.bib`
 - `<project-name>/v1/data/raw/.gitkeep`
 - `<project-name>/v1/data/temp/.gitkeep`
 
-## Step 11: Print Summary
+## 步骤 11：打印总结
 
-After creating everything, print a summary:
+创建完成后，打印总结：
 
 ```
-Project "<project-name>" initialized successfully!
+项目"<project-name>"初始化成功！
 
-Structure created:
+已创建结构：
   v1/
     data/raw/  data/clean/  data/temp/
     code/stata/  code/python/  code/r/
@@ -597,23 +596,23 @@ Structure created:
     paper/sections/  paper/bib/
     docs/
 
-Files created:
-  - CLAUDE.md (project configuration)
+已创建文件：
+  - CLAUDE.md（项目配置）
   - v1/_VERSION_INFO.md
   - v1/MEMORY.md
-  - v1/REPLICATION.md (AEA Data Editor format)
+  - v1/REPLICATION.md（AEA 数据编辑标准格式）
   - v1/code/stata/master.do
   - v1/docs/CHANGELOG.md
-  - v1/paper/main_cn.tex (if CN or both)
-  - v1/paper/main_en.tex (if EN or both)
-  - v1/paper/main_nber.tex (if NBER or all)
-  - v1/paper/main_ssrn.tex (if SSRN or all)
+  - v1/paper/main_cn.tex（如选择 CN 或双语）
+  - v1/paper/main_en.tex（如选择 EN 或双语）
+  - v1/paper/main_nber.tex（如选择 NBER 或 all）
+  - v1/paper/main_ssrn.tex（如选择 SSRN 或 all）
   - v1/paper/bib/references.bib
   - .gitignore
 
-Next steps:
-  1. Place raw data files in v1/data/raw/
-  2. Update REPLICATION.md with data sources
-  3. Start with /data-describe to explore your data
-  4. Use /run-did, /run-iv, /run-rdd, or /run-panel for analysis
+下一步：
+  1. 将原始数据文件放入 v1/data/raw/
+  2. 更新 REPLICATION.md 填写数据来源
+  3. 使用 /data-describe 探索数据
+  4. 使用 /run-did、/run-iv、/run-rdd 或 /run-panel 进行分析
 ```

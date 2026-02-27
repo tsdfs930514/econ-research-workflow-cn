@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "Before context compaction, append a brief session summary to MEMORY.md under the Session Log section. Format: `| YYYY-MM-DD | summary |`. Include key decisions, issues found, and current quality score if known."
+            "prompt": "在上下文压缩之前，请在 MEMORY.md 的 Session Log 部分追加一条简要会话摘要。格式：`| YYYY-MM-DD | 摘要 |`。包含关键决策、发现的问题以及当前质量评分（如已知）。"
           }
         ]
       }

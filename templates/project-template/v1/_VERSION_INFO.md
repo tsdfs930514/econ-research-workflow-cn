@@ -1,21 +1,21 @@
-# Version Information
+# 版本信息 (Version Information)
 
-## Version: v1
-- **Created**: [DATE]
-- **Based on**: Initial version
-- **Author**: [AUTHOR]
-- **Status**: Active
+## 版本: v1
+- **创建日期**: [DATE]
+- **基于**: 初始版本
+- **作者**: [AUTHOR]
+- **状态**: 活跃
 
-## Description
-[Brief description of this version's analysis]
+## 说明
+[对本版本分析内容的简要说明]
 
-## Key Changes from Previous Version
-- N/A (initial version)
+## 与上一版本的主要变更
+- 不适用（初始版本）
 
-## Key Files
-- Main regression: `code/stata/03_reg_main.do`
-- Descriptive statistics: `code/stata/02_desc_stats.do`
-- Data cleaning: `code/stata/01_clean_data.do`
+## 关键文件
+- 主回归: `code/stata/03_reg_main.do`
+- 描述性统计: `code/stata/02_desc_stats.do`
+- 数据清洗: `code/stata/01_clean_data.do`
 
-## Notes
-[Any important notes about this version]
+## 备注
+[关于此版本的重要备注]

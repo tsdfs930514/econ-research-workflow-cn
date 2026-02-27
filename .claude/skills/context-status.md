@@ -1,87 +1,87 @@
 ---
-description: "Display current project context: version, recent decisions, quality scores, git state"
+description: "显示当前项目上下文：版本、近期决策、质量评分、Git 状态"
 user_invocable: true
 ---
 
-# /context-status — Project Context Dashboard
+# /context-status — 项目上下文仪表盘
 
-When the user invokes `/context-status`, gather and display a comprehensive snapshot of the current project state. This is useful at the start of a session or when resuming work.
+当用户调用 `/context-status` 时，收集并显示当前项目状态的全面快照。适合在会话开始或恢复工作时使用。
 
-## Information to Gather
+## 需要收集的信息
 
-### 1. Current Version
-- Read `CLAUDE.md` for the active version (e.g., `v1`)
-- Read `_VERSION_INFO.md` in the active version directory for version metadata
+### 1. 当前版本
+- 读取 `CLAUDE.md` 获取当前活跃版本（如 `v1`）
+- 读取活跃版本目录中的 `_VERSION_INFO.md` 获取版本元数据
 
-### 2. Recent Decisions (from MEMORY.md)
-- Read `MEMORY.md`
-- Display the last 5 tagged entries (any tag: LEARN, DECISION, ISSUE, PREFERENCE)
-- Display the last session log entry
+### 2. 近期决策（来自 MEMORY.md）
+- 读取 `MEMORY.md`
+- 显示最近 5 条标记条目（任何标记：LEARN、DECISION、ISSUE、PREFERENCE）
+- 显示最近一条会话日志
 
-### 3. Last Quality Score
-- Check if `quality_scorer.py` has been run recently by looking for score entries in MEMORY.md
-- If available, display the last score breakdown
+### 3. 最新质量评分
+- 检查 `quality_scorer.py` 是否最近运行过（查找 MEMORY.md 中的评分条目）
+- 如果可用，显示最新评分明细
 
-### 4. Output File Status
-- Check `output/tables/` — list .tex files with sizes
-- Check `output/figures/` — list .pdf/.png files with sizes
-- Check `output/logs/` — list .log files, flag any containing `r(` errors
-- Report any expected files that are missing or empty
+### 4. 输出文件状态
+- 检查 `output/tables/` — 列出 .tex 文件及大小
+- 检查 `output/figures/` — 列出 .pdf/.png 文件及大小
+- 检查 `output/logs/` — 列出 .log 文件，标记包含 `r(` 错误的文件
+- 报告任何预期但缺失或为空的文件
 
-### 5. Git State
-- `git branch` — current branch name
-- `git status --short` — dirty/clean state, untracked files
-- `git log --oneline -3` — last 3 commits
+### 5. Git 状态
+- `git branch` — 当前分支名
+- `git status --short` — 是否有未提交的修改、未追踪的文件
+- `git log --oneline -3` — 最近 3 次提交
 
-### 6. Data Status
-- Check `data/raw/` — list files (confirm data is present)
-- Check `data/clean/` — list processed datasets
-- Flag if `data/raw/` is empty (data not yet placed)
+### 6. 数据状态
+- 检查 `data/raw/` — 列出文件（确认数据已到位）
+- 检查 `data/clean/` — 列出已处理的数据集
+- 如果 `data/raw/` 为空则发出提示（数据尚未放置）
 
-## Display Format
+## 显示格式
 
 ```
-Project Context Dashboard
+项目上下文仪表盘
 ═══════════════════════════════════════════
 
-Version:  v1 (created 2026-02-25)
-Project:  [Project Name]
-Branch:   main (clean)
+版本：  v1（创建于 2026-02-25）
+项目：  [项目名称]
+分支：  main（干净）
 
-Recent Activity:
-  [ISSUE] 2026-02-25: boottest incompatible with multi-FE reghdfe
-  [DECISION] 2026-02-25: Use CS-DiD as primary estimator over TWFE
-  [LEARN] 2026-02-25: Quality score for v1/: 82/100
+近期活动：
+  [ISSUE] 2026-02-25: boottest 与含多维 FE 的 reghdfe 不兼容
+  [DECISION] 2026-02-25: 选择 CS-DiD 作为主要估计量（而非 TWFE）
+  [LEARN] 2026-02-25: v1/ 的质量评分：82/100
 
-Last Session: 2026-02-25 — Completed DID analysis, fixed boottest issue
+上次会话：2026-02-25 — 完成了 DID 分析，修复了 boottest 问题
 
-Quality Score: 82/100 (last run 2026-02-25)
-  Code: 12/15 | Logs: 15/15 | Output: 10/15
-  CrossVal: 0/15 | Docs: 12/15 | Diagnostics: 20/25
+质量评分：82/100（最后运行于 2026-02-25）
+  代码：12/15 | 日志：15/15 | 输出：10/15
+  交叉验证：0/15 | 文档：12/15 | 诊断检验：20/25
 
-Output Files:
-  tables/  3 files (tab_did_main.tex, tab_did_comparison.tex, tab_summary.tex)
-  figures/ 4 files (fig_event_study_*.pdf, fig_bacon_decomp.pdf)
-  logs/    5 files (2 with errors flagged)
+输出文件：
+  tables/  3 个文件（tab_did_main.tex, tab_did_comparison.tex, tab_summary.tex）
+  figures/ 4 个文件（fig_event_study_*.pdf, fig_bacon_decomp.pdf）
+  logs/    5 个文件（2 个有错误标记）
 
-Data:
-  raw/    2 files (panel_data.dta, crosswalk.csv)
-  clean/  1 file (panel_cleaned.dta)
+数据：
+  raw/    2 个文件（panel_data.dta, crosswalk.csv）
+  clean/  1 个文件（panel_cleaned.dta）
 
-Git:
+Git：
   abc1234 [v1] code: add event study with CS-DiD
   def5678 [v1] output: regenerate DID tables
   ghi9012 [v1] data: initial data cleaning pipeline
 
-Suggested Next Steps:
-  - Cross-validation score is 0/15 → run /cross-check
-  - 2 log files have errors → review with /adversarial-review code
-  - Overall score 82 → run /score after fixes
+建议的下一步：
+  - 交叉验证评分为 0/15 → 运行 /cross-check
+  - 2 个日志文件有错误 → 使用 /adversarial-review code 审查
+  - 总分 82 → 修复后运行 /score
 ```
 
-## Error Handling
+## 错误处理
 
-- If MEMORY.md doesn't exist: note "No memory file found. Run /init-project or create MEMORY.md."
-- If no version directory exists: note "No version directory found. Run /init-project to start."
-- If git is not initialized: skip git section, note "Not a git repository."
-- If quality_scorer.py hasn't been run: note "No quality score recorded. Run /score."
+- 如果 MEMORY.md 不存在：提示"未找到 memory 文件。请运行 /init-project 或创建 MEMORY.md。"
+- 如果没有版本目录：提示"未找到版本目录。请运行 /init-project 开始。"
+- 如果未初始化 git：跳过 git 部分，提示"不是 git 仓库。"
+- 如果 quality_scorer.py 未运行过：提示"未记录质量评分。请运行 /score。"

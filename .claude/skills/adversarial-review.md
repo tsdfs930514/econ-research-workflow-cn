@@ -1,120 +1,120 @@
 ---
-description: "Run adversarial critic-fixer quality assurance loop across code, econometrics, and tables domains"
+description: "运行代码、计量经济学和表格领域的对抗式评审者-修复者质量保障循环"
 user_invocable: true
 ---
 
-# /adversarial-review — Adversarial Quality Assurance Loop
+# /adversarial-review — 对抗式质量保障循环
 
-When the user invokes `/adversarial-review`, orchestrate a multi-round critic → fixer → re-critic cycle that enforces separation of concerns: critics identify issues but cannot fix them; fixers apply corrections but cannot score their own work.
+当用户调用 `/adversarial-review` 时，编排多轮"评审者 → 修复者 → 再评审"循环，强制分离职责：评审者只能发现问题不能修复；修复者只能应用修正不能为自己评分。
 
-## Step 1: Gather Inputs
+## 步骤 1：收集输入
 
-Ask the user:
+向用户询问：
 
-1. **Target**: Directory or specific files to review (default: current version directory, e.g., `v1/`)
-2. **Domains**: Which domains to review? Options:
-   - `all` (default) — code + econometrics + tables
-   - `code` — code conventions, safety, reproducibility only
-   - `econometrics` — identification, diagnostics, robustness only
-   - `tables` — table formatting and reporting only
-   - Any combination (e.g., `code,tables`)
-3. **Score threshold**: Minimum acceptable score (default: 95)
-4. **Max rounds**: Maximum critic-fixer iterations (default: 5)
+1. **目标**：要审查的目录或特定文件（默认：当前版本目录，如 `v1/`）
+2. **领域**：审查哪些领域？选项：
+   - `all`（默认）— 代码 + 计量经济学 + 表格
+   - `code` — 仅代码规范、安全性、可复现性
+   - `econometrics` — 仅识别策略、诊断检验、稳健性
+   - `tables` — 仅表格格式和报告
+   - 任意组合（如 `code,tables`）
+3. **分数阈值**：最低可接受分数（默认：95）
+4. **最大轮次**：评审者-修复者最大迭代次数（默认：5）
 
-## Step 2: Launch Critics
+## 步骤 2：启动评审者
 
-For each selected domain, launch the corresponding critic agent **in parallel** using the Task tool:
+对每个选定的领域，使用 Task 工具**并行**启动对应的评审者代理：
 
-| Domain | Agent | Subagent Type |
-|--------|-------|---------------|
-| Code | `code-critic` | Read-only agent |
-| Econometrics | `econometrics-critic` | Read-only agent |
-| Tables | `tables-critic` | Read-only agent |
+| 领域 | 代理 | 子代理类型 |
+|------|------|-----------|
+| 代码 | `code-critic` | 只读代理 |
+| 计量经济学 | `econometrics-critic` | 只读代理 |
+| 表格 | `tables-critic` | 只读代理 |
 
-Each critic:
-- Reviews all relevant files in the target directory
-- Produces a structured findings list with severity levels
-- Assigns a score (0-100)
+每个评审者：
+- 审查目标目录中的所有相关文件
+- 生成带有严重级别的结构化发现列表
+- 给出一个分数（0-100）
 
-Collect all critic reports.
+收集所有评审报告。
 
-## Step 3: Evaluate Scores
+## 步骤 3：评估分数
 
-Display the scores to the user:
+向用户展示分数：
 
 ```
-Round 1 Results:
-  Code:          82/100 (3 Critical, 5 High, 2 Medium)
-  Econometrics:  75/100 (1 Critical, 4 High, 6 Medium)
-  Tables:        90/100 (0 Critical, 2 High, 3 Medium)
+第 1 轮结果：
+  代码：         82/100（3 个严重、5 个高、2 个中等）
+  计量经济学：    75/100（1 个严重、4 个高、6 个中等）
+  表格：         90/100（0 个严重、2 个高、3 个中等）
 ```
 
-**Decision logic**:
-- If ALL scores >= threshold (default 95): **Done.** Report final scores and exit.
-- If any score < threshold: proceed to Step 4.
+**决策逻辑**：
+- 如果所有分数均 >= 阈值（默认 95）：**完成。**报告最终分数并退出。
+- 如果任一分数 < 阈值：进入步骤 4。
 
-## Step 4: Launch Fixers
+## 步骤 4：启动修复者
 
-For each domain scoring below threshold, launch the corresponding fixer agent:
+对每个分数低于阈值的领域，启动对应的修复者代理：
 
-| Domain | Agent | Input |
-|--------|-------|-------|
-| Code | `code-fixer` | code-critic findings |
-| Econometrics | `econometrics-fixer` | econometrics-critic findings |
-| Tables | `tables-fixer` | tables-critic findings |
+| 领域 | 代理 | 输入 |
+|------|------|------|
+| 代码 | `code-fixer` | code-critic 的发现列表 |
+| 计量经济学 | `econometrics-fixer` | econometrics-critic 的发现列表 |
+| 表格 | `tables-fixer` | tables-critic 的发现列表 |
 
-Each fixer:
-- Receives the critic's findings list
-- Applies fixes in priority order (Critical → High → Medium → Low)
-- Documents every change with rationale
-- Reports what was changed
+每个修复者：
+- 接收评审者的发现列表
+- 按优先级顺序应用修复（严重 → 高 → 中等 → 低）
+- 记录每项更改及其理由
+- 报告已更改的内容
 
-## Step 5: Re-Launch Critics
+## 步骤 5：重新启动评审者
 
-After fixers complete, re-launch the same critics on the updated files to produce new scores.
+修复者完成后，对更新后的文件重新启动相同的评审者以生成新的分数。
 
-## Step 6: Loop Control
+## 步骤 6：循环控制
 
-Check termination conditions:
+检查终止条件：
 
-1. **Success**: All scores >= threshold → report final scores, exit
-2. **Max rounds**: Round count >= max_rounds → report current scores, list remaining issues, exit
-3. **Stagnation**: Score improved < 5 points since last round → report stagnation, list remaining issues, ask user for guidance
+1. **成功**：所有分数 >= 阈值 → 报告最终分数，退出
+2. **达到最大轮次**：轮次计数 >= 最大轮次 → 报告当前分数，列出剩余问题，退出
+3. **停滞**：自上一轮以来分数提升 < 5 分 → 报告停滞，列出剩余问题，请求用户指导
 
-If none met, return to Step 4.
+如果都未满足，返回步骤 4。
 
-## Step 7: Final Report
+## 步骤 7：最终报告
 
 ```markdown
-# Adversarial Review Report
+# 对抗式审查报告
 
-## Final Scores (Round N)
+## 最终分数（第 N 轮）
 
-| Domain | Score | Status |
-|--------|-------|--------|
-| Code | XX/100 | PASS/FAIL |
-| Econometrics | XX/100 | PASS/FAIL |
-| Tables | XX/100 | PASS/FAIL |
+| 领域 | 分数 | 状态 |
+|------|------|------|
+| 代码 | XX/100 | 通过/未通过 |
+| 计量经济学 | XX/100 | 通过/未通过 |
+| 表格 | XX/100 | 通过/未通过 |
 
-## Score History
+## 分数历史
 
-| Round | Code | Econometrics | Tables |
-|-------|------|--------------|--------|
+| 轮次 | 代码 | 计量经济学 | 表格 |
+|------|------|-----------|------|
 | 1 | XX | XX | XX |
 | 2 | XX | XX | XX |
 | ... | ... | ... | ... |
 
-## Remaining Issues (if any)
-- [List of unfixed findings with severity]
+## 剩余问题（如有）
+- [带严重级别的未修复发现列表]
 
-## Recommendation
-- [Publication ready / Minor revisions needed / Major revisions needed]
+## 建议
+- [可发表 / 需要小修 / 需要大修]
 ```
 
-## Notes
+## 注意事项
 
-- Critics CANNOT edit files — they can only read and report
-- Fixers CANNOT score their own work — only critics can evaluate
-- This separation prevents self-approval loops
-- If the quality scorer script is available, run it after the final round for an independent score
-- For trivial tasks (score >= 80 on first round with no Critical findings), suggest using "Just Do It" mode from the orchestrator protocol
+- 评审者不能编辑文件——只能读取和报告
+- 修复者不能为自己的工作评分——只有评审者可以评估
+- 这种分离防止了自我审批循环
+- 如果质量评分脚本可用，在最后一轮后运行以获取独立评分
+- 对于简单任务（第一轮分数 >= 80 且无严重发现），建议使用编排协议中的"直接执行"模式

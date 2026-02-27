@@ -1,17 +1,17 @@
 ---
-description: "Write a specific section of an economics research paper in Chinese or English"
+description: "撰写经济学研究论文的特定章节（中文或英文）"
 user_invocable: true
 ---
 
-# /write-section - Write a Paper Section
+# /write-section — 撰写论文章节
 
-When the user invokes `/write-section`, follow these steps:
+当用户调用 `/write-section` 时，按以下步骤操作：
 
-## Step 1: Gather Information
+## 步骤 1：收集信息
 
-Ask the user for:
+向用户询问：
 
-1. **Section name** (required) - One of:
+1. **章节名称**（必填）— 以下之一：
    - `introduction` / 引言
    - `literature` / 文献综述
    - `background` / 制度背景
@@ -20,123 +20,123 @@ Ask the user for:
    - `results` / 实证结果
    - `robustness` / 稳健性检验
    - `conclusion` / 结论
-2. **Language** (required) - `CN` (Chinese) or `EN` (English)
-3. **Target journal/format** (optional) - e.g., "经济研究", "管理世界", "AER", "QJE", "JPE", "NBER", "SSRN"
-4. **Key points to cover** (required) - Bullet points of the main content the user wants included
-5. **Related files** (optional) - Any existing tables, results, or notes to reference
+2. **语言**（必填）— `CN`（中文）或 `EN`（英文）
+3. **目标期刊/格式**（可选）— 如"经济研究"、"管理世界"、"AER"、"QJE"、"JPE"、"NBER"、"SSRN"
+4. **核心要点**（必填）— 用户希望涵盖的主要内容的要点列表
+5. **相关文件**（可选）— 可供参考的已有表格、结果或笔记
 
-## Step 2: Section-Specific Guidelines
+## 步骤 2：章节特定写作指南
 
-### 1. Introduction (引言)
+### 1. 引言 (Introduction)
 
-**Structure:**
-1. Opening hook: Motivate the research question with real-world relevance
-2. Research question: State clearly what the paper studies
-3. Brief description of approach/identification strategy
-4. Preview of main findings
-5. Contribution to literature (2-3 specific contributions)
-6. Paper structure paragraph
+**结构：**
+1. 开篇导入：用现实相关性引出研究问题
+2. 研究问题：清晰陈述论文研究什么
+3. 方法/识别策略简述
+4. 主要发现预览
+5. 文献贡献（2-3 条具体贡献）
+6. 结构安排段落
 
-**Chinese (经济研究/管理世界 style):**
-- Length: approximately 3000-4000 Chinese characters
-- Opening: Start with broad economic context, policy relevance
-- Use formal academic Chinese throughout
-- Phrases to use: "本文", "研究发现", "实证结果表明", "本文的边际贡献在于"
-- Contribution paragraph: "与已有文献相比，本文的贡献主要体现在以下几个方面："
-- Structure paragraph: "本文余下部分结构安排如下：第二部分..."
-- Avoid colloquial expressions, maintain academic formality
-- Reference format: use author-year in Chinese (张三和李四, 2020)
+**中文（经济研究/管理世界风格）：**
+- 长度：约 3000-4000 字
+- 开篇：从宏观经济背景、政策相关性入手
+- 全篇使用正式学术中文
+- 常用表达："本文"、"研究发现"、"实证结果表明"、"本文的边际贡献在于"
+- 贡献段："与已有文献相比，本文的贡献主要体现在以下几个方面："
+- 结构段："本文余下部分结构安排如下：第二部分..."
+- 避免口语化表达，保持学术规范
+- 引用格式：中文作者-年份制（张三和李四, 2020）
 
-**English (AER/QJE style):**
-- Length: approximately 1500-2000 words
-- Opening: Direct, engaging first sentence
-- Concise and precise language
-- Active voice where possible
-- Contribution clearly stated early
-- Follow AER style: avoid jargon, be accessible
-- Structure paragraph: "The remainder of this paper is organized as follows..."
+**英文（AER/QJE 风格）：**
+- 长度：约 1500-2000 词
+- 开篇：直接、吸引人的第一句话
+- 语言简洁精确
+- 尽可能使用主动语态
+- 贡献尽早清晰陈述
+- 遵循 AER 风格：避免行话，力求可读性
+- 结构段："The remainder of this paper is organized as follows..."
 
-**LaTeX template:**
+**LaTeX 模板：**
 ```latex
 \section{Introduction}
-% or \section{引言} for Chinese
+% 或中文论文使用 \section{引言}
 
 <content>
 ```
 
-### 2. Literature Review (文献综述)
+### 2. 文献综述 (Literature Review)
 
-**Structure:**
-1. Organize by 2-4 thematic strands of literature
-2. For each strand: summarize key findings, identify consensus and debates
-3. Identify the gap that this paper fills
-4. Position the paper's contribution relative to existing work
+**结构：**
+1. 按 2-4 条主题线索组织
+2. 每条线索：概括核心发现，指出共识和争议
+3. 识别本文填补的空白
+4. 相对于已有工作定位本文贡献
 
-**Chinese style:**
+**中文风格：**
 - "本文与以下几支文献密切相关。"
 - "第一支文献关注..."
 - "第二支文献研究..."
 - "与上述文献不同，本文..."
-- Be comprehensive but focused; cite 30-50 papers typically
+- 力求全面但聚焦；通常引用 30-50 篇
 
-**English style:**
+**英文风格：**
 - "This paper contributes to several strands of the literature."
 - "First, our work relates to..."
 - "Second, we contribute to..."
 - "We differ from this literature by..."
-- More selective citation; quality over quantity
+- 引用更精选；质量重于数量
 
-### 3. Institutional Background (制度背景)
+### 3. 制度背景 (Institutional Background)
 
-**Structure:**
-1. Policy/institution description
-2. Timeline of key events and policy changes
-3. Affected groups / entities
-4. Why this setting is suitable for identification
-5. Relevant institutional details for understanding the empirical strategy
+**结构：**
+1. 政策/制度描述
+2. 关键事件和政策变化时间线
+3. 受影响的群体/实体
+4. 为什么此背景适合做因果识别
+5. 理解实证策略所需的制度细节
 
-**Chinese style:**
-- Detailed policy description with official document citations
-- Timeline format for policy evolution
-- Use exact dates and policy document numbers
+**中文风格：**
+- 详细的政策描述，引用官方文件
+- 时间线格式展示政策演进
+- 使用具体日期和政策文号
 
-**English style:**
-- Concise institutional description
-- Focus on details relevant to identification
-- Include a timeline figure if helpful
+**英文风格：**
+- 简洁的制度描述
+- 聚焦于与识别相关的细节
+- 如有助于理解，可包含时间线图表
 
-### 4. Data and Variables (数据与变量)
+### 4. 数据与变量 (Data and Variables)
 
-**Structure:**
-1. Data sources and time coverage
-2. Sample construction process (merging, filtering, final sample)
-3. Key variable definitions (dependent, independent, controls)
-4. Summary statistics reference (point to table)
-5. Data limitations (if any)
+**结构：**
+1. 数据来源和时间覆盖
+2. 样本构建过程（合并、筛选、最终样本）
+3. 核心变量定义（因变量、自变量、控制变量）
+4. 描述性统计引用（指向表格）
+5. 数据局限性（如有）
 
-**Chinese style:**
+**中文风格：**
 - "本文使用的数据来源于..."
 - "样本期间为...年至...年"
-- Variable definitions in a clear list format
+- 变量定义以清晰的列表格式呈现
 - "表1报告了主要变量的描述性统计结果"
-- Use variable definition table if many variables
+- 变量较多时使用变量定义表
 
-**English style:**
+**英文风格：**
 - "We use data from..."
 - "Our sample covers the period..."
-- Clear variable definitions, potentially in a table
+- 变量定义清晰，可使用表格
 - "Table 1 presents summary statistics for our main variables."
 
-**LaTeX template for variable definition:**
+**变量定义 LaTeX 模板：**
 ```latex
-% Chinese
+% 中文
 \begin{itemize}
-  \item \textbf{被解释变量}：<variable name>，定义为...
-  \item \textbf{核心解释变量}：<variable name>，定义为...
+  \item \textbf{被解释变量}：<变量名>，定义为...
+  \item \textbf{核心解释变量}：<变量名>，定义为...
   \item \textbf{控制变量}：包括...
 \end{itemize}
 
-% English
+% 英文
 \begin{itemize}
   \item \textbf{Dependent Variable}: <variable name>, defined as...
   \item \textbf{Key Independent Variable}: <variable name>, defined as...
@@ -144,33 +144,33 @@ Ask the user for:
 \end{itemize}
 ```
 
-### 5. Empirical Strategy (实证策略)
+### 5. 实证策略 (Empirical Strategy)
 
-**Structure:**
-1. Identification strategy overview
-2. Estimation equation in LaTeX math
-3. Variable definitions within the equation
-4. Key identifying assumptions
-5. Threats to identification and how they are addressed
-6. Expected sign of key coefficient
+**结构：**
+1. 识别策略概述
+2. LaTeX 数学公式表达的估计方程
+3. 方程中的变量定义
+4. 核心识别假设
+5. 识别威胁及应对策略
+6. 核心系数的预期符号
 
-**Chinese style:**
+**中文风格：**
 - "本文采用...方法进行因果识别"
 - "基准回归模型设定如下："
-- Equation: `\begin{equation} Y_{it} = \alpha + \beta D_{it} + \gamma X_{it} + \mu_i + \lambda_t + \varepsilon_{it} \end{equation}`
+- 方程：`\begin{equation} Y_{it} = \alpha + \beta D_{it} + \gamma X_{it} + \mu_i + \lambda_t + \varepsilon_{it} \end{equation}`
 - "其中，$Y_{it}$表示..., $D_{it}$为..., $X_{it}$为控制变量向量..."
 - "识别假设为..."
 - "本文关注的核心系数为$\beta$，预期符号为正/负"
 
-**English style:**
+**英文风格：**
 - "Our identification strategy exploits..."
 - "We estimate the following specification:"
-- Same equation format
+- 相同的方程格式
 - "where $Y_{it}$ denotes..., $D_{it}$ is..., and $X_{it}$ is a vector of controls..."
 - "The key identifying assumption is that..."
 - "Our coefficient of interest is $\beta$, which captures..."
 
-**Method-specific templates:**
+**方法特定模板：**
 
 DID:
 ```latex
@@ -188,149 +188,149 @@ RDD:
 Y_i = \alpha + \beta \cdot \mathbf{1}(X_i \geq c) + f(X_i - c) + \varepsilon_i
 ```
 
-### 6. Results (实证结果)
+### 6. 实证结果 (Results)
 
-**Structure:**
-1. Main regression results (reference table)
-2. Economic significance interpretation
-3. Mechanism analysis / channel tests
-4. Heterogeneity analysis (if applicable)
+**结构：**
+1. 主回归结果（引用表格）
+2. 经济显著性解释
+3. 机制分析 / 渠道检验
+4. 异质性分析（如适用）
 
-**Chinese style:**
+**中文风格：**
 - "表X报告了基准回归结果。"
 - "第(1)列仅控制了...，第(2)列进一步加入了..."
 - "核心解释变量的系数为...，在1%水平上显著"
 - "经济含义上，...每增加一个标准差，...将变化...%"
 - "为探究作用机制，本文从以下几个渠道进行分析："
 
-**English style:**
+**英文风格：**
 - "Table X reports our main results."
 - "Column (1) includes only..., while Column (2) adds..."
 - "The coefficient on our key variable is..., significant at the 1% level."
 - "In terms of economic magnitude, a one standard deviation increase in... is associated with a ...% change in..."
 - "To explore the underlying mechanisms, we examine..."
 
-### 7. Robustness Checks (稳健性检验)
+### 7. 稳健性检验 (Robustness Checks)
 
-**Structure:**
-1. Overview of robustness strategy
-2. Each test type as a subsection or paragraph
-3. Reference specific table/column for each test
-4. Brief interpretation of each result
-5. Overall assessment
+**结构：**
+1. 稳健性策略概述
+2. 每种检验类型作为一个小节或段落
+3. 引用具体表格/列
+4. 每项结果的简要解释
+5. 总体评估
 
-**Chinese style:**
+**中文风格：**
 - "为验证基准回归结果的稳健性，本文从以下几个方面进行检验。"
-- Subsections: "更换被解释变量", "改变样本范围", "安慰剂检验", "替换固定效应", etc.
+- 小节："更换被解释变量"、"改变样本范围"、"安慰剂检验"、"替换固定效应"等
 - "上述检验结果表明，本文的基准回归结果是稳健的。"
 
-**English style:**
+**英文风格：**
 - "We conduct a battery of robustness checks to validate our main findings."
-- Subsections: "Alternative Outcomes", "Sample Restrictions", "Placebo Tests", etc.
+- 小节："Alternative Outcomes"、"Sample Restrictions"、"Placebo Tests" 等
 - "Taken together, these results confirm the robustness of our baseline estimates."
 
-### 8. Conclusion (结论)
+### 8. 结论 (Conclusion)
 
-**Structure:**
-1. Brief summary of research question and approach
-2. Key findings (2-3 sentences)
-3. Policy implications
-4. Limitations
-5. Future research directions
+**结构：**
+1. 研究问题和方法简要回顾
+2. 核心发现（2-3 句）
+3. 政策含义
+4. 局限性
+5. 未来研究方向
 
-**Chinese style:**
+**中文风格：**
 - "本文利用...数据，采用...方法，研究了...问题。"
 - "研究发现：第一，...；第二，...；第三，..."
 - "本文的研究具有以下政策启示：..."
 - "当然，本文也存在一些不足之处：..."
 - "未来的研究可以从以下方面进行拓展：..."
-- Length: approximately 800-1200 characters
+- 长度：约 800-1200 字
 
-**English style:**
+**英文风格：**
 - "This paper studies... using... We find that..."
 - "Our findings have several policy implications..."
 - "We acknowledge several limitations..."
 - "Future research could explore..."
-- Length: approximately 400-600 words
+- 长度：约 400-600 词
 
-## Step 3: Style Guidelines
+## 步骤 3：风格指南
 
-### Chinese Core Journals (经济研究、管理世界、经济学季刊、中国工业经济)
-- Formal academic Chinese, never colloquial
-- Use 本文 (not 我们 or 笔者, though 笔者 is acceptable in some journals)
-- Common phrases:
-  - 研究发现 (research finds)
-  - 实证结果表明 (empirical results show)
-  - 进一步地 (furthermore)
-  - 具体而言 (specifically)
-  - 值得注意的是 (it is worth noting)
-  - 与此同时 (meanwhile)
-- Paragraph structure: topic sentence -> evidence -> interpretation
-- Citations: (张三和李四, 2020) or 张三和李四(2020)
+### 中文核心期刊（经济研究、管理世界、经济学季刊、中国工业经济）
+- 正式学术中文，避免口语化
+- 使用"本文"（而非"我们"或"笔者"，虽然"笔者"在部分期刊中可接受）
+- 常用表达：
+  - 研究发现
+  - 实证结果表明
+  - 进一步地
+  - 具体而言
+  - 值得注意的是
+  - 与此同时
+- 段落结构：主题句 → 论据 → 解释
+- 引用：（张三和李四, 2020）或 张三和李四（2020）
 
-### English Top Journals (AER, QJE, JPE, Econometrica, REStud)
-- Concise, precise academic English
-- Active voice preferred: "We find..." not "It is found that..."
-- Short sentences where possible
-- Follow AER style guide:
-  - Spell out numbers below 10
-  - Use "percent" not "%"  in text (% is fine in tables)
-  - Avoid starting sentences with symbols or numbers
-  - "Section 3" not "section 3"
-- Avoid hedging language: be direct about findings
-- Citations: Author (Year) or (Author, Year)
+### 英文顶级期刊（AER、QJE、JPE、Econometrica、REStud）
+- 简洁精确的学术英文
+- 优先使用主动语态："We find..." 而非 "It is found that..."
+- 尽量使用短句
+- 遵循 AER 风格指南：
+  - 10 以下的数字拼写英文
+  - 正文中用 "percent" 而非 "%"（表格中可用 %）
+  - 避免以符号或数字开头的句子
+  - "Section 3" 而非 "section 3"
+- 避免模棱两可的表述：对发现要直接
+- 引用：Author (Year) 或 (Author, Year)
 
-### NBER Working Paper Style
-- **Tone**: More detailed and exploratory than journal submissions; working papers allow longer exposition, extended appendices, and preliminary findings
-- **Length**: Typically 30-60 pages including appendices; no strict page limit
-- **Title page**: NBER Working Paper No. XXXXX, JEL codes, keywords, acknowledgments as first-page footnote
-- **Abstract**: 100-200 words, placed on title page
-- **JEL Classification**: Required, list 2-4 codes (e.g., J31, C21, H53)
-- **Keywords**: 3-5 keywords below abstract
-- **Acknowledgments**: First-page footnote thanking seminar participants, discussants, funding sources
-- **Spacing**: 1.5-spaced body text
-- **Sections**: Standard numbering (1, 2, 3...) without "Section" prefix
-- **Appendix**: Detailed data appendix, additional robustness, and derivations encouraged
-- **Writing conventions**:
-  - More room for methodological detail than in journal format
-  - Can include "work in progress" caveats
-  - Discuss data construction in more detail
-  - More extensive literature positioning is acceptable
-  - "In this paper, we..." is fine (first person plural)
-- **Citations**: Author (Year) format, natbib compatible
-- **Figures/tables**: Can be embedded in text or collected at end; embedded preferred for working papers
+### NBER 工作论文风格
+- **语调**：比期刊投稿更详细和探索性；工作论文允许更长的论述、扩展附录和初步发现
+- **长度**：通常 30-60 页（含附录）；无严格页数限制
+- **标题页**：NBER Working Paper No. XXXXX、JEL 分类码、关键词、致谢作为首页脚注
+- **摘要**：100-200 词，放在标题页
+- **JEL 分类**：必须，列出 2-4 个代码（如 J31, C21, H53）
+- **关键词**：摘要下方 3-5 个关键词
+- **致谢**：首页脚注感谢研讨会参与者、讨论人、资助来源
+- **行距**：正文 1.5 倍行距
+- **章节编号**：标准编号（1, 2, 3...），不加 "Section" 前缀
+- **附录**：鼓励详细的数据附录、额外稳健性检验和推导
+- **写作习惯**：
+  - 比期刊格式有更多的方法论细节空间
+  - 可以包含"进行中"的注意事项
+  - 更详细地讨论数据构建
+  - 更广泛的文献定位是可接受的
+  - "In this paper, we..." 是常见表达（第一人称复数）
+- **引用**：Author (Year) 格式，与 natbib 兼容
+- **图表**：可嵌入正文或汇集在末尾；工作论文偏好嵌入
 
-### SSRN Preprint Style
-- **Tone**: Professional but can be more informal than journal submissions; suitable for rapid dissemination
-- **Length**: Flexible, typically 20-50 pages
-- **Title page**: Title, author(s) with affiliations and email, date, abstract, keywords, JEL codes
-- **Abstract**: 150-250 words; should be self-contained (readers often only see the abstract on SSRN)
-- **Keywords**: 4-6 keywords (SSRN uses these for search indexing — choose strategically)
-- **Date**: "This version: Month Year" and optionally "First version: Month Year"
-- **Footer**: "Available at SSRN: https://ssrn.com/abstract=XXXXXXX" (placeholder until assigned)
-- **Spacing**: Single or 1.5-spaced; single-spaced is common for working papers
-- **Writing conventions**:
-  - Can discuss motivation and policy relevance more extensively
-  - Preliminary results and caveats are acceptable
-  - "Draft — comments welcome" is a common subtitle
-  - More conversational tone than journal submissions is acceptable
-  - Extensive footnotes are common
-- **Citations**: Author (Year) format
-- **Practical notes**:
-  - SSRN readers scan abstracts heavily — make it compelling and self-contained
-  - Include all results (even negative) since this is a working paper
-  - Clearly state contribution in the abstract itself
-  - Consider adding a "Summary of Results" subsection in the introduction
+### SSRN 预印本风格
+- **语调**：专业但可以比期刊投稿更非正式；适合快速传播
+- **长度**：灵活，通常 20-50 页
+- **标题页**：标题、作者（含机构和邮箱）、日期、摘要、关键词、JEL 代码
+- **摘要**：150-250 词；应自成一体（许多 SSRN 读者只看摘要）
+- **关键词**：4-6 个关键词（SSRN 用于搜索索引——应策略性选择）
+- **日期**："This version: Month Year"，可选 "First version: Month Year"
+- **页脚**："Available at SSRN: https://ssrn.com/abstract=XXXXXXX"（占位符）
+- **行距**：单倍或 1.5 倍；工作论文常用单倍行距
+- **写作习惯**：
+  - 可以更广泛地讨论动机和政策相关性
+  - 初步结果和注意事项是可接受的
+  - "Draft — comments welcome" 是常见副标题
+  - 比期刊投稿可以更口语化
+  - 大量脚注很常见
+- **引用**：Author (Year) 格式
+- **实用提示**：
+  - SSRN 读者大量浏览摘要——摘要要有吸引力且自成一体
+  - 包含所有结果（包括负面结果），因为这是工作论文
+  - 在摘要中清晰陈述贡献
+  - 考虑在引言中添加"结果摘要"小节
 
-## Step 4: Generate Output
+## 步骤 4：生成输出
 
-Create the .tex file in `paper/sections/`:
+在 `paper/sections/` 中创建 .tex 文件：
 
 ```
 paper/sections/<NN>_<section_name>.tex
 ```
 
-Where `<NN>` is the section number:
+其中 `<NN>` 为章节编号：
 - 01_introduction.tex
 - 02_literature.tex
 - 03_background.tex
@@ -340,21 +340,21 @@ Where `<NN>` is the section number:
 - 07_robustness.tex
 - 08_conclusion.tex
 
-Print confirmation:
+打印确认：
 
 ```
-Section "<section name>" generated successfully!
+章节"<章节名称>"生成成功！
 
-Output: paper/sections/<filename>.tex
-Language: <CN/EN>
-Approximate length: <word/character count>
+输出：paper/sections/<filename>.tex
+语言：<CN/EN>
+大约长度：<字数/字符数>
 
-To include in your main document:
+在主文档中引用：
   \input{sections/<filename>}
 
-Remember to:
-  - Review and customize the content
-  - Add specific citations from your bibliography
-  - Reference correct table and figure numbers
-  - Adjust any placeholder text marked with <...>
+请注意：
+  - 审阅并定制内容
+  - 从你的参考文献库中添加具体引用
+  - 核对表格和图表编号
+  - 修改 <...> 标记的占位文字
 ```

@@ -1,98 +1,107 @@
-# Econ Research Workflow
+# 经济学研究工作流 (Econ Research Workflow)
 
-A Claude Code-powered template for reproducible economics research, featuring automated Stata/Python pipelines, adversarial quality assurance, and cross-validation infrastructure.
+一个基于 Claude Code 的可复现经济学研究模板，集成了自动化 Stata/Python 分析管道、对抗式质量审查和交叉验证基础设施。
 
-Inspired by [pedrohcgs/claude-code-my-workflow](https://github.com/pedrohcgs/claude-code-my-workflow).
+灵感来源：[pedrohcgs/claude-code-my-workflow](https://github.com/pedrohcgs/claude-code-my-workflow)
 
----
-
-## Features
-
-- **30 skills** — slash-command workflows covering the full research lifecycle (data cleaning, DID/IV/RDD/Panel/SDID/Bootstrap/Placebo/Logit-Probit/LASSO estimation, cross-validation, tables, paper writing, review, pipeline orchestration, synthesis reporting, exploration sandbox, session continuity, Socratic research tools, and self-extension)
-- **12 agents** — specialized reviewers plus 3 adversarial critic-fixer pairs (code, econometrics, tables) enforcing separation of concerns
-- **7 rules** — 4 path-scoped coding/econometrics conventions + 3 always-on (constitution, orchestrator protocol, Stata error verification)
-- **3 lifecycle hooks** — automatic session context loading, pre-compaction memory save, and post-Stata error detection
-- **Adversarial QA loop** — `/adversarial-review` runs critic → fixer → re-critic cycles (up to 5 rounds) until quality score >= 95
-- **Executable quality scorer** — `quality_scorer.py` scores projects on 6 dimensions (100 pts), including method-specific diagnostics auto-detected from .do files
-- **Exploration sandbox** — `/explore` for hypothesis testing with relaxed thresholds; `/promote` to graduate results to the main pipeline
-- **Stata + Python/R cross-validation** — every regression is verified across languages via `pyfixest` and R `fixest`
-- **Multi-format output** — Chinese journals (经济研究/管理世界), English TOP5 (AER/QJE), NBER Working Paper, and SSRN preprint styles
-- **Version-controlled analysis** — `v1/`, `v2/`, ... directory structure with full replication packages
-- **Session continuity** — `/session-log` for explicit session management with MEMORY.md integration
+> 本仓库为 [econ-research-workflow](https://github.com/Weiyu-USTC/econ-research-workflow) 的中文版。所有技能提示词、代理描述、规则和文档均已中文化。斜杠命令名称保持英文不变（如 `/run-did`），以确保与 Claude Code 的兼容性。
 
 ---
 
-## Quick Start
+## 功能特点
 
-1. **Fork** this repository
-2. **Configure** `CLAUDE.md` — fill in `[PLACEHOLDER]` fields (project name, institution, researcher, Stata path)
-3. **Run** `/init-project` in Claude Code to scaffold a new research project
-4. Place raw data in `v1/data/raw/`
-5. Use `/data-describe` → `/run-did` (or `/run-iv`, `/run-rdd`, `/run-panel`) → `/cross-check` → `/make-table`
-6. Run `/adversarial-review` for automated quality assurance
-7. Run `/score` to get a quantitative quality report
-
----
-
-## Skills Reference
-
-| Skill | Trigger | Description |
-|-------|---------|-------------|
-| `/init-project` | Start a new project | Initialize standardized directory structure with master.do, REPLICATION.md, templates |
-| `/data-describe` | Explore data | Generate descriptive statistics and variable distributions (Stata + Python) |
-| `/run-did` | DID analysis | Full DID/TWFE/Callaway-Sant'Anna pipeline with diagnostics |
-| `/run-iv` | IV analysis | Complete IV/2SLS pipeline with first-stage, weak-instrument tests, LIML comparison |
-| `/run-rdd` | RDD analysis | Complete RDD pipeline with bandwidth sensitivity, density test, placebo cutoffs |
-| `/run-panel` | Panel analysis | Panel FE/RE/GMM pipeline with Hausman, serial correlation, CD tests |
-| `/cross-check` | Validate results | Cross-validate Stata vs Python/R regression results (target: < 0.1% coefficient diff) |
-| `/robustness` | Robustness tests | Comprehensive robustness test suite for regression results |
-| `/make-table` | Format tables | Generate publication-quality LaTeX regression tables (AER or 三线表 style) |
-| `/write-section` | Draft paper | Write a paper section in Chinese or English following journal conventions |
-| `/review-paper` | Simulate review | Three simulated peer reviewers with structured feedback; optional APE-style multi-round deep review |
-| `/lit-review` | Literature review | Structured literature review with BibTeX entries |
-| `/adversarial-review` | Quality assurance | Adversarial critic-fixer loop across code, econometrics, and tables domains |
-| `/score` | Quality scoring | Run executable quality scorer (6 dimensions, 100 pts) on current version |
-| `/commit` | Git commit | Smart commit with type prefix, data safety warnings, auto-generated message |
-| `/compile-latex` | Compile paper | Run pdflatex/bibtex pipeline with error checking |
-| `/context-status` | Session context | Display current version, recent decisions, quality scores, git state |
-| `/run-sdid` | SDID analysis | Synthetic DID analysis with unit/time weights and inference |
-| `/run-bootstrap` | Bootstrap inference | Pairs, wild cluster, residual, and teffects bootstrap pipelines |
-| `/run-placebo` | Placebo tests | Timing, outcome, instrument, and permutation placebo test pipelines |
-| `/run-logit-probit` | Logit/Probit analysis | Logit/probit, propensity score, treatment effects (RA/IPW/AIPW), conditional logit |
-| `/run-lasso` | LASSO/regularization | LASSO, post-double-selection, rigorous LASSO, R `glmnet` matching pipeline |
-| `/explore` | Exploration sandbox | Set up `explore/` directory with relaxed quality thresholds (>= 60) |
-| `/promote` | Promote results | Graduate exploratory files to main `vN/` pipeline with quality check |
-| `/session-log` | Session continuity | Start/end sessions with MEMORY.md context loading and recording |
-| `/interview-me` | Research ideation | Bilingual Socratic interview to formalize research ideas into structured proposals |
-| `/devils-advocate` | Strategy challenge | Pre-analysis threat assessment for identification strategy (threats, alternatives, falsification) |
-| `/learn` | Self-extension | Create new rules or skills from within a session, with constitution guard |
-| `/run-pipeline` | Orchestrate pipeline | Auto-detect methods from research plan and run full skill sequence end-to-end |
-| `/synthesis-report` | Generate report | Collect all outputs into structured synthesis report (Markdown + LaTeX) |
+- **30 个技能** — 斜杠命令工作流，覆盖完整研究生命周期：数据清洗、DID/IV/RDD/面板/SDID/Bootstrap/安慰剂/Logit-Probit/LASSO 估计、交叉验证、表格生成、论文撰写、审稿模拟、管道编排、综合报告、探索沙盒、会话连续性、苏格拉底式研究工具和自我扩展
+- **12 个代理** — 专业审查者 + 3 对对抗式评审者-修复者（代码、计量、表格），强制关注点分离
+- **7 条规则** — 4 条路径限定的编码/计量规范 + 3 条常驻规则（基本准则、编排协议、Stata 错误验证）
+- **3 个生命周期钩子** — 自动加载会话上下文、压缩前记忆保存、Stata 运行后错误检测
+- **对抗式质量审查循环** — `/adversarial-review` 运行评审者 → 修复者 → 再评审循环（最多 5 轮），直到质量评分 ≥ 95
+- **可执行质量评分器** — `quality_scorer.py` 在 6 个维度上评分（满分 100），自动从 .do 文件检测计量方法
+- **探索沙盒** — `/explore` 提供宽松阈值的假设检验环境；`/promote` 将结果提升至正式管道
+- **Stata + Python/R 交叉验证** — 每个回归均通过 `pyfixest` 和 R `fixest` 跨语言验证
+- **多格式输出** — 支持中文期刊（经济研究/管理世界）、英文 TOP5（AER/QJE）、NBER 工作论文和 SSRN 预印本格式
+- **版本化分析** — `v1/`、`v2/`、... 目录结构，包含完整复现包
+- **会话连续性** — `/session-log` 提供显式会话管理，与 MEMORY.md 集成
 
 ---
 
-## Agents Reference
+## 安装与配置
 
-| Agent | Role | Tools |
-|-------|------|-------|
-| `code-reviewer` | ~~Code quality evaluation~~ **(DEPRECATED — use `code-critic`)** | Read-only |
-| `econometrics-reviewer` | ~~Identification strategy review~~ **(DEPRECATED — use `econometrics-critic`)** | Read-only |
-| `tables-reviewer` | ~~Table formatting review~~ **(DEPRECATED — use `tables-critic`)** | Read-only |
-| `robustness-checker` | Missing robustness checks and sensitivity analysis | Read-only |
-| `paper-reviewer` | Full paper review simulating peer referees | Read-only |
-| `cross-checker` | Stata vs Python cross-validation | Read + Bash |
-| `code-critic` | Adversarial code review (conventions, safety, defensive programming) | Read-only |
-| `code-fixer` | Implements fixes from code-critic findings | Full access |
-| `econometrics-critic` | Adversarial econometrics review (diagnostics, identification, robustness) | Read-only |
-| `econometrics-fixer` | Implements fixes from econometrics-critic findings | Full access |
-| `tables-critic` | Adversarial table review (format, stars, reporting completeness) | Read-only |
-| `tables-fixer` | Implements fixes from tables-critic findings | Full access |
+### 前置要求
+
+| 软件 | 版本要求 | 用途 |
+|------|----------|------|
+| **Stata** | 18（推荐 MP 版） | 所有计量经济学估计 |
+| **Python** | 3.10+ | 交叉验证（`pyfixest`、`pandas`、`numpy`） |
+| **Claude Code** | 最新版 | 运行技能和代理的 CLI 工具 |
+| **Git Bash** | — | Windows 下 Stata 执行的 Shell 环境 |
+| **LaTeX** | 可选 | `/compile-latex` 编译论文（pdflatex + bibtex） |
+
+### 安装步骤
+
+1. **克隆本仓库**
+   ```bash
+   git clone https://github.com/Weiyu-USTC/econ-research-workflow-cn.git
+   cd econ-research-workflow-cn
+   ```
+
+2. **安装 Claude Code CLI**
+   - 访问 [claude.com/claude-code](https://claude.com/claude-code) 下载安装
+   - 确保 `claude` 命令在终端中可用
+
+3. **安装 Python 依赖**
+   ```bash
+   pip install pyfixest pandas numpy polars matplotlib stargazer
+   ```
+
+4. **配置 `CLAUDE.md`**
+   - 打开项目根目录的 `CLAUDE.md`
+   - 填写所有 `[PLACEHOLDER]` 字段：
+     - `[PROJECT_NAME]` — 你的研究项目名称
+     - `[INSTITUTION_NAME]` — 你的机构名称
+     - `[RESEARCHER_NAMES]` — 研究者姓名
+     - `[DATE]` — 创建日期
+   - 修改 Stata 可执行文件路径为你的本地路径
+
+5. **验证安装**
+   ```bash
+   # 在项目目录启动 Claude Code
+   claude
+
+   # 初始化一个新研究项目
+   /init-project
+   ```
 
 ---
 
-## Typical Workflow Sequences
+## 快速上手
 
-### Full Paper Pipeline
+### 三步开始你的第一个分析
+
+1. **初始化项目** — 在 Claude Code 中运行 `/init-project`，按提示输入项目信息
+2. **放入数据** — 将原始数据放入 `v1/data/raw/`（此目录为只读，永远不会被修改）
+3. **运行分析** — 根据你的研究设计选择对应技能：
+
+```bash
+# 描述性统计
+/data-describe
+
+# 运行 DID 分析（支持 TWFE、Callaway-Sant'Anna、Bacon 分解等）
+/run-did
+
+# 交叉验证 Stata 与 Python 结果（系数差异 < 0.1%）
+/cross-check
+
+# 生成发表质量的回归表格（支持三线表和 booktabs）
+/make-table
+
+# 对抗式质量审查（代码 + 计量 + 表格，最多 5 轮）
+/adversarial-review
+
+# 量化质量评分（6 维度，100 分制）
+/score
+```
+
+### 完整论文管道
 
 ```
 /init-project → /data-describe → /run-did → /cross-check → /robustness
@@ -100,224 +109,287 @@ Inspired by [pedrohcgs/claude-code-my-workflow](https://github.com/pedrohcgs/cla
     → /score → /synthesis-report → /compile-latex → /commit
 ```
 
-### Automated Pipeline (single command)
+### 一键自动化管道
 
-```
-/run-pipeline  →  auto-detects method  →  runs full sequence  →  /synthesis-report
-```
-
-### Quick Check (single regression)
-
-```
-/run-{method} → /cross-check → /score
+```bash
+# 自动检测计量方法并执行完整技能序列
+/run-pipeline
 ```
 
-Supported methods: `did`, `iv`, `rdd`, `panel`, `sdid`, `bootstrap`, `placebo`, `logit-probit`, `lasso`
-
-### Research Ideation
+### 研究构思流程
 
 ```
 /interview-me → /devils-advocate → /data-describe → /run-{method}
 ```
 
-### Revision Response
+---
+
+## 技能参考
+
+| 技能 | 描述 |
+|------|------|
+| `/init-project` | 初始化标准化目录结构，生成 master.do、REPLICATION.md 和模板文件 |
+| `/data-describe` | 生成描述性统计和变量分布（Stata + Python 双语言） |
+| `/run-did` | 完整 DID/TWFE/Callaway-Sant'Anna 分析管道，含平行趋势检验和事件研究图 |
+| `/run-iv` | 完整 IV/2SLS 分析管道，含第一阶段诊断、弱工具变量检验和 LIML 对比 |
+| `/run-rdd` | 完整 RDD 分析管道，含带宽敏感性、密度检验和安慰剂断点 |
+| `/run-panel` | 面板 FE/RE/GMM 分析管道，含 Hausman 检验、序列相关和 CD 检验 |
+| `/run-sdid` | 合成双重差分分析，含单位/时间权重和推断 |
+| `/run-bootstrap` | Bootstrap 推断管道（配对、野生聚类、残差、teffects） |
+| `/run-placebo` | 安慰剂检验管道（时间、结果、工具变量、置换推断） |
+| `/run-logit-probit` | Logit/Probit、倾向得分、处理效应（RA/IPW/AIPW）和条件 Logit |
+| `/run-lasso` | LASSO、双重选择后推断、严格 LASSO 和 R `glmnet` 匹配管道 |
+| `/cross-check` | Stata vs Python/R 回归结果交叉验证（目标：系数差异 < 0.1%） |
+| `/robustness` | 回归结果的综合稳健性检验套件 |
+| `/make-table` | 生成发表质量的 LaTeX 回归表格（AER 格式或三线表） |
+| `/write-section` | 按期刊规范撰写论文章节（支持中英文） |
+| `/review-paper` | 模拟三位匿名审稿人的结构化反馈；可选 APE 式多轮深度评审 |
+| `/lit-review` | 结构化文献综述，生成 BibTeX 条目 |
+| `/adversarial-review` | 对抗式评审者-修复者质量审查循环（代码、计量、表格三个领域） |
+| `/score` | 运行可执行质量评分器（6 维度，满分 100） |
+| `/commit` | 智能 Git 提交，含类型前缀和数据安全警告 |
+| `/compile-latex` | 运行 pdflatex/bibtex 编译管道并检查错误 |
+| `/context-status` | 显示当前版本、近期决策、质量评分和 Git 状态 |
+| `/explore` | 设置探索沙盒，使用宽松质量阈值（≥ 60） |
+| `/promote` | 将探索性结果提升至正式 `vN/` 管道，含质量检查 |
+| `/session-log` | 会话启动/结束管理，加载上下文并记录决策和学习 |
+| `/interview-me` | 苏格拉底式研究访谈 — 将模糊想法结构化为研究提案 |
+| `/devils-advocate` | 识别策略威胁评估 — 预分析阶段的魔鬼代言人 |
+| `/learn` | 在会话内创建新规则或技能（受基本准则约束） |
+| `/run-pipeline` | 自动检测计量方法，编排完整技能管道端到端执行 |
+| `/synthesis-report` | 收集所有分析输出，生成结构化综合报告（Markdown + LaTeX） |
+
+---
+
+## 支持的计量方法
+
+| 方法 | 技能命令 | Stata 主要命令 |
+|------|----------|----------------|
+| 双重差分 (DID) | `/run-did` | `reghdfe`, `csdid`, `did_multiplegt`, `bacondecomp` |
+| 工具变量 (IV) | `/run-iv` | `ivreghdfe`, `ivreg2`, `weakiv` |
+| 断点回归 (RDD) | `/run-rdd` | `rdrobust`, `rddensity`, `rdplot` |
+| 面板数据 (Panel) | `/run-panel` | `reghdfe`, `xtabond2` |
+| 合成双重差分 (SDID) | `/run-sdid` | `sdid` |
+| Bootstrap 推断 | `/run-bootstrap` | `boottest`, `fwildclusterboot` |
+| 安慰剂检验 (Placebo) | `/run-placebo` | 置换推断, 时间安慰剂 |
+| Logit/Probit | `/run-logit-probit` | `logit`, `probit`, `teffects`, `clogit` |
+| LASSO 正则化 | `/run-lasso` | `lasso2`, `pdslasso`, `glmnet` |
+
+---
+
+## 代理参考
+
+| 代理 | 角色 | 权限 |
+|------|------|------|
+| `code-reviewer` | ~~代码质量评估~~ **（已弃用 — 请用 `code-critic`）** | 只读 |
+| `econometrics-reviewer` | ~~识别策略审查~~ **（已弃用 — 请用 `econometrics-critic`）** | 只读 |
+| `tables-reviewer` | ~~表格格式审查~~ **（已弃用 — 请用 `tables-critic`）** | 只读 |
+| `robustness-checker` | 检查缺失的稳健性检验和敏感性分析 | 只读 |
+| `paper-reviewer` | 模拟匿名审稿人的全文审查 | 只读 |
+| `cross-checker` | Stata vs Python 交叉验证诊断 | 只读 + Bash |
+| `code-critic` | 对抗式代码审查（规范、安全性、防御式编程） | 只读 |
+| `code-fixer` | 根据 code-critic 发现实施修复 | 完全访问 |
+| `econometrics-critic` | 对抗式计量审查（诊断、识别策略、稳健性） | 只读 |
+| `econometrics-fixer` | 根据 econometrics-critic 发现实施修复 | 完全访问 |
+| `tables-critic` | 对抗式表格审查（格式、星号、报告完整性） | 只读 |
+| `tables-fixer` | 根据 tables-critic 发现实施修复 | 完全访问 |
+
+---
+
+## 典型工作流程
+
+### 完整论文管道
 
 ```
-/context-status → (address reviewer comments) → /adversarial-review → /score → /commit
+/init-project → /data-describe → /run-did → /cross-check → /robustness
+    → /make-table → /write-section → /review-paper → /adversarial-review
+    → /score → /synthesis-report → /compile-latex → /commit
+```
+
+### 自动化管道（单条命令）
+
+```
+/run-pipeline  →  自动检测方法  →  执行完整序列  →  /synthesis-report
+```
+
+### 快速检查（单个回归）
+
+```
+/run-{method} → /cross-check → /score
+```
+
+支持的方法：`did`、`iv`、`rdd`、`panel`、`sdid`、`bootstrap`、`placebo`、`logit-probit`、`lasso`
+
+### 研究构思
+
+```
+/interview-me → /devils-advocate → /data-describe → /run-{method}
+```
+
+### 修改回复
+
+```
+/context-status → （处理审稿人意见） → /adversarial-review → /score → /commit
 ```
 
 ---
 
-## Directory Structure
+## 目录结构
 
 ```
-econ-research-workflow/
+econ-research-workflow-cn/
 ├── .claude/
-│   ├── agents/           # 12 specialized agents
-│   ├── hooks/            # Lifecycle hook scripts (session loader, Stata log check)
-│   ├── scripts/          # Auto-approved wrapper scripts (run-stata.sh)
-│   ├── rules/            # Coding conventions, econometrics standards (4 path-scoped + 3 always-on incl. constitution)
-│   ├── settings.json     # Hook + permission configuration
-│   └── skills/           # 30 slash-command skills + 1 reference guide
+│   ├── agents/           # 12 个专业代理
+│   ├── hooks/            # 生命周期钩子脚本（会话加载器、Stata 日志检查）
+│   ├── scripts/          # 自动批准的包装脚本（run-stata.sh）
+│   ├── rules/            # 编码规范、计量标准（4 条路径限定 + 3 条常驻规则含基本准则）
+│   ├── settings.json     # 钩子 + 权限配置
+│   └── skills/           # 30 个斜杠命令技能 + 1 个参考指南
 ├── scripts/
-│   └── quality_scorer.py # Executable 6-dimension quality scorer
-├── tests/                # Test cases (DID, RDD, IV, Panel, Full Pipeline)
-├── CLAUDE.md             # Project configuration (fill in placeholders)
-├── MEMORY.md             # Cross-session learning and decision log
-├── ROADMAP.md            # Phase 1-5 implementation history
-└── README.md             # This file
+│   └── quality_scorer.py # 可执行的 6 维度质量评分器
+├── tests/                # 测试用例（DID、RDD、IV、面板、完整管道）
+├── CLAUDE.md             # 项目配置（填写占位符）
+├── MEMORY.md             # 跨会话学习和决策日志
+├── ROADMAP.md            # Phase 1-6 实现历史
+└── README.md             # 本文件
 ```
 
-Each research project created with `/init-project` follows:
+使用 `/init-project` 创建的每个研究项目遵循以下结构：
 
 ```
-project-name/
+项目名称/
 └── v1/
-    ├── code/stata/       # .do files (numbered: 01_, 02_, ...)
-    ├── code/python/      # .py files for cross-validation
-    ├── data/raw/         # Original data (READ-ONLY)
-    ├── data/clean/       # Processed datasets
-    ├── data/temp/        # Intermediate files
-    ├── output/tables/    # LaTeX tables (.tex)
-    ├── output/figures/   # Figures (.pdf/.png)
-    ├── output/logs/      # Stata .log files
-    ├── paper/sections/   # LaTeX section files
-    ├── paper/bib/        # BibTeX files
-    ├── _VERSION_INFO.md  # Version metadata
-    └── REPLICATION.md    # AEA Data Editor format replication instructions
+    ├── code/stata/       # .do 文件（按编号排序：01_、02_、...）
+    ├── code/python/      # .py 文件（用于交叉验证）
+    ├── data/raw/         # 原始数据（只读，永不修改）
+    ├── data/clean/       # 清洗后的数据集
+    ├── data/temp/        # 中间文件
+    ├── output/tables/    # LaTeX 表格（.tex）
+    ├── output/figures/   # 图表（.pdf/.png）
+    ├── output/logs/      # Stata .log 文件
+    ├── paper/sections/   # LaTeX 章节文件
+    ├── paper/bib/        # BibTeX 文件
+    ├── _VERSION_INFO.md  # 版本元数据
+    └── REPLICATION.md    # AEA 数据编辑格式的复现说明
 ```
 
 ---
 
-## Prerequisites
+## 质量评分
 
-- **Stata 18** (MP recommended) — all econometric estimation
-- **Python 3.10+** — cross-validation via `pyfixest`, `pandas`, `numpy`
-- **Claude Code** — CLI tool for running skills and agents
-- **Git Bash** (Windows) — shell environment for Stata execution
-- **LaTeX distribution** (optional) — for `/compile-latex` (pdflatex + bibtex)
+可执行质量评分器（`scripts/quality_scorer.py`）在 6 个维度上评估项目：
 
----
+| 维度 | 分值 | 关键检查项 |
+|------|------|-----------|
+| 代码规范 | 15 | .do 文件头、`set seed`、编号命名、日志模式、`vce(cluster)` |
+| 日志清洁度 | 15 | 无 `r(xxx)` 错误、无变量未找到、无命令未识别 |
+| 输出完整性 | 15 | 表格（.tex）、图表（.pdf/.png）和日志存在且非空 |
+| 交叉验证 | 15 | Python 脚本存在、系数比较、通过/失败阈值 |
+| 文档 | 15 | REPLICATION.md 有实质内容、_VERSION_INFO.md、数据来源记录 |
+| 方法诊断 | 25 | 自动检测：DID 平行趋势、IV 第一阶段 F、RDD 密度检验、面板 Hausman |
 
-## Test Suite
+运行方式：`python scripts/quality_scorer.py v1/` 或使用 `/score` 技能。
 
-5 end-to-end tests covering all major estimation methods:
-
-| Test | Method | Status |
-|------|--------|--------|
-| `test1-did` | DID / TWFE / Callaway-Sant'Anna | Pass |
-| `test2-rdd` | RDD / rdrobust / density test | Pass |
-| `test3-iv` | IV / 2SLS / first-stage diagnostics | Pass |
-| `test4-panel` | Panel FE / RE / GMM | Pass |
-| `test5-full-pipeline` | End-to-end multi-script pipeline | Pass |
-
-Issues discovered during testing are documented in `tests/ISSUES_LOG.md` and tracked in `MEMORY.md`.
-
----
-
-## 中文快速上手指南
-
-### 安装与配置
-
-1. Fork 本仓库到你的 GitHub 账户
-2. 安装 [Claude Code](https://claude.com/claude-code) CLI 工具
-3. 确保已安装 Stata 18 和 Python 3.10+
-4. 打开 `CLAUDE.md`，填写项目信息（项目名、机构、研究者姓名等）
-
-### 基本用法
-
-```bash
-# 在项目目录中启动 Claude Code
-claude
-
-# 初始化新研究项目
-/init-project
-
-# 运行 DID 分析（支持 TWFE、CS-DiD、BJS 等）
-/run-did
-
-# 交叉验证 Stata 与 Python 结果
-/cross-check
-
-# 生成发表质量的回归表格（支持三线表和 booktabs）
-/make-table
-
-# 对抗式质量审查（代码 + 计量 + 表格）
-/adversarial-review
-
-# 量化质量评分（6 维度，100 分制）
-/score
-```
-
-### 支持的计量方法
-
-| 方法 | 技能命令 | 主要工具 |
-|------|----------|----------|
-| 双重差分 (DID) | `/run-did` | reghdfe, csdid, did_multiplegt, bacondecomp |
-| 工具变量 (IV) | `/run-iv` | ivreghdfe, ivreg2, weakiv |
-| 断点回归 (RDD) | `/run-rdd` | rdrobust, rddensity, rdplot |
-| 面板数据 | `/run-panel` | reghdfe, xtabond2 |
-| 合成 DID | `/run-sdid` | sdid |
-| Bootstrap 推断 | `/run-bootstrap` | boottest, fwildclusterboot |
-| 安慰剂检验 | `/run-placebo` | permutation inference, timing placebo |
-| Logit/Probit | `/run-logit-probit` | logit, probit, teffects, clogit |
-| LASSO 正则化 | `/run-lasso` | lasso2, pdslasso, glmnet |
-
-### 质量评分标准
+### 评分标准
 
 | 分数 | 等级 | 操作 |
 |------|------|------|
-| >= 95 | 可发表 | 无需修改 |
-| >= 90 | 小修 | 处理小问题后提交 |
-| >= 80 | 大修 | 需要显著修改 |
+| ≥ 95 | 可发表 | 无需修改 |
+| ≥ 90 | 小修 | 处理小问题后提交 |
+| ≥ 80 | 大修 | 需要显著修改 |
 | < 80 | 重做 | 存在根本性问题 |
 
 ---
 
-## Governance
+## 治理机制
 
-The workflow operates under a **constitution** (`.claude/rules/constitution.md`) defining 5 immutable principles: raw data integrity, full reproducibility, mandatory cross-validation, version preservation, and score integrity. All skills, agents, and rules operate within this envelope. The `/learn` skill cannot create rules that violate it.
+### 基本准则
 
-Non-trivial tasks follow a **spec-then-plan** protocol (Phase 0 in the orchestrator) requiring MUST/SHOULD/MAY requirements before implementation begins.
+工作流在**基本准则**（`.claude/rules/constitution.md`）下运行，定义了 5 条不可变原则：
 
-## Roadmap
+1. **原始数据完整性** — `data/raw/` 永远不被修改、覆盖或删除
+2. **完全可复现性** — 每个结果必须可从代码 + 原始数据复现
+3. **强制交叉验证** — 所有回归在 Stata 和 Python 间交叉验证（系数差异 < 0.1%；`explore/` 内可豁免）
+4. **版本保存** — `vN/` 目录永不删除，仅被 `vN+1/` 取代
+5. **评分诚信** — 质量评分如实记录，永不伪造或膨胀
 
-See [ROADMAP.md](ROADMAP.md) for the full Phase 1-5 implementation history.
+所有技能、代理和规则在此框架内运行。`/learn` 技能不能创建违反基本准则的规则。
 
-### Hooks
+### 编排协议
 
-3 lifecycle hooks configured in `.claude/settings.json`:
-
-| Hook | Trigger | What It Does |
-|------|---------|-------------|
-| Session-start loader | `SessionStart` | Reads MEMORY.md, shows recent entries and last quality score |
-| Pre-compact save | `PreCompact` | Prompts session summary to MEMORY.md before context compaction |
-| Post-Stata log check | `PostToolUse` (Bash) | Auto-parses `.log` files for `r(xxx)` errors after Stata runs |
-
-### Always-On Rules
-
-3 always-on rules (no path scope, loaded in every session):
-
-| Rule | Purpose |
-|------|---------|
-| `constitution.md` | 5 immutable principles (raw data integrity, reproducibility, cross-validation, version preservation, score integrity) |
-| `orchestrator-protocol.md` | Spec-Plan-Implement-Verify-Review-Fix-Score cycle with "Just Do It" mode |
-| `stata-error-verification.md` | Enforces reading hook output before re-running Stata; prevents log-overwrite false positives |
-
-### Auto-Approval
-
-Stata execution is wrapped in `.claude/scripts/run-stata.sh` and auto-approved via
-`permissions.allow` pattern `Bash(bash *run-stata.sh *)`. This eliminates manual
-approval prompts for every Stata run.
+非琐碎任务遵循 **Spec → Plan → Implement → Verify → Review → Fix → Score → Report** 八阶段循环，最多 5 轮迭代。琐碎任务（影响 ≤ 2 个文件、首轮评分 ≥ 80 且无严重问题）使用"直接执行"模式。
 
 ---
 
-## Changelog
+## 钩子
 
-| Date | Time (GMT) | Version | Description |
-|------|------------|---------|-------------|
-| 2026-02-25 | 09:25 | v0.1 | Initial commit — 14 skills, 6 agents, CLAUDE.md template, directory conventions |
-| 2026-02-25 | 10:32 | v0.2 | Phase 1 — adversarial QA loop (`/adversarial-review`), quality scorer (`quality_scorer.py`), 6 new skills, README |
-| 2026-02-25 | 11:24 | v0.3 | Phase 2 — 3 lifecycle hooks (session loader, pre-compact save, Stata log check), path-scoped rules, exploration sandbox (`/explore` + `/promote`), session continuity (`/session-log`) |
-| 2026-02-25 | 12:09 | v0.4 | NBER Working Paper and SSRN preprint LaTeX style support |
-| 2026-02-25 | 12:50 | v0.5 | Phase 3 — Socratic research tools (`/interview-me`, `/devils-advocate`), self-extension (`/learn`), constitution governance |
-| 2026-02-25 | 15:32 | v0.6 | 4 new skills (`/run-bootstrap`, `/run-placebo`, `/run-logit-probit`, `/run-lasso`), replication package audit (jvae023, data_programs) |
-| 2026-02-26 | 06:44 | v0.7 | Phase 5 — real-data replication testing across 11 package × skill combinations, 15 issues found and fixed, all 9 `/run-*` skills hardened with defensive programming |
-| 2026-02-26 | 07:51 | v0.8 | Stata auto-approve wrapper (`run-stata.sh` + `permissions.allow`), orchestrator protocol update |
-| 2026-02-26 | 15:24 | v0.9 | Stata error verification rule — enforces reading hook output before re-running, prevents log-overwrite false positives (Issue #26) |
-| 2026-02-26 | 15:55 | v0.10 | Consistency audit — fixed 31 issues across docs, regex, YAML frontmatter, cross-references, and feature descriptions |
-| 2026-02-27 | — | v0.11 | Phase 6 — Pipeline orchestration (`/run-pipeline`), synthesis report (`/synthesis-report`), legacy agent rewiring, orchestrator Phase 7 (Report), score persistence |
+3 个生命周期钩子配置在 `.claude/settings.json` 中：
+
+| 钩子 | 触发事件 | 功能 |
+|------|----------|------|
+| 会话启动加载器 | `SessionStart` | 读取 MEMORY.md，显示近期条目和上次质量评分 |
+| 压缩前保存 | `PreCompact` | 提示在上下文压缩前将会话摘要追加到 MEMORY.md |
+| Stata 日志检查 | `PostToolUse`（Bash） | Stata 运行后自动解析 `.log` 文件中的 `r(xxx)` 错误 |
+
+### 常驻规则
+
+3 条常驻规则（无路径限定，每次会话均加载）：
+
+| 规则 | 用途 |
+|------|------|
+| `constitution.md` | 5 条不可变原则（原始数据完整性、可复现性、交叉验证、版本保存、评分诚信） |
+| `orchestrator-protocol.md` | Spec-Plan-Implement-Verify-Review-Fix-Score-Report 任务循环 |
+| `stata-error-verification.md` | 强制在重新运行 Stata 前读取钩子输出，防止日志覆盖导致的误判 |
+
+### 自动批准
+
+Stata 执行通过 `.claude/scripts/run-stata.sh` 包装，并在 `permissions.allow` 中配置 `Bash(bash *run-stata.sh *)` 自动批准模式，无需每次手动确认。
 
 ---
 
-## Credits
+## 更新日志
 
-- Template architecture inspired by [Pedro H.C. Sant'Anna's claude-code-my-workflow](https://github.com/pedrohcgs/claude-code-my-workflow)
-- Econometric methods follow guidelines from Angrist & Pischke, Callaway & Sant'Anna (2021), Rambachan & Roth (2023), and Cattaneo, Idrobo & Titiunik (2020)
-- Quality scoring framework adapted from AEA Data Editor replication standards
+| 日期 | 版本 | 描述 |
+|------|------|------|
+| 2026-02-25 | v0.1 | 初始提交 — 14 个技能、6 个代理、CLAUDE.md 模板、目录规范 |
+| 2026-02-25 | v0.2 | Phase 1 — 对抗式质量审查循环、质量评分器、6 个新技能 |
+| 2026-02-25 | v0.3 | Phase 2 — 3 个生命周期钩子、路径限定规则、探索沙盒、会话连续性 |
+| 2026-02-25 | v0.4 | NBER 工作论文和 SSRN 预印本 LaTeX 格式支持 |
+| 2026-02-25 | v0.5 | Phase 3 — 苏格拉底式研究工具、自我扩展、基本准则治理 |
+| 2026-02-25 | v0.6 | 4 个新技能（Bootstrap、安慰剂、Logit-Probit、LASSO） |
+| 2026-02-26 | v0.7 | Phase 5 — 真实数据复现测试，11 组包×技能组合，19 个问题修复 |
+| 2026-02-26 | v0.8 | Stata 自动批准包装器、编排协议更新 |
+| 2026-02-26 | v0.9 | Stata 错误验证规则 — 防止日志覆盖误判 |
+| 2026-02-26 | v0.10 | 一致性审计 — 修复 31 个文档/正则/YAML/交叉引用问题 |
+| 2026-02-27 | v0.11 | Phase 6 — 管道编排、综合报告、遗留代理重连、评分持久化 |
+| 2026-02-27 | v0.12-cn | 中文版发布 — 所有技能提示词、代理描述、规则和文档中文化 |
 
 ---
 
-## License
+## 测试套件
+
+5 个端到端测试覆盖所有主要估计方法：
+
+| 测试 | 方法 | 状态 |
+|------|------|------|
+| `test1-did` | DID / TWFE / Callaway-Sant'Anna | 通过 |
+| `test2-rdd` | RDD / rdrobust / 密度检验 | 通过 |
+| `test3-iv` | IV / 2SLS / 第一阶段诊断 | 通过 |
+| `test4-panel` | 面板 FE / RE / GMM | 通过 |
+| `test5-full-pipeline` | 端到端多脚本管道 | 通过 |
+
+测试中发现的问题记录在 `tests/ISSUES_LOG.md` 中，并在 `MEMORY.md` 中跟踪。
+
+---
+
+## 致谢
+
+- 模板架构灵感来源于 [Pedro H.C. Sant'Anna 的 claude-code-my-workflow](https://github.com/pedrohcgs/claude-code-my-workflow)
+- 计量经济学方法遵循 Angrist & Pischke、Callaway & Sant'Anna (2021)、Rambachan & Roth (2023) 以及 Cattaneo, Idrobo & Titiunik (2020) 的指南
+- 质量评分框架改编自 AEA 数据编辑复现标准
+
+---
+
+## 许可证
 
 MIT

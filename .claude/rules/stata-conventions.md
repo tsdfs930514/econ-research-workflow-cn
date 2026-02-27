@@ -3,31 +3,31 @@ paths:
   - "**/*.do"
 ---
 
-# Stata Code Conventions
+# Stata 代码规范 (Stata Code Conventions)
 
-These conventions apply to ALL Stata .do files in this project.
+以下规范适用于本项目中的所有 Stata .do 文件。
 
-## Header Template
+## 文件头模板
 
-Every .do file MUST start with this header block:
+每个 .do 文件**必须**以如下头部块开始：
 
 ```stata
 /*==============================================================================
 Project:    [Project Name]
 Version:    [vN]
 Script:     [filename.do]
-Purpose:    [Brief description]
+Purpose:    [简要说明]
 Author:     [Name]
 Created:    [Date]
 Modified:   [Date]
-Input:      [Input files]
-Output:     [Output files]
+Input:      [输入文件]
+Output:     [输出文件]
 ==============================================================================*/
 ```
 
-## Standard Settings
+## 标准设置
 
-Every .do file must include these settings immediately after the header:
+每个 .do 文件须在文件头之后立即包含以下设置：
 
 ```stata
 version 18
@@ -38,41 +38,41 @@ set matsize 11000
 set seed 12345
 ```
 
-## Logging
+## 日志记录
 
-Every .do file must:
-1. Close any existing log first (with `cap log close` to avoid error if no log open)
-2. Start a new log
-3. End with `log close`
+每个 .do 文件必须：
+1. 先关闭已有日志（使用 `cap log close` 避免无日志时报错）
+2. 启动新日志
+3. 以 `log close` 结束
 
 ```stata
 cap log close
 log using "output/logs/XX_script_name.log", replace
-* ... all code ...
+* ... 所有代码 ...
 log close
 ```
 
-## Cluster Standard Errors
+## 聚类标准误 (Cluster Standard Errors)
 
-Always use `vce(cluster var)` as the default for ALL regressions. Never report non-clustered standard errors unless explicitly justified.
+所有回归**默认**使用 `vce(cluster var)`。除非有明确的合理说明，不得报告非聚类标准误。
 
 ```stata
 reghdfe y x1 x2, absorb(fe) vce(cluster firmid)
 ```
 
-## Fixed Effects
+## 固定效应
 
-Use `reghdfe` for multi-way fixed effects, with `absorb()` syntax:
+多维固定效应使用 `reghdfe`，搭配 `absorb()` 语法：
 
 ```stata
 reghdfe y x1 x2, absorb(firmid year) vce(cluster firmid)
 ```
 
-For single-dimension FE, `reghdfe` is still preferred for consistency.
+单维固定效应也优先使用 `reghdfe`，以保持一致性。
 
-## Table Output
+## 表格输出
 
-Use `esttab`/`estout` for LaTeX table generation. Store estimates with `estimates store`:
+使用 `esttab`/`estout` 生成 LaTeX 表格。使用 `estimates store` 存储估计结果：
 
 ```stata
 eststo clear
@@ -85,34 +85,34 @@ esttab m1 m2 using "output/tables/results.tex", ///
     label booktabs replace
 ```
 
-Note: Use 4 decimal places for coefficients (TOP5 standard for causal inference).
+注意：系数使用 4 位小数（TOP5 因果推断标准）。
 
-## Variable Labels
+## 变量标签
 
-All variables MUST have labels. Apply `label variable` immediately after `gen` or `rename`:
+所有变量**必须**有标签。在 `gen` 或 `rename` 之后立即使用 `label variable`：
 
 ```stata
 gen log_wage = ln(wage)
 label variable log_wage "Log of hourly wage"
 ```
 
-## Data Safety
+## 数据安全
 
-- NEVER write to `data/raw/` -- raw data is read-only.
-- All modifications go to `data/clean/` or `data/temp/`.
-- Save cleaned datasets with descriptive names and version suffixes if needed.
+- **不得**写入 `data/raw/`——原始数据为只读。
+- 所有修改写入 `data/clean/` 或 `data/temp/`。
+- 清洗后数据使用描述性命名，必要时加版本后缀。
 
 ```stata
-* CORRECT
+* 正确
 save "data/clean/panel_cleaned.dta", replace
 
-* WRONG -- never do this
+* 错误——绝对不要这样做
 save "data/raw/original_data.dta", replace
 ```
 
-## Path Convention
+## 路径规范
 
-Use relative paths from the project root. Define globals for base paths at the top of each .do file or in a master .do file:
+使用相对于项目根目录的相对路径。在每个 .do 文件或 master.do 文件顶部定义全局宏路径：
 
 ```stata
 global root    "."
@@ -126,79 +126,79 @@ global figures "$output/figures"
 global logs    "$output/logs"
 ```
 
-## Reproducibility
+## 可复现性
 
-Set `set seed 12345` before ANY randomization, bootstrapping, or simulation:
+在任何随机化、自助法或模拟操作之前设置 `set seed 12345`：
 
 ```stata
 set seed 12345
 bootstrap, reps(1000) cluster(firmid): reg y x1 x2
 ```
 
-Always save intermediate datasets so that each script can be run independently.
+始终保存中间数据集，使得每个脚本可以独立运行。
 
-## Defensive Programming
+## 防御性编程
 
-Use `isid` and `assert` to validate data integrity:
+使用 `isid` 和 `assert` 验证数据完整性：
 
 ```stata
-* Verify unique identifier
+* 验证唯一标识符
 isid panel_id year
 
-* Verify expected values
+* 验证预期值域
 assert treatment >= 0 & treatment <= 1
 assert !missing(outcome, treatment, running_var)
 
-* Verify panel structure
+* 验证面板结构
 xtset panel_id year
 assert r(balanced) == "strongly balanced"
 ```
 
-### Community Package Guards (from Issues #1-#25)
+### 社区包防护（源自 Issues #1-#25）
 
-All SSC/community commands must be wrapped in `cap noisily` because:
-- They may be uninstalled, renamed, or have version-breaking API changes
-- Their `e()` scalars may differ across versions
-- Some are removed from SSC entirely (e.g., `xtserial` — Issue #6-7)
+所有 SSC/社区命令必须使用 `cap noisily` 包裹，原因：
+- 可能未安装、被重命名或存在版本兼容性问题
+- 其 `e()` 标量可能因版本而异
+- 部分已从 SSC 移除（如 `xtserial`——Issue #6-7）
 
 ```stata
-* CORRECT: defensive install + defensive call
-cap ssc install xtserial, replace        // cap: may fail if removed from SSC
-cap noisily xtserial y x1 x2            // cap noisily: fail gracefully
+* 正确：防御性安装 + 防御性调用
+cap ssc install xtserial, replace        // cap: 如已从 SSC 移除可能失败
+cap noisily xtserial y x1 x2            // cap noisily: 优雅地处理失败
 if _rc != 0 {
     di "xtserial unavailable. Skipping."
 }
 
-* WRONG: bare call that halts the script on error
+* 错误：裸调用，出错时直接中断脚本
 ssc install xtserial, replace
 xtserial y x1 x2
 ```
 
-**Commands that MUST always be wrapped in `cap noisily`:**
+**以下命令必须始终使用 `cap noisily` 包裹：**
 
-| Command | Package | Risk |
+| 命令 | 包名 | 风险 |
 |---------|---------|------|
-| `csdid` / `csdid_stats` | csdid | Version-sensitive syntax (Issue #20) |
-| `bacondecomp` | bacondecomp | Dependency issues (Issue #2) |
-| `did_multiplegt` | did_multiplegt | Version-sensitive |
-| `did_imputation` | did_imputation | Version-sensitive |
-| `eventstudyinteract` | eventstudyinteract | Version-sensitive |
-| `sdid` | sdid | jackknife fails on staggered treatment (Issue #25) |
-| `boottest` | boottest | Fails after non-reghdfe estimators (Issue #1, #12) |
-| `xtserial` | xtserial | Removed from SSC (Issue #6-7) |
-| `xtcsd` | xtcsd | May be unavailable (Issue #8) |
-| `xttest3` | xttest3 | May be unavailable (Issue #8) |
-| `teffects` (all) | built-in | Fails on panel data with repeated obs (Issue #15) |
-| `lasso logit` | built-in | Convergence failure with near-separation (Issue #18) |
-| `weakiv` | weakiv | May not be installed |
-| `rddensity` | rddensity | p-value scalar varies by version (Issue #3) |
+| `csdid` / `csdid_stats` | csdid | 语法随版本变化（Issue #20） |
+| `bacondecomp` | bacondecomp | 依赖问题（Issue #2） |
+| `did_multiplegt` | did_multiplegt | 版本敏感 |
+| `did_imputation` | did_imputation | 版本敏感 |
+| `eventstudyinteract` | eventstudyinteract | 版本敏感 |
+| `sdid` | sdid | 渐进处理时 jackknife 失败（Issue #25） |
+| `boottest` | boottest | 非 reghdfe 估计后失败（Issue #1, #12） |
+| `xtserial` | xtserial | 已从 SSC 移除（Issue #6-7） |
+| `xtcsd` | xtcsd | 可能不可用（Issue #8） |
+| `xttest3` | xttest3 | 可能不可用（Issue #8） |
+| `teffects`（全部） | 内置 | 面板数据重复观测时失败（Issue #15） |
+| `lasso logit` | 内置 | 近似分离时收敛失败（Issue #18） |
+| `weakiv` | weakiv | 可能未安装 |
+| `rddensity` | rddensity | p 值标量因版本而异（Issue #3） |
 
-### String Panel ID Check
+### 字符串面板 ID 检查
 
-Before `xtset`, always check if the panel ID variable is string. `xtset` requires numeric IDs:
+`xtset` 之前必须检查面板 ID 变量是否为字符串。`xtset` 要求数值 ID：
 
 ```stata
-* Check if unit variable is string and encode if needed (Issue #19)
+* 检查单位变量是否为字符串，如是则编码（Issue #19）
 cap confirm string variable UNIT_VAR
 if _rc == 0 {
     encode UNIT_VAR, gen(_unit_num)
@@ -207,12 +207,12 @@ if _rc == 0 {
 xtset `UNIT_VAR' TIME_VAR
 ```
 
-### e-class Result Availability
+### e-class 结果可用性
 
-Always check if e-class scalars exist before using them. Some commands leave certain scalars missing:
+使用 e-class 标量前必须检查其是否存在。某些命令可能不生成特定标量：
 
 ```stata
-* CORRECT: check before use (Issue #14 — DWH may be missing with xtivreg2)
+* 正确：使用前检查（Issue #14——xtivreg2 的 DWH 可能缺失）
 if e(estatp) != . {
     di "DWH p-value: " e(estatp)
 }
@@ -220,44 +220,44 @@ else {
     di "DWH p-value unavailable for this estimator."
 }
 
-* WRONG: assume scalar exists
-di "DWH p-value: " e(estatp)   // crashes if missing
+* 错误：假设标量存在
+di "DWH p-value: " e(estatp)   // 如缺失则崩溃
 ```
 
-### Results Storage Pattern for Non-Standard Estimators
+### 非标准估计量的结果存储模式
 
-For commands whose `e()` results are not compatible with `estimates store` (e.g., `sdid`), store results in local macros and build tables manually:
+对于 `e()` 结果与 `estimates store` 不兼容的命令（如 `sdid`），将结果存储在局部宏中并手动构建表格：
 
 ```stata
-* CORRECT: local macros + file write (Issue #24)
+* 正确：局部宏 + 文件写入（Issue #24）
 cap noisily sdid Y unit time treat, vce(bootstrap) method(sdid) seed(12345)
 if _rc == 0 {
     local att = e(ATT)
     local se  = e(se)
 }
-* Then build LaTeX table via file write using locals
+* 然后通过 file write 使用局部宏构建 LaTeX 表格
 
-* WRONG: ereturn post + estimates store after sdid
-ereturn post b V       // clears e-class, fails with r(301)
-estimates store m1      // not reached
+* 错误：sdid 后使用 ereturn post + estimates store
+ereturn post b V       // 清除 e-class，r(301) 失败
+estimates store m1      // 无法到达
 ```
 
-### Continuous vs Categorical Variable Inspection
+### 连续变量与分类变量检查
 
-Use `summarize` for continuous variables and `tab` only for low-cardinality categoricals:
+连续变量使用 `summarize`，`tab` 仅用于低基数分类变量：
 
 ```stata
-* CORRECT
-summarize wage, detail      // continuous variable
-tab industry, missing       // categorical with few levels
+* 正确
+summarize wage, detail      // 连续变量
+tab industry, missing       // 类别数较少的分类变量
 
-* WRONG: tab on continuous variable (Issue #5)
-tab wage                    // generates 1 row per unique value, huge output
+* 错误：对连续变量使用 tab（Issue #5）
+tab wage                    // 每个唯一值一行，输出巨大
 ```
 
-### Negative Hausman Chi-Squared
+### 负 Hausman 卡方值
 
-The Hausman test can produce negative chi2 when FE strongly dominates RE. This is known behavior, not an error:
+Hausman 检验在 FE 明显优于 RE 时可能产生负 chi2。这是已知行为，不是错误：
 
 ```stata
 hausman fe_model re_model
@@ -267,46 +267,46 @@ if r(chi2) < 0 {
 }
 ```
 
-### Old Stata Syntax Handling
+### 旧版 Stata 语法处理
 
-Published replication packages may contain deprecated commands (Issue #23):
+已发表的复现包可能包含已弃用的命令（Issue #23）：
 
-| Old Command | Action | Modern Equivalent |
+| 旧命令 | 处理方式 | 现代替代 |
 |-------------|--------|-------------------|
-| `set mem 250m` | Omit entirely | Stata 18 memory is dynamic |
-| `set memory 500m` | Omit entirely | Stata 18 memory is dynamic |
-| `clear matrix` | Replace | `matrix drop _all` or `clear all` |
-| `set matsize 800` | Omit (default 11000) | Only set if explicitly needed |
+| `set mem 250m` | 直接删除 | Stata 18 内存为动态分配 |
+| `set memory 500m` | 直接删除 | Stata 18 内存为动态分配 |
+| `clear matrix` | 替换 | `matrix drop _all` 或 `clear all` |
+| `set matsize 800` | 删除（默认 11000） | 仅在明确需要时设置 |
 
-When adapting old replication code, omit deprecated commands. Do not include them in new `.do` files.
+改编旧复现代码时，删除已弃用命令。新 `.do` 文件中不要包含它们。
 
-## Memory Management
+## 内存管理
 
-Use `compress` before saving large datasets:
+保存大型数据集前使用 `compress`：
 
 ```stata
 compress
 save "data/clean/panel_cleaned.dta", replace
 ```
 
-## Required Packages
+## 所需安装包
 
-List all required packages in a comment block at the top of each .do file or in master.do:
+在每个 .do 文件或 master.do 文件顶部的注释块中列出所有所需包：
 
 ```stata
-* Required packages:
+* 所需安装包：
 *   ssc install reghdfe
 *   ssc install ftools
 *   ssc install estout
 *   ssc install coefplot
 ```
 
-## Master.do Pattern
+## Master.do 模式
 
-Organize projects with a master.do file that:
-1. Sets all globals
-2. Creates output directories
-3. Runs all analysis scripts in order
-4. Verifies outputs
+使用 master.do 文件组织项目：
+1. 设置所有全局宏
+2. 创建输出目录
+3. 按顺序运行所有分析脚本
+4. 验证输出
 
-See `init-project.md` for the full master.do template.
+详见 `init-project.md` 的完整 master.do 模板。

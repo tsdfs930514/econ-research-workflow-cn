@@ -1,59 +1,59 @@
-# Stata Error Verification Protocol
+# Stata 错误验证协议 (Stata Error Verification Protocol)
 
-**Origin**: 2026-02-26, discovered during DDCG Phase 5 replication. Claude re-ran a failing script, overwrote the log, then grepped the new clean log and falsely claimed no errors existed. The `run-stata.sh` hook had correctly reported `r(111)` errors that were ignored.
+**起源**: 2026-02-26，在 DDCG 阶段 5 复现中发现。Claude 重新运行了一个失败的脚本，覆盖了日志，然后 grep 新的干净日志并错误地声称没有错误。`run-stata.sh` 钩子已正确报告了 `r(111)` 错误却被忽略。
 
 ---
 
-## Mandatory Steps After Every Stata Execution
+## 每次 Stata 执行后的强制步骤
 
-### Step 1: Read the hook output FIRST
+### 步骤 1：首先读取钩子输出
 
-After `run-stata.sh` completes, the **inline log check** at the end of the script prints either:
+`run-stata.sh` 完成后，脚本末尾的**内联日志检查**会输出以下之一：
 - `[Stata Log Check] Clean: no r(xxx) errors in <file>.log`
 - `=== [Stata Log Check] ERRORS FOUND in <file>.log ===`
 
-**You MUST read and report this output before doing anything else.** Do not grep the log independently — trust the hook output as the primary signal.
+**你必须在做任何其他操作之前读取并报告此输出。** 不要独立 grep 日志——以钩子输出作为首要信号。
 
-### Step 2: If errors are reported — STOP and acknowledge
+### 步骤 2：如果报告了错误——停下并确认
 
-If the hook reports errors:
-1. **Say explicitly**: "The hook found N error(s) in `<file>.log`."
-2. **Read the relevant portion of the log** to understand the error context.
-3. **Diagnose the root cause** before making any changes.
-4. **Fix the script** based on the diagnosis.
-5. **Only then re-run.**
+如果钩子报告了错误：
+1. **明确说明**: "钩子在 `<file>.log` 中发现了 N 个错误。"
+2. **读取日志的相关部分**以理解错误上下文。
+3. **在修改之前诊断根本原因**。
+4. **根据诊断修复脚本**。
+5. **然后才能重新运行。**
 
-### Step 3: After re-run — verify the NEW hook output
+### 步骤 3：重新运行后——验证新的钩子输出
 
-After re-running, again read the hook output. Confirm it says "Clean" before declaring success.
-
----
-
-## Prohibited Behaviors
-
-1. **NEVER re-run a script without first acknowledging its errors.** Re-running overwrites the `.log` file, destroying evidence of the failure.
-
-2. **NEVER grep a log file after re-running and claim the ORIGINAL run was clean.** The log was overwritten — you're reading the re-run's log, not the original.
-
-3. **NEVER dismiss hook-reported errors.** If `run-stata.sh` says errors were found, they were found. The regex `r([0-9][0-9]*)` matches real Stata error codes.
-
-4. **NEVER claim "clean" without showing the specific hook output line** that says "Clean: no r(xxx) errors."
+重新运行后，再次读取钩子输出。确认其显示 "Clean" 后方可宣布成功。
 
 ---
 
-## Verification Reporting Template
+## 禁止行为
 
-After every Stata run, report to the user in this format:
+1. **绝对不要在未先确认错误的情况下重新运行脚本。** 重新运行会覆盖 `.log` 文件，销毁失败证据。
+
+2. **绝对不要在重新运行后 grep 日志文件并声称原始运行是干净的。** 日志已被覆盖——你读到的是重新运行的日志，而非原始日志。
+
+3. **绝对不要忽视钩子报告的错误。** 如果 `run-stata.sh` 说发现了错误，那就是发现了错误。正则表达式 `r([0-9][0-9]*)` 匹配真实的 Stata 错误代码。
+
+4. **绝对不要在没有展示具体钩子输出行**（显示 "Clean: no r(xxx) errors"）的情况下声称"干净"。
+
+---
+
+## 验证报告模板
+
+每次 Stata 运行后，以如下格式向用户报告：
 
 ```
 Script: <filename>.do
-Hook output: [Clean / N error(s) found]
-[If errors: brief description of each error]
-[If re-run after fix: "Re-run hook output: Clean"]
+Hook output: [Clean / 发现 N 个错误]
+[如有错误：每个错误的简要描述]
+[如修复后重新运行："Re-run hook output: Clean"]
 ```
 
 ---
 
-## Why This Matters
+## 为何重要
 
-The `run-stata.sh` wrapper exists specifically to catch errors automatically. Ignoring its output and doing independent (faulty) verification defeats the purpose of the hook system. The user must be able to trust that when Claude says "clean," it actually is clean.
+`run-stata.sh` 封装脚本的存在就是为了自动捕捉错误。忽略其输出而进行独立的（有缺陷的）验证，违背了钩子系统的初衷。用户必须能够信任：当 Claude 说"干净"时，确实是干净的。

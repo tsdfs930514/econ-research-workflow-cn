@@ -1,30 +1,30 @@
 ---
-description: "Generate descriptive statistics and variable distributions using Stata and Python"
+description: "使用 Stata 和 Python 生成描述性统计和变量分布"
 user_invocable: true
 ---
 
-# /data-describe - Generate Descriptive Statistics
+# /data-describe — 生成描述性统计
 
-When the user invokes `/data-describe`, follow these steps:
+当用户调用 `/data-describe` 时，按以下步骤执行：
 
-## Step 1: Gather Information
+## 步骤 1：收集信息
 
-Ask the user for:
+向用户询问：
 
-1. **Dataset path** (required) - Path to the data file (.dta, .csv, or other format)
-2. **Key variables** (required) - List of variables to describe (comma-separated)
-3. **Grouping variable** (optional) - Variable for subgroup analysis / balance table (e.g., treatment indicator)
-4. **Output directory** (optional) - Where to save results (default: `output/tables/` and `output/figures/`)
+1. **数据集路径**（必填）— 数据文件路径（.dta、.csv 或其他格式）
+2. **关键变量**（必填）— 需描述的变量列表（逗号分隔）
+3. **分组变量**（可选）— 用于分组分析/平衡性检验的变量（如处理/干预指标）
+4. **输出目录**（可选）— 结果保存位置（默认：`output/tables/` 和 `output/figures/`）
 
-## Step 2: Generate Stata .do File
+## 步骤 2：生成 Stata .do 文件
 
-Create a Stata .do file (e.g., `code/stata/00_descriptive_stats.do`) that does the following:
+创建 Stata .do 文件（如 `code/stata/00_descriptive_stats.do`），执行以下操作：
 
 ```stata
 /*==============================================================================
-  Descriptive Statistics
-  Dataset: <dataset path>
-  Generated: <current date>
+  描述性统计
+  数据集: <dataset path>
+  生成日期: <current date>
 ==============================================================================*/
 
 clear all
@@ -33,26 +33,26 @@ cap log close
 
 log using "output/logs/descriptive_stats.log", replace
 
-* --- Load Data ---
+* --- 加载数据 ---
 use "<dataset path>", clear
 
-* --- Summary Statistics ---
-* Produce: N, Mean, SD, Min, P25, P50, P75, Max for each key variable
+* --- 汇总统计 ---
+* 输出: N, 均值, 标准差, 最小值, P25, P50, P75, 最大值
 estpost summarize <key variables>, detail
 esttab using "output/tables/tab_summary_stats.tex", ///
     cells("count mean(fmt(3)) sd(fmt(3)) min(fmt(3)) p25(fmt(3)) p50(fmt(3)) p75(fmt(3)) max(fmt(3))") ///
     label nomtitle nonumber replace booktabs ///
     title("Summary Statistics")
 
-* --- Correlation Matrix ---
+* --- 相关系数矩阵 ---
 correlate <key variables>
-* Export correlation matrix to LaTeX
+* 导出相关系数矩阵为 LaTeX
 estpost correlate <key variables>, matrix
 esttab using "output/tables/tab_correlation.tex", ///
     unstack not noobs compress label replace booktabs ///
     title("Correlation Matrix")
 
-* --- Distribution Histograms ---
+* --- 分布直方图 ---
 foreach var of varlist <key variables> {
     histogram `var', ///
         frequency normal ///
@@ -62,11 +62,11 @@ foreach var of varlist <key variables> {
 }
 ```
 
-If a **grouping variable** is provided, also add:
+如提供了**分组变量**，追加以下内容：
 
 ```stata
-* --- Balance Table ---
-* Compare means across groups
+* --- 平衡性检验表 ---
+* 比较各组均值
 estpost ttest <key variables>, by(<grouping variable>)
 esttab using "output/tables/tab_balance.tex", ///
     cells("mu_1(fmt(3)) mu_2(fmt(3)) b(fmt(3) star)") ///
@@ -76,21 +76,21 @@ esttab using "output/tables/tab_balance.tex", ///
     addnotes("* p<0.10, ** p<0.05, *** p<0.01")
 ```
 
-End with:
+以下列命令结束：
 
 ```stata
 log close
 ```
 
-## Step 3: Generate Python .py File
+## 步骤 3：生成 Python .py 文件
 
-Create a Python script (e.g., `code/python/00_descriptive_stats.py`) that replicates the same analysis:
+创建 Python 脚本（如 `code/python/00_descriptive_stats.py`），复现相同的分析：
 
 ```python
 """
-Descriptive Statistics
-Dataset: <dataset path>
-Generated: <current date>
+描述性统计
+数据集: <dataset path>
+生成日期: <current date>
 """
 
 import pandas as pd
@@ -99,8 +99,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 
-# --- Load Data ---
-# Support .dta and .csv
+# --- 加载数据 ---
+# 支持 .dta 和 .csv
 file_path = "<dataset path>"
 if file_path.endswith(".dta"):
     df = pd.read_stata(file_path)
@@ -111,7 +111,7 @@ else:
 
 key_vars = [<list of key variables as strings>]
 
-# --- Summary Statistics ---
+# --- 汇总统计 ---
 summary = df[key_vars].describe(percentiles=[0.25, 0.5, 0.75]).T
 summary = summary.rename(columns={
     "count": "N", "mean": "Mean", "std": "SD",
@@ -123,14 +123,14 @@ print(summary.to_string())
 summary.to_latex("output/tables/tab_summary_stats_py.tex",
                  float_format="%.3f", caption="Summary Statistics (Python)")
 
-# --- Correlation Matrix ---
+# --- 相关系数矩阵 ---
 corr = df[key_vars].corr()
 print("\n=== Correlation Matrix ===")
 print(corr.to_string())
 corr.to_latex("output/tables/tab_correlation_py.tex",
               float_format="%.3f", caption="Correlation Matrix (Python)")
 
-# --- Distribution Histograms ---
+# --- 分布直方图 ---
 for var in key_vars:
     fig, ax = plt.subplots(figsize=(8, 5))
     df[var].dropna().hist(bins=50, ax=ax, density=True, alpha=0.7)
@@ -142,10 +142,10 @@ for var in key_vars:
     plt.close(fig)
 ```
 
-If a **grouping variable** is provided, also add:
+如提供了**分组变量**，追加以下内容：
 
 ```python
-# --- Balance Table ---
+# --- 平衡性检验表 ---
 group_var = "<grouping variable>"
 groups = df[group_var].unique()
 balance = pd.DataFrame()
@@ -168,55 +168,55 @@ balance.to_latex("output/tables/tab_balance_py.tex",
                  float_format="%.3f", index=False, caption="Balance Table (Python)")
 ```
 
-## Step 4: Execute and Cross-Check
+## 步骤 4：执行并交叉验证
 
-1. Run the Stata .do file (if Stata is available on the system)
-2. Run the Python .py file
-3. Compare summary statistics between Stata and Python outputs:
-   - Check that N, Mean, SD match within floating-point tolerance
-   - Report any discrepancies
+1. 运行 Stata .do 文件（若系统中 Stata 可用）
+2. 运行 Python .py 文件
+3. 比较 Stata 与 Python 输出的汇总统计：
+   - 检查 N、均值、标准差是否在浮点误差范围内一致
+   - 报告任何差异
 
-## Step 5: Report Results
+## 步骤 5：报告结果
 
-Print a summary of all generated outputs:
+输出所有生成文件的汇总：
 
 ```
-Descriptive statistics generated successfully!
+描述性统计生成成功！
 
-Stata outputs:
+Stata 输出:
   - output/tables/tab_summary_stats.tex
   - output/tables/tab_correlation.tex
-  - output/figures/fig_dist_<var>.pdf (for each variable)
-  - output/tables/tab_balance.tex (if grouping variable provided)
+  - output/figures/fig_dist_<var>.pdf（每个变量各一张）
+  - output/tables/tab_balance.tex（如提供了分组变量）
   - output/logs/descriptive_stats.log
 
-Python outputs:
+Python 输出:
   - output/tables/tab_summary_stats_py.tex
   - output/tables/tab_correlation_py.tex
-  - output/figures/fig_dist_<var>_py.pdf (for each variable)
-  - output/tables/tab_balance_py.tex (if grouping variable provided)
+  - output/figures/fig_dist_<var>_py.pdf（每个变量各一张）
+  - output/tables/tab_balance_py.tex（如提供了分组变量）
 
-Cross-check: <PASS/FAIL with details>
+交叉验证: <通过/未通过及详情>
 ```
 
-## Additional Data Format Support
+## 附加数据格式支持
 
-### SAS Datasets (.sas7bdat)
+### SAS 数据集 (.sas7bdat)
 
-Some replication packages (especially in accounting/finance) provide data in SAS format. Load in Python via:
+部分复现包（特别是会计/金融领域）以 SAS 格式提供数据。在 Python 中加载：
 ```python
 df = pd.read_sas("data/raw/filename.sas7bdat", format="sas7bdat", encoding="latin-1")
 ```
-Note: `pd.read_sas()` may be slow for large files. Consider converting to .dta or .parquet first.
+注意：`pd.read_sas()` 处理大文件时可能较慢。建议先转换为 .dta 或 .parquet 格式。
 
-### Large Dataset Guidance (N > 1M observations)
+### 大数据集处理指南（N > 100 万观测）
 
-For datasets exceeding 1 million observations:
-- **Subsample for histograms**: Use `if mod(_n, 100) == 0` in Stata or `df.sample(frac=0.01)` in Python
-- **Use `summarize` instead of `estpost summarize`** for basic stats (faster, lower memory)
-- **Skip correlation matrix** if > 50 key variables (produces very large table)
-- **Consider `polars`** instead of `pandas` for faster data loading:
+当数据集超过 100 万条观测时：
+- **直方图使用子样本**：Stata 中用 `if mod(_n, 100) == 0`，Python 中用 `df.sample(frac=0.01)`
+- **使用 `summarize` 替代 `estpost summarize`** 获取基本统计量（更快、更省内存）
+- **变量超过 50 个时跳过相关系数矩阵**（表格过大）
+- **考虑使用 `polars`** 替代 `pandas` 以加快数据加载速度：
   ```python
   import polars as pl
-  df = pl.read_ipc("data/raw/large_file.arrow")  # or scan_csv for lazy evaluation
+  df = pl.read_ipc("data/raw/large_file.arrow")  # 或用 scan_csv 进行惰性求值
   ```

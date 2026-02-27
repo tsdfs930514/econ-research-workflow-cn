@@ -1,226 +1,221 @@
 ---
-description: "Bilingual Socratic research interview to formalize ideas into structured proposals"
+description: "苏格拉底式研究访谈，将想法形式化为结构化研究提案"
 user_invocable: true
 ---
 
-# /interview-me — Socratic Research Interview
+# /interview-me — 苏格拉底式研究访谈
 
-A bilingual (EN/CN) Socratic questioning process that walks through the key elements of a research idea and produces a structured research proposal. The goal is to sharpen vague ideas into testable, implementable research designs.
+通过苏格拉底式提问，逐步引导研究者梳理研究想法的关键要素，最终生成结构化的研究提案。目标是将模糊的想法打磨成可检验、可实施的研究设计。
 
-## Activation
+## 启动
 
-When the user runs `/interview-me`, begin the interview process below.
+当用户运行 `/interview-me` 时，开始以下访谈流程。
 
-## Core Principle
+## 核心原则
 
-Ask **ONE question at a time**. Wait for the user's response before proceeding. Do not dump all questions at once. The user can say "skip" at any stage to move to the next section.
+每次只问**一个问题**。等待用户回答后再继续。不要一次性抛出所有问题。用户在任何阶段都可以说"跳过"以进入下一部分。
 
-## Language
+## 语言
 
-Detect the user's language from their first response. If Chinese, conduct the interview in Chinese. If English, use English. The user can switch at any time.
+根据用户首次回复的语言进行检测。若用户使用中文，则以中文进行访谈；若使用英文，则以英文进行。用户可随时切换语言。
 
 ---
 
-## Interview Sections
+## 访谈部分
 
-### Section 1: Research Question
+### 第一部分：研究问题
 
-**Goal**: Arrive at a precise, testable research question.
+**目标**：明确一个精确、可检验的研究问题。
 
-Start with:
-> What is the broad topic or phenomenon you want to study?
+开场提问：
 > 你想研究什么现象或主题？
 
-Follow-up probes (as needed):
-- What is the specific causal relationship you're interested in? (X -> Y)
-- What is the unit of analysis? (firm, individual, province, county-year)
-- What is the time period and geographic scope?
-- Can you state this as a question with a clear dependent variable and independent variable?
+跟进提问（视需要而定）：
+- 你关注的具体因果关系是什么？（X -> Y）
+- 分析单位是什么？（企业、个体、省份、县-年）
+- 时间跨度和地理范围是什么？
+- 能否用一个包含明确因变量和自变量的问题来表述？
 
-Push for precision: "Does X cause Y?" is better than "What is the relationship between X and Y?"
+推动精确化："X 是否导致 Y？" 比 "X 和 Y 之间有什么关系？" 更好。
 
-### Section 2: Hypothesis
+### 第二部分：假说
 
-**Goal**: Formulate main hypothesis, auxiliary hypotheses, and establish falsifiability.
+**目标**：提出主假说、辅助假说，并确立可证伪性。
 
-Ask:
-> What do you expect to find? What is your main hypothesis?
+提问：
 > 你预期发现什么？主假说是什么？
 
-Follow-up probes:
-- What is the sign of the expected effect? (positive/negative)
-- Why do you expect this direction? (theoretical mechanism)
-- What auxiliary hypotheses would support the main story? (channels, heterogeneity)
-- What result would **falsify** your hypothesis? If no possible result would falsify it, the hypothesis needs work.
+跟进提问：
+- 预期效应的方向是什么？（正向/负向）
+- 为什么预期这个方向？（理论机制）
+- 有哪些辅助假说可以支撑主假说？（渠道、异质性）
+- 什么样的结果会**证伪**你的假说？如果没有任何结果能够证伪，说明假说需要修改。
 
-### Section 3: Identification Strategy
+### 第三部分：识别策略
 
-**Goal**: Choose and justify a credible causal identification approach.
+**目标**：选择并论证一种可信的因果识别方法。
 
-Ask:
-> How will you establish that the relationship is causal rather than correlational?
-> 你打算如何建立因果关系？
+提问：
+> 你打算如何建立因果关系，而非仅仅是相关关系？
 
-**Method detection**: Based on the user's answer, route to method-specific questions:
+**方法识别**：根据用户的回答，引导至对应方法的具体提问：
 
-**DID / TWFE / Staggered DID**:
-- What is the treatment event and when does it occur?
-- Which units are treated vs. control?
-- Is treatment timing staggered across units?
-- Why would parallel trends hold? What evidence can you provide?
-- Are there concerns about anticipation effects?
+**DID / TWFE / 渐进 DID**：
+- 处理事件是什么？何时发生？
+- 哪些单位是处理组，哪些是对照组？
+- 处理时间是否在各单位间交错？
+- 为什么平行趋势假设成立？你能提供什么证据？
+- 是否存在预期效应的担忧？
 
-**IV / 2SLS**:
-- What is your proposed instrument?
-- Why is the instrument relevant (first-stage)?
-- Why does the exclusion restriction hold (instrument affects Y only through X)?
-- Is monotonicity reasonable?
-- What is the LATE you are estimating, and is it policy-relevant?
+**IV / 2SLS**：
+- 你提出的工具变量是什么？
+- 为什么工具变量是相关的（第一阶段）？
+- 为什么排除性约束成立（工具变量仅通过 X 影响 Y）？
+- 单调性假设是否合理？
+- 你估计的 LATE 是什么？它是否具有政策意义？
 
-**RDD**:
-- What is the running variable and cutoff?
-- Is the cutoff exogenous or potentially manipulable?
-- Is the design sharp or fuzzy?
-- What bandwidth will you use, and how sensitive are results to bandwidth choice?
+**RDD**：
+- 驱动变量和断点是什么？
+- 断点是外生的还是可能被操纵的？
+- 是精确断点设计还是模糊断点设计？
+- 你将使用什么带宽？结果对带宽选择的敏感性如何？
 
-**Panel FE**:
-- What fixed effects will you include?
-- What time-varying confounders remain after FE?
-- Is there a dynamic story requiring lagged variables or GMM?
+**Panel FE**：
+- 你将使用哪些固定效应？
+- 加入固定效应后，还有哪些时变混淆因素？
+- 是否有动态过程需要使用滞后变量或 GMM？
 
-**SDID / Synthetic Control**:
-- How many treated units and time periods?
-- What is the donor pool?
-- Are unit/time weights well-distributed or concentrated?
+**SDID / 合成控制**：
+- 有多少处理单位和时间期数？
+- 供体池如何构成？
+- 单位/时间权重分布是否均匀？
 
-If the user is unsure about method, discuss the strengths and weaknesses of feasible approaches given their data structure.
+如果用户对方法选择不确定，可以根据其数据结构讨论各种可行方法的优劣。
 
-### Section 4: Data Requirements
+### 第四部分：数据需求
 
-**Goal**: Identify exactly what data is needed and whether it's obtainable.
+**目标**：明确需要什么数据以及能否获取。
 
-Ask:
-> What data do you need for this analysis? What variables are essential?
+提问：
 > 你需要什么数据？哪些变量是核心变量？
 
-Follow-up probes:
-- What is the data source? (CSMAR, CNRDS, Wind, CFPS, survey, admin data)
-- What is the unit-time structure? (firm-year, province-month, individual-wave)
-- Dependent variable: exact name, how measured, any proxies?
-- Independent variable (treatment): exact definition, when does it switch on?
-- Control variables: what confounders must you control for?
-- Instrument / running variable (if IV/RDD): data source and measurement?
-- Sample restrictions: what firms/individuals are excluded and why?
-- Is the data currently available or does it need to be acquired?
+跟进提问：
+- 数据来源是什么？（CSMAR、CNRDS、Wind、CFPS、调查数据、行政数据）
+- 单位-时间结构是什么？（企业-年、省份-月、个体-波次）
+- 因变量：具体名称、如何度量、是否有代理变量？
+- 自变量（处理变量）：具体定义、何时开启？
+- 控制变量：需要控制哪些混淆因素？
+- 工具变量/驱动变量（若使用 IV/RDD）：数据来源和度量方式？
+- 样本限制条件：哪些企业/个体被排除，原因是什么？
+- 数据目前是否可获取，还是需要采集？
 
-### Section 5: Expected Results
+### 第五部分：预期结果
 
-**Goal**: Pre-commit to expected findings, sign, magnitude, and robustness strategy.
+**目标**：预先承诺预期发现、方向、量级和稳健性策略。
 
-Ask:
-> What results do you expect to see in the main regression? Be specific about sign and approximate magnitude.
+提问：
 > 你预期主回归结果的方向和大致程度是什么？
 
-Follow-up probes:
-- What sign and rough magnitude do you expect for the main coefficient?
-- What would be a "surprisingly large" or "surprisingly small" effect?
-- What robustness checks will you pre-commit to running?
-  - Placebo tests (treatment/outcome/cutoff)
-  - Subsample analysis (by firm size, region, time period)
-  - Alternative specifications (different FE, controls, clustering)
-  - Dose-response or intensity margin
-- What result would change your conclusion?
+跟进提问：
+- 你预期主要系数的方向和大致量级是什么？
+- 什么样的效应算"异常大"或"异常小"？
+- 你打算预先承诺做哪些稳健性检验？
+  - 安慰剂检验（处理/结果/断点安慰剂）
+  - 子样本分析（按企业规模、地区、时间段）
+  - 替代性设定（不同固定效应、控制变量、聚类标准误）
+  - 剂量-反应或密集边际
+- 什么结果会改变你的结论？
 
 ---
 
-## Output: Structured Proposal
+## 输出：结构化研究提案
 
-After completing the interview (or after the user says "done"), generate a structured research proposal.
+完成访谈后（或用户说"完成"后），生成结构化研究提案。
 
-### File Location
+### 文件位置
 
-Save to `vN/docs/research_proposal.md` (where `vN` is the current active version from CLAUDE.md).
+保存至 `vN/docs/research_proposal.md`（其中 `vN` 为 CLAUDE.md 中的当前活跃版本）。
 
-### Template
+### 模板
 
 ```markdown
-# Research Proposal
+# 研究提案
 
-**Generated**: YYYY-MM-DD via /interview-me
+**生成日期**: YYYY-MM-DD，通过 /interview-me
 
 ---
 
-## 1. Research Question
+## 1. 研究问题
 
-[Precise statement of the causal question]
+[因果问题的精确表述]
 
-- **Treatment (X)**: [definition]
-- **Outcome (Y)**: [definition]
-- **Unit of analysis**: [unit-time]
-- **Scope**: [geography, time period]
+- **处理变量 (X)**: [定义]
+- **结果变量 (Y)**: [定义]
+- **分析单位**: [单位-时间]
+- **范围**: [地理、时间范围]
 
-## 2. Hypotheses
+## 2. 假说
 
-**Main hypothesis**: [H1 — precise, directional statement]
+**主假说**: [H1 — 精确、有方向的表述]
 
-**Auxiliary hypotheses**:
-- H2: [channel / mechanism]
-- H3: [heterogeneity prediction]
+**辅助假说**:
+- H2: [渠道/机制]
+- H3: [异质性预测]
 
-**Falsification condition**: [what result would reject the hypothesis]
+**证伪条件**: [什么结果能否定该假说]
 
-## 3. Identification Strategy
+## 3. 识别策略
 
-**Method**: [DID / IV / RDD / Panel FE / SDID]
+**方法**: [DID / IV / RDD / Panel FE / SDID]
 
-**Key assumptions**:
-1. [assumption and justification]
-2. [assumption and justification]
+**核心假设**:
+1. [假设及论证]
+2. [假设及论证]
 
-**Threats**: [top 2-3 concerns to address]
+**威胁**: [最主要的 2-3 个需要解决的问题]
 
-## 4. Data
+## 4. 数据
 
-| Variable | Type | Source | Measurement |
-|----------|------|--------|-------------|
-| Y        | DV   |        |             |
-| X        | IV/Treatment |  |             |
-| Z        | Instrument/Running var |  |    |
-| Controls | Control |     |             |
+| 变量 | 类型 | 来源 | 度量方式 |
+|------|------|------|----------|
+| Y    | 因变量 |    |          |
+| X    | 自变量/处理变量 |  |  |
+| Z    | 工具变量/驱动变量 |  |  |
+| 控制变量 | 控制变量 |  |    |
 
-**Sample**: [unit-time structure, N estimate, restrictions]
+**样本**: [单位-时间结构，估计样本量 N，限制条件]
 
-## 5. Expected Results
+## 5. 预期结果
 
-**Main coefficient**: [sign, approximate magnitude]
+**主要系数**: [方向，大致量级]
 
-**Pre-committed robustness checks**:
-1. [test]
-2. [test]
-3. [test]
+**预先承诺的稳健性检验**:
+1. [检验]
+2. [检验]
+3. [检验]
 
-## 6. Next Steps
+## 6. 后续步骤
 
-1. [ ] Acquire/clean data
-2. [ ] Run descriptive statistics (/data-describe)
-3. [ ] Implement main specification (/run-{method})
-4. [ ] Cross-validate (/cross-check)
-5. [ ] Robustness suite (/robustness)
+1. [ ] 获取/清洗数据
+2. [ ] 生成描述性统计 (/data-describe)
+3. [ ] 实现主回归设定 (/run-{method})
+4. [ ] 交叉验证 (/cross-check)
+5. [ ] 稳健性检验套件 (/robustness)
 ```
 
-After generating the proposal, display:
+生成提案后，显示：
 ```
-Research proposal saved to vN/docs/research_proposal.md
+研究提案已保存至 vN/docs/research_proposal.md
 
-Suggested next steps:
-  /data-describe    — Explore and describe your data
-  /devils-advocate  — Challenge your identification strategy
-  /run-{method}     — Run the main estimation
+建议后续步骤：
+  /data-describe    — 探索和描述你的数据
+  /devils-advocate  — 挑战你的识别策略
+  /run-{method}     — 运行主估计
 ```
 
-## Notes
+## 注意事项
 
-- The interview should feel like a conversation with a knowledgeable advisor, not a form.
-- If the user gives very short answers, probe deeper. If they give detailed answers, move forward.
-- Sections can be revisited — if data constraints in Section 4 invalidate the method in Section 3, circle back.
-- The proposal is a living document — it can be updated in future sessions.
+- 访谈应感觉像是与一位资深导师的对话，而非填表。
+- 如果用户回答过于简短，深入追问；如果回答详尽，则直接推进。
+- 各部分可以回溯——如果第四部分的数据约束否定了第三部分的方法，可以返回调整。
+- 研究提案是一份活文档——可以在后续会话中更新。

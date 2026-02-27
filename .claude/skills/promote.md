@@ -1,88 +1,88 @@
 ---
-description: "Graduate exploratory files to main pipeline with quality check"
+description: "将探索性文件提升至主流水线，含质量检查"
 user_invocable: true
 ---
 
-# /promote — Promote Exploratory Results to Main Pipeline
+# /promote — 将探索性结果提升至主流水线
 
-Graduate files from the `explore/` sandbox to the main `vN/` pipeline, applying full quality standards.
+将 `explore/` 沙盒中的文件提升至主 `vN/` 流水线，应用完整质量标准。
 
-## Activation
+## 激活
 
-When the user runs `/promote`, they should specify:
-- **Source**: file(s) in `explore/` to promote (e.g., `explore/code/alt_spec.do`)
-- **Target**: destination in the version directory (e.g., `v1/code/stata/`)
+当用户运行 `/promote` 时，应指定：
+- **来源**：`explore/` 中要提升的文件（如 `explore/code/alt_spec.do`）
+- **目标**：版本目录中的目标位置（如 `v1/code/stata/`）
 
-If arguments are not provided, prompt the user for source and target.
+如果未提供参数，提示用户指定来源和目标。
 
-## Steps
+## 步骤
 
-### 1. Identify Source Files
+### 1. 识别来源文件
 
-List files in `explore/` and ask the user which to promote if not specified:
+列出 `explore/` 中的文件，如果未指定则询问用户要提升哪些：
 
 ```
-Files in explore/:
+explore/ 中的文件：
   explore/code/alt_spec_EXPLORATORY.do
   explore/code/new_outcome_EXPLORATORY.py
   explore/output/alt_results.tex
 
-Which file(s) to promote? (specify paths or "all")
+要提升哪些文件？（指定路径或输入 "all"）
 ```
 
-### 2. Copy and Rename
+### 2. 复制并重命名
 
-For each source file:
+对每个来源文件：
 
-1. Copy from `explore/` to the target `vN/` location
-2. Remove `_EXPLORATORY` suffix from the filename if present
-3. Renumber to fit the `vN/code/` sequence:
-   - Check existing numbered scripts (e.g., `01_`, `02_`, ..., `06_`)
-   - Assign the next available number
-   - Example: `alt_spec_EXPLORATORY.do` → `07_alt_spec.do`
+1. 从 `explore/` 复制到目标 `vN/` 位置
+2. 如果存在 `_EXPLORATORY` 后缀则去除
+3. 重新编号以适应 `vN/code/` 的序列：
+   - 检查已有的编号脚本（如 `01_`、`02_`、...、`06_`）
+   - 分配下一个可用编号
+   - 示例：`alt_spec_EXPLORATORY.do` → `07_alt_spec.do`
 
-### 3. Upgrade to Full Standards
+### 3. 升级至完整标准
 
-After copying, apply full pipeline standards to the promoted file:
+复制后，对提升的文件应用完整流水线标准：
 
-- Add full header block (if abbreviated)
-- Add proper logging (`cap log close` / `log using` / `log close`)
-- Add variable labels if missing
-- Ensure `set seed 12345` is present
-- Add `vce(cluster ...)` to regressions if missing
+- 添加完整文件头（如果是简化版）
+- 添加规范的日志记录（`cap log close` / `log using` / `log close`）
+- 如果缺少变量标签则添加
+- 确保包含 `set seed 12345`
+- 如果回归缺少 `vce(cluster ...)` 则添加
 
-### 4. Quality Check
+### 4. 质量检查
 
-Run `/score` on the promoted files to verify they meet main pipeline standards:
+对提升的文件运行 `/score` 以验证是否符合主流水线标准：
 
-- If score >= 80: promotion successful, inform user
-- If score < 80: warn the user and list specific issues that need fixing
+- 如果评分 >= 80：提升成功，通知用户
+- 如果评分 < 80：警告用户并列出需要修复的具体问题
 
 ```
-Promotion complete:
+提升完成：
   explore/code/alt_spec_EXPLORATORY.do → v1/code/stata/07_alt_spec.do
-  Quality score: 85/100 ✓
+  质量评分：85/100
 
-  OR
+  或
 
-  Quality score: 72/100 ✗
-  Issues:
-    - Missing cross-validation script
-    - No variable labels on generated variables
-  Run /adversarial-review on v1/code/stata/07_alt_spec.do to address.
+  质量评分：72/100
+  问题：
+    - 缺少交叉验证脚本
+    - 生成的变量缺少变量标签
+  请对 v1/code/stata/07_alt_spec.do 运行 /adversarial-review 进行处理。
 ```
 
-### 5. Clean Up (Optional)
+### 5. 清理（可选）
 
-Ask the user if they want to remove the source files from `explore/`:
+询问用户是否要从 `explore/` 中删除已提升的源文件：
 
 ```
-Remove promoted files from explore/? (y/n)
+是否删除 explore/ 中已提升的文件？(y/n)
 ```
 
-## Notes
+## 注意事项
 
-- Never overwrite existing files in `vN/` without confirmation
-- Preserve the original exploratory file in `explore/` until the user confirms deletion
-- If promoting Python cross-validation scripts, place them in `vN/code/python/`
-- Update `master.do` if a new Stata script is added to the sequence
+- 在未经确认的情况下，不覆盖 `vN/` 中的已有文件
+- 在用户确认删除之前，保留 `explore/` 中的原始探索性文件
+- 如果提升的是 Python 交叉验证脚本，将其放置在 `vN/code/python/`
+- 如果向序列中添加了新的 Stata 脚本，更新 `master.do`

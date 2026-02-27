@@ -1,22 +1,22 @@
 ---
-description: "Compile LaTeX paper with pdflatex/bibtex pipeline and error checking"
+description: "使用 pdflatex/bibtex 管道编译 LaTeX 论文并检查错误"
 user_invocable: true
 ---
 
-# /compile-latex — LaTeX Compilation Pipeline
+# /compile-latex — LaTeX 编译管道
 
-When the user invokes `/compile-latex`, compile a .tex file through the full pdflatex + bibtex pipeline.
+当用户调用 `/compile-latex` 时，通过完整的 pdflatex + bibtex 管道编译 .tex 文件。
 
-## Step 1: Determine Target
+## 步骤 1：确定目标
 
-- If user specifies a file: use that (e.g., `/compile-latex v1/paper/main_en.tex`)
-- If not specified: look for `.tex` files in the current version's `paper/` directory
-  - If multiple found, ask which one to compile
-  - Common targets: `main_cn.tex`, `main_en.tex`
+- 如果用户指定了文件：使用该文件（如 `/compile-latex v1/paper/main_en.tex`）
+- 如果未指定：在当前版本的 `paper/` 目录中查找 `.tex` 文件
+  - 如果找到多个，询问编译哪一个
+  - 常见目标：`main_cn.tex`、`main_en.tex`
 
-## Step 2: Compile
+## 步骤 2：编译
 
-Run the standard 4-pass compilation from the directory containing the .tex file:
+从包含 .tex 文件的目录运行标准 4 遍编译：
 
 ```bash
 cd /path/to/paper/directory
@@ -26,60 +26,60 @@ pdflatex -interaction=nonstopmode main.tex
 pdflatex -interaction=nonstopmode main.tex
 ```
 
-Use `-interaction=nonstopmode` so compilation continues past errors (allowing us to collect all issues).
+使用 `-interaction=nonstopmode` 使编译在遇到错误时继续（以便收集所有问题）。
 
-## Step 3: Check for Errors
+## 步骤 3：检查错误
 
-Read the `.log` file produced by pdflatex and check for:
+读取 pdflatex 生成的 `.log` 文件并检查：
 
-### Errors (must fix)
-- `! LaTeX Error:` — package errors, undefined commands
-- `! Missing` — missing delimiters
-- `! Undefined control sequence` — typos in commands
-- `! File not found` — missing input files or figures
+### 错误（必须修复）
+- `! LaTeX Error:` — 包错误、未定义命令
+- `! Missing` — 缺少分隔符
+- `! Undefined control sequence` — 命令拼写错误
+- `! File not found` — 缺少输入文件或图形
 
-### Warnings (should fix)
-- `LaTeX Warning: Reference .* undefined` — broken `\ref{}` or `\cite{}`
-- `LaTeX Warning: Label .* multiply defined` — duplicate labels
-- `Overfull \\hbox` — lines extending past margins (report if > 10pt overfull)
-- `Package natbib Warning: Citation .* undefined` — missing bibliography entries
+### 警告（应该修复）
+- `LaTeX Warning: Reference .* undefined` — 断裂的 `\ref{}` 或 `\cite{}`
+- `LaTeX Warning: Label .* multiply defined` — 重复标签
+- `Overfull \\hbox` — 行超出页边距（超过 10pt 时报告）
+- `Package natbib Warning: Citation .* undefined` — 缺少参考文献条目
 
-### Info (report if relevant)
-- Number of pages in output PDF
-- Whether bibliography was successfully built
-- Total number of warnings
+### 信息（相关时报告）
+- 输出 PDF 的页数
+- 参考文献是否成功构建
+- 警告总数
 
-## Step 4: Report Results
+## 步骤 4：报告结果
 
 ```
-Compilation Report for main_en.tex
+main_en.tex 编译报告
 ═══════════════════════════════════
 
-  Status:     SUCCESS (with warnings)
-  Output:     v1/paper/main_en.pdf
-  Pages:      24
+  状态：     成功（有警告）
+  输出：     v1/paper/main_en.pdf
+  页数：     24
 
-  Errors:     0
-  Warnings:   3
-    - Undefined reference: fig:event_study (line 142)
-    - Overfull hbox (12.3pt) at line 256
-    - Citation "smith2024" undefined
+  错误：     0
+  警告：     3
+    - 未定义引用：fig:event_study（第 142 行）
+    - Overfull hbox (12.3pt)，第 256 行
+    - 引用 "smith2024" 未定义
 
-  Action needed:
-    1. Add label for fig:event_study in your figures section
-    2. Check line 256 for long text that needs rewording
-    3. Add smith2024 entry to references.bib
+  需要处理：
+    1. 在图形章节中为 fig:event_study 添加标签
+    2. 检查第 256 行是否有需要改写的长文本
+    3. 在 references.bib 中添加 smith2024 条目
 ```
 
-## Step 5: Handle Missing Packages
+## 步骤 5：处理缺少的包
 
-If compilation fails with `! LaTeX Error: File 'package.sty' not found`:
+如果编译因 `! LaTeX Error: File 'package.sty' not found` 失败：
 
-- On TeX Live: suggest `tlmgr install <package>`
-- On MiKTeX: suggest opening MiKTeX Console to install missing packages
-- Report the specific package name clearly
+- TeX Live：建议 `tlmgr install <package>`
+- MiKTeX：建议打开 MiKTeX Console 安装缺少的包
+- 清楚报告具体的包名称
 
-## Notes
+## 注意事项
 
-- For Chinese papers (`main_cn.tex`), `xelatex` may be needed instead of `pdflatex` if using `ctex` with system fonts. Check the documentclass and suggest `xelatex` if appropriate.
-- If `bibtex` reports "I found no \citation commands", the bibliography section may be commented out — this is normal for early drafts.
+- 对于中文论文（`main_cn.tex`），如果使用 `ctex` 配合系统字体，可能需要 `xelatex` 替代 `pdflatex`。检查 documentclass 并在适当时建议使用 `xelatex`。
+- 如果 `bibtex` 报告 "I found no \citation commands"，参考文献部分可能已被注释掉——这在早期草稿中是正常的。

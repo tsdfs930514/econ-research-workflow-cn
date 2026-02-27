@@ -25,6 +25,20 @@ import sys
 from pathlib import Path
 
 
+# ---------------------------------------------------------------------------
+# Dimension name mapping (English -> Chinese) for display output
+# ---------------------------------------------------------------------------
+
+DIM_NAMES_CN = {
+    "Code Conventions": "代码规范",
+    "Log Cleanliness": "日志清洁度",
+    "Output Completeness": "输出完整性",
+    "Cross-Validation": "交叉验证",
+    "Documentation": "文档",
+    "Method Diagnostics": "方法诊断",
+}
+
+
 def find_files(base: Path, pattern: str) -> list[Path]:
     """Recursively find files matching a glob pattern."""
     return sorted(base.rglob(pattern))
@@ -48,7 +62,7 @@ def score_code_conventions(base: Path, verbose: bool = False) -> dict:
     py_files = find_files(base / "code", "*.py") if (base / "code").exists() else []
 
     if not do_files and not py_files:
-        return {"score": 0, "max": 15, "details": ["No code files found"]}
+        return {"score": 0, "max": 15, "details": ["未找到代码文件"]}
 
     checks = {
         "headers_present": {"pass": 0, "fail": 0, "details": []},
@@ -67,21 +81,21 @@ def score_code_conventions(base: Path, verbose: bool = False) -> dict:
             checks["headers_present"]["pass"] += 1
         else:
             checks["headers_present"]["fail"] += 1
-            checks["headers_present"]["details"].append(f"Missing header: {name}")
+            checks["headers_present"]["details"].append(f"缺少文件头: {name}")
 
         # set seed
         if "set seed" in content.lower():
             checks["set_seed"]["pass"] += 1
         else:
             checks["set_seed"]["fail"] += 1
-            checks["set_seed"]["details"].append(f"No set seed: {name}")
+            checks["set_seed"]["details"].append(f"未设置 set seed: {name}")
 
         # Numbered naming
         if re.match(r"^\d{2}_", name) or name == "master.do":
             checks["numbered_naming"]["pass"] += 1
         else:
             checks["numbered_naming"]["fail"] += 1
-            checks["numbered_naming"]["details"].append(f"Not numbered: {name}")
+            checks["numbered_naming"]["details"].append(f"未使用编号前缀: {name}")
 
         # Log pattern
         has_cap_log = "cap log close" in content or "capture log close" in content
@@ -90,14 +104,14 @@ def score_code_conventions(base: Path, verbose: bool = False) -> dict:
             checks["log_pattern"]["pass"] += 1
         else:
             checks["log_pattern"]["fail"] += 1
-            checks["log_pattern"]["details"].append(f"Missing log pattern: {name}")
+            checks["log_pattern"]["details"].append(f"缺少日志模式: {name}")
 
         # vce(cluster)
         if "vce(cluster" in content or "vce(cl " in content:
             checks["vce_cluster"]["pass"] += 1
         elif re.search(r"(reghdfe|regress|xtreg|ivreghdfe|ivreg2)", content):
             checks["vce_cluster"]["fail"] += 1
-            checks["vce_cluster"]["details"].append(f"Regression without vce(cluster): {name}")
+            checks["vce_cluster"]["details"].append(f"回归未使用 vce(cluster): {name}")
         else:
             checks["vce_cluster"]["pass"] += 1  # No regressions in this file
 
@@ -128,13 +142,13 @@ def score_log_cleanliness(base: Path, verbose: bool = False) -> dict:
     log_files = find_files(base, "*.log")
 
     if not log_files:
-        return {"score": 0, "max": 15, "details": ["No .log files found"]}
+        return {"score": 0, "max": 15, "details": ["未找到 .log 文件"]}
 
     error_patterns = [
-        (r"r\(\d+\)", "Stata error"),
-        (r"variable .+ not found", "Variable not found"),
-        (r"command .+ is unrecognized", "Command not recognized"),
-        (r"no observations", "No observations"),
+        (r"r\(\d+\)", "Stata 错误"),
+        (r"variable .+ not found", "变量未找到"),
+        (r"command .+ is unrecognized", "命令无法识别"),
+        (r"no observations", "无观测值"),
     ]
 
     clean_logs = 0
@@ -147,7 +161,7 @@ def score_log_cleanliness(base: Path, verbose: bool = False) -> dict:
         for pattern, label in error_patterns:
             matches = re.findall(pattern, content)
             if matches:
-                errors_found.append(f"{label}: {len(matches)} occurrence(s)")
+                errors_found.append(f"{label}: {len(matches)} 处")
         if errors_found:
             details.append(f"{f.name}: {'; '.join(errors_found)}")
         else:
@@ -182,9 +196,9 @@ def score_output_completeness(base: Path, verbose: bool = False) -> dict:
         if non_empty:
             checks["tables"] = 5
         else:
-            details.append("No non-empty .tex files in output/tables/")
+            details.append("output/tables/ 中无非空 .tex 文件")
     else:
-        details.append("output/tables/ directory not found")
+        details.append("未找到 output/tables/ 目录")
 
     # Figures: .pdf or .png files exist
     if figures_dir.exists():
@@ -192,9 +206,9 @@ def score_output_completeness(base: Path, verbose: bool = False) -> dict:
         if fig_files:
             checks["figures"] = 5
         else:
-            details.append("No .pdf/.png files in output/figures/")
+            details.append("output/figures/ 中无 .pdf/.png 文件")
     else:
-        details.append("output/figures/ directory not found")
+        details.append("未找到 output/figures/ 目录")
 
     # Logs: .log files exist
     if logs_dir.exists():
@@ -202,15 +216,15 @@ def score_output_completeness(base: Path, verbose: bool = False) -> dict:
         if log_files:
             checks["logs"] = 5
         else:
-            details.append("No .log files in output/logs/")
+            details.append("output/logs/ 中无 .log 文件")
     else:
         # Also check root for logs (Stata generates them in CWD)
         root_logs = find_files(base, "*.log")
         if root_logs:
             checks["logs"] = 3  # Partial credit — logs exist but not in output/logs/
-            details.append("Logs found in root but not in output/logs/")
+            details.append("日志文件存在于根目录但不在 output/logs/ 中")
         else:
-            details.append("No log files found")
+            details.append("未找到日志文件")
 
     score = checks["tables"] + checks["figures"] + checks["logs"]
     return {"score": score, "max": 15, "details": details}
@@ -250,15 +264,15 @@ def score_cross_validation(base: Path, verbose: bool = False) -> dict:
         if "diff" in content.lower() or "compare" in content.lower() or "match" in content.lower():
             score += 5
         else:
-            details.append("Cross-validation script found but no comparison logic detected")
+            details.append("找到交叉验证脚本但未检测到比较逻辑")
 
         # Check for pass/fail threshold
         if "0.1" in content or "0.001" in content or "PASS" in content or "FAIL" in content:
             score += 5
         else:
-            details.append("No pass/fail threshold found in cross-validation script")
+            details.append("交叉验证脚本中未找到通过/失败阈值")
     else:
-        details.append("No Python cross-validation script found")
+        details.append("未找到 Python 交叉验证脚本")
 
     return {"score": score, "max": 15, "details": details}
 
@@ -280,12 +294,12 @@ def score_documentation(base: Path, verbose: bool = False) -> dict:
             score += 6  # Full credit — has real content
         elif len(content) > 100:
             score += 3  # Partial — still has template placeholders
-            details.append("REPLICATION.md has template placeholders")
+            details.append("REPLICATION.md 仍含模板占位符")
         else:
             score += 1
-            details.append("REPLICATION.md exists but is mostly empty")
+            details.append("REPLICATION.md 存在但内容基本为空")
     else:
-        details.append("REPLICATION.md not found")
+        details.append("未找到 REPLICATION.md")
 
     # _VERSION_INFO.md exists
     vinfo = base / "_VERSION_INFO.md"
@@ -295,9 +309,9 @@ def score_documentation(base: Path, verbose: bool = False) -> dict:
             score += 5
         else:
             score += 2
-            details.append("_VERSION_INFO.md exists but is sparse")
+            details.append("_VERSION_INFO.md 存在但内容稀少")
     else:
-        details.append("_VERSION_INFO.md not found")
+        details.append("未找到 _VERSION_INFO.md")
 
     # Data sources documented (check REPLICATION.md or docs/)
     docs_dir = base / "docs"
@@ -314,7 +328,7 @@ def score_documentation(base: Path, verbose: bool = False) -> dict:
     if has_data_docs:
         score += 4
     else:
-        details.append("No data source documentation found")
+        details.append("未找到数据来源文档")
 
     return {"score": min(score, 15), "max": 15, "details": details}
 
@@ -351,7 +365,7 @@ def score_method_diagnostics(base: Path, verbose: bool = False) -> dict:
     """Score method-specific diagnostics based on auto-detected methods."""
     methods = detect_methods(base)
     if not methods:
-        return {"score": 0, "max": 25, "details": ["No econometric methods detected in .do files"],
+        return {"score": 0, "max": 25, "details": ["未在 .do 文件中检测到计量经济学方法"],
                 "methods": []}
 
     do_files = find_files(base, "*.do")
@@ -371,31 +385,31 @@ def score_method_diagnostics(base: Path, verbose: bool = False) -> dict:
         if "testparm" in combined or "pre-trend" in combined or "pretrend" in combined:
             did_score += 5
         else:
-            details.append("DID: No pre-trend F-test found")
+            details.append("DID: 未找到前趋势 F 检验")
 
         # Event study
         if "event" in combined and ("coefplot" in combined or "csdid_plot" in combined or "event_plot" in combined):
             did_score += 5
         else:
-            details.append("DID: No event study plot found")
+            details.append("DID: 未找到事件研究图")
 
         # Robust estimator alongside TWFE
         if "csdid" in combined or "did_multiplegt" in combined or "did_imputation" in combined:
             did_score += 5
         else:
-            details.append("DID: No robust DID estimator (CS-DiD, dCDH, BJS) found alongside TWFE")
+            details.append("DID: 未在 TWFE 之外找到稳健 DID 估计量 (CS-DiD, dCDH, BJS)")
 
         # Goodman-Bacon decomposition
         if "bacondecomp" in combined:
             did_score += 5
         else:
-            details.append("DID: No Goodman-Bacon decomposition found")
+            details.append("DID: 未找到 Goodman-Bacon 分解")
 
         # HonestDiD or wild cluster bootstrap
         if "honestdid" in combined or "boottest" in combined:
             did_score += 5
         else:
-            details.append("DID: No HonestDiD sensitivity or wild cluster bootstrap found")
+            details.append("DID: 未找到 HonestDiD 敏感性分析或野蛮聚类 bootstrap")
 
         method_scores["DID"] = {"score": did_score, "max": did_max}
 
@@ -408,31 +422,31 @@ def score_method_diagnostics(base: Path, verbose: bool = False) -> dict:
                                     or "f stat" in combined):
             iv_score += 6
         else:
-            details.append("IV: First-stage F-statistic not clearly reported")
+            details.append("IV: 第一阶段 F 统计量未明确报告")
 
         # KP F reported
         if "kleibergen" in combined or "kp" in combined:
             iv_score += 5
         else:
-            details.append("IV: Kleibergen-Paap F not reported")
+            details.append("IV: 未报告 Kleibergen-Paap F")
 
         # LIML comparison
         if "liml" in combined:
             iv_score += 5
         else:
-            details.append("IV: No LIML comparison found")
+            details.append("IV: 未找到 LIML 比较")
 
         # Density/exclusion discussion
         if "exclusion" in combined or "instrument validity" in combined:
             iv_score += 4
         else:
-            details.append("IV: No exclusion restriction discussion found")
+            details.append("IV: 未找到排除性限制讨论")
 
         # Over-identification or AR test
         if "hansen" in combined or "sargan" in combined or "anderson-rubin" in combined or "weakiv" in combined:
             iv_score += 5
         else:
-            details.append("IV: No over-identification or weak-IV robust test found")
+            details.append("IV: 未找到过度识别检验或弱工具变量稳健检验")
 
         method_scores["IV"] = {"score": iv_score, "max": iv_max}
 
@@ -444,7 +458,7 @@ def score_method_diagnostics(base: Path, verbose: bool = False) -> dict:
         if "rddensity" in combined or "mccrary" in combined:
             rdd_score += 6
         else:
-            details.append("RDD: No density test (CJM/McCrary) found")
+            details.append("RDD: 未找到密度检验 (CJM/McCrary)")
 
         # Bandwidth sensitivity
         bw_keywords = ["0.5", "0.75", "1.25", "1.5", "2.0", "bwselect"]
@@ -453,27 +467,27 @@ def score_method_diagnostics(base: Path, verbose: bool = False) -> dict:
             rdd_score += 6
         elif bw_count >= 1:
             rdd_score += 3
-            details.append("RDD: Limited bandwidth sensitivity analysis")
+            details.append("RDD: 带宽敏感性分析有限")
         else:
-            details.append("RDD: No bandwidth sensitivity analysis found")
+            details.append("RDD: 未找到带宽敏感性分析")
 
         # Polynomial sensitivity
         if "p(1)" in combined or "p(2)" in combined or "p(3)" in combined:
             rdd_score += 5
         else:
-            details.append("RDD: No polynomial order sensitivity found")
+            details.append("RDD: 未找到多项式阶数敏感性分析")
 
         # Placebo cutoffs
         if "placebo" in combined or "fake" in combined:
             rdd_score += 4
         else:
-            details.append("RDD: No placebo cutoff tests found")
+            details.append("RDD: 未找到安慰剂断点检验")
 
         # Covariate balance
         if "balance" in combined or "covariate" in combined:
             rdd_score += 4
         else:
-            details.append("RDD: No covariate balance test at cutoff found")
+            details.append("RDD: 未找到断点处协变量平衡检验")
 
         method_scores["RDD"] = {"score": rdd_score, "max": rdd_max}
 
@@ -485,25 +499,25 @@ def score_method_diagnostics(base: Path, verbose: bool = False) -> dict:
         if "hausman" in combined:
             panel_score += 7
         else:
-            details.append("Panel: No Hausman test found")
+            details.append("Panel: 未找到 Hausman 检验")
 
         # Serial correlation
         if "xtserial" in combined or "wooldridge" in combined or "serial" in combined:
             panel_score += 6
         else:
-            details.append("Panel: No serial correlation test found")
+            details.append("Panel: 未找到序列相关检验")
 
         # Appropriate clustering
         if "vce(cluster" in combined or "cluster(" in combined:
             panel_score += 6
         else:
-            details.append("Panel: No clustered standard errors found")
+            details.append("Panel: 未找到聚类标准误")
 
         # Within R-squared or dynamic panels
         if "r2_within" in combined or "within r" in combined or "xtabond2" in combined:
             panel_score += 6
         else:
-            details.append("Panel: No within R-squared reported or dynamic panel considered")
+            details.append("Panel: 未报告组内 R 方或未考虑动态面板")
 
         method_scores["Panel"] = {"score": panel_score, "max": panel_max}
 
@@ -532,7 +546,7 @@ def score_directory(base_path: str, verbose: bool = False) -> dict:
     """Score a version directory on all 6 dimensions."""
     base = Path(base_path)
     if not base.exists():
-        print(f"Error: Directory '{base_path}' does not exist.", file=sys.stderr)
+        print(f"错误: 目录 '{base_path}' 不存在。", file=sys.stderr)
         sys.exit(1)
 
     results = {
@@ -560,51 +574,57 @@ def score_directory(base_path: str, verbose: bool = False) -> dict:
     total = results["total"]
     if total >= 95:
         results["status"] = "PUBLICATION READY"
+        results["status_cn"] = "可发表"
     elif total >= 90:
         results["status"] = "MINOR REVISIONS"
+        results["status_cn"] = "小修"
     elif total >= 80:
         results["status"] = "MAJOR REVISIONS"
+        results["status_cn"] = "大修"
     else:
         results["status"] = "REDO"
+        results["status_cn"] = "重做"
 
     return results
 
 
 def print_text_report(results: dict, verbose: bool = False) -> None:
     """Print human-readable report."""
-    print(f"\nQuality Score Report for {results['target']}")
+    print(f"\n质量评分报告: {results['target']}")
     print("=" * 50)
     print()
 
     for name, dim in results["dimensions"].items():
+        display_name = DIM_NAMES_CN.get(name, name)
         score = dim["score"]
         max_score = dim["max"]
         bar_len = 15
         filled = round(score / max_score * bar_len) if max_score > 0 else 0
         bar = "#" * filled + "." * (bar_len - filled)
-        print(f"  {name:<22s} {score:>2d}/{max_score:<2d}  [{bar}]")
+        print(f"  {display_name:<14s} {score:>2d}/{max_score:<2d}  [{bar}]")
 
         if verbose and dim.get("details"):
             for detail in dim["details"]:
                 print(f"    - {detail}")
 
         if "methods" in dim and dim["methods"]:
-            print(f"    Methods detected: {', '.join(dim['methods'])}")
+            print(f"    检测到的方法: {', '.join(dim['methods'])}")
             if verbose and "method_scores" in dim:
                 for method, ms in dim["method_scores"].items():
                     print(f"      {method}: {ms['score']}/{ms['max']}")
 
     print()
-    print(f"  {'TOTAL':<22s} {results['total']:>2d}/{results['max_total']}")
+    print(f"  {'总分':<14s} {results['total']:>2d}/{results['max_total']}")
     print()
-    print(f"  Status: {results['status']}")
+    print(f"  状态: {results.get('status_cn', results['status'])}")
 
     if results["total"] < 80:
         print()
-        print("  Priority fixes:")
+        print("  优先修复项:")
         for name, dim in results["dimensions"].items():
+            display_name = DIM_NAMES_CN.get(name, name)
             if dim["score"] < dim["max"] * 0.6:
-                print(f"    [{name}] Score {dim['score']}/{dim['max']} — needs attention")
+                print(f"    [{display_name}] 得分 {dim['score']}/{dim['max']} — 需要关注")
                 if dim.get("details"):
                     for detail in dim["details"][:3]:
                         print(f"      - {detail}")
@@ -614,11 +634,11 @@ def print_text_report(results: dict, verbose: bool = False) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Score an economics research version directory on 6 quality dimensions."
+        description="对经济学研究版本目录进行 6 个质量维度评分。"
     )
-    parser.add_argument("directory", help="Path to the version directory (e.g., v1/)")
-    parser.add_argument("--json", action="store_true", help="Output results as JSON")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed findings")
+    parser.add_argument("directory", help="版本目录路径 (如 v1/)")
+    parser.add_argument("--json", action="store_true", help="以 JSON 格式输出结果")
+    parser.add_argument("--verbose", "-v", action="store_true", help="显示详细发现")
 
     args = parser.parse_args()
 
@@ -646,7 +666,7 @@ def main():
                     k: {"score": v["score"], "max": v["max"]}
                     for k, v in dim["method_scores"].items()
                 }
-        print(json.dumps(output, indent=2))
+        print(json.dumps(output, indent=2, ensure_ascii=False))
     else:
         print_text_report(results, verbose=args.verbose)
 

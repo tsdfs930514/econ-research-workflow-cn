@@ -14,7 +14,7 @@ def main():
     memory_path = os.path.join(project_dir, "MEMORY.md")
 
     if not os.path.isfile(memory_path):
-        print("[Session Loader] No MEMORY.md found. Start a new session with /session-log start.")
+        print("[会话加载器] 未找到 MEMORY.md。请使用 /session-log start 开始新会话。")
         return
 
     with open(memory_path, "r", encoding="utf-8") as f:
@@ -47,25 +47,25 @@ def main():
 
     # Build output
     print("=" * 60)
-    print("SESSION CONTEXT (from MEMORY.md)")
+    print("会话上下文 (来自 MEMORY.md)")
     print("=" * 60)
 
     if recent_entries:
-        print("\n--- Recent Entries ---")
+        print("\n--- 近期条目 ---")
         for entry in recent_entries:
             print(f"  {entry}")
     else:
-        print("\n--- No tagged entries yet ---")
+        print("\n--- 暂无标记条目 ---")
 
     if last_session:
-        print(f"\n--- Last Session ---")
-        print(f"  Date: {last_session[0]}")
-        print(f"  Summary: {last_session[1]}")
+        print(f"\n--- 上次会话 ---")
+        print(f"  日期: {last_session[0]}")
+        print(f"  摘要: {last_session[1]}")
     else:
-        print("\n--- No previous session log ---")
+        print("\n--- 无历史会话记录 ---")
 
     if last_score:
-        print(f"\n--- Last Quality Score: {last_score}/100 ---")
+        print(f"\n--- 最新质量评分: {last_score}/100 ---")
 
     print("=" * 60)
 
