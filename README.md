@@ -24,81 +24,63 @@
 
 ---
 
-## 安装与配置
+## 工作原理
 
-### 前置要求
+本仓库是一个**项目级模板**。`.claude/` 目录包含所有技能、代理和规则——当你在项目目录中运行 `claude` 时，Claude Code 会自动加载它们。无需全局安装任何东西。
+
+两种使用方式：
+
+- **作为完整项目模板** — Fork 本仓库，以完整工作流启动一个新研究项目
+- **按需选用单个技能** — 将特定的 `.claude/skills/*.md` 文件复制到你自己项目的 `.claude/skills/` 目录中
+
+## 快速上手
+
+### 1. Fork 并克隆
+
+```bash
+# 在 GitHub 上 Fork 本仓库，然后：
+git clone https://github.com/<你的用户名>/econ-research-workflow-cn.git
+cd econ-research-workflow-cn
+```
+
+### 2. 安装前置依赖
 
 | 软件 | 版本要求 | 用途 |
 |------|----------|------|
 | **Stata** | 18（推荐 MP 版） | 所有计量经济学估计 |
 | **Python** | 3.10+ | 交叉验证（`pyfixest`、`pandas`、`numpy`） |
-| **Claude Code** | 最新版 | 运行技能和代理的 CLI 工具 |
-| **Git Bash** | — | Windows 下 Stata 执行的 Shell 环境 |
+| **Claude Code** | 最新版 | CLI 工具——从 [claude.com/claude-code](https://claude.com/claude-code) 安装 |
+| **Git Bash** (Windows) | — | Stata 执行的 Shell 环境 |
 | **LaTeX** | 可选 | `/compile-latex` 编译论文（pdflatex + bibtex） |
 
-### 安装步骤
+```bash
+pip install pyfixest pandas numpy polars matplotlib stargazer
+```
 
-1. **克隆本仓库**
-   ```bash
-   git clone https://github.com/Weiyu-USTC/econ-research-workflow-cn.git
-   cd econ-research-workflow-cn
-   ```
+### 3. 配置
 
-2. **安装 Claude Code CLI**
-   - 访问 [claude.com/claude-code](https://claude.com/claude-code) 下载安装
-   - 确保 `claude` 命令在终端中可用
+打开 `CLAUDE.md`，填写 `[PLACEHOLDER]` 字段：
+- `[PROJECT_NAME]` — 你的研究项目名称
+- `[INSTITUTION_NAME]` — 你的机构名称
+- `[RESEARCHER_NAMES]` — 研究者姓名
+- `[DATE]` — 创建日期
+- 修改 Stata 可执行文件路径为你的本地路径
 
-3. **安装 Python 依赖**
-   ```bash
-   pip install pyfixest pandas numpy polars matplotlib stargazer
-   ```
-
-4. **配置 `CLAUDE.md`**
-   - 打开项目根目录的 `CLAUDE.md`
-   - 填写所有 `[PLACEHOLDER]` 字段：
-     - `[PROJECT_NAME]` — 你的研究项目名称
-     - `[INSTITUTION_NAME]` — 你的机构名称
-     - `[RESEARCHER_NAMES]` — 研究者姓名
-     - `[DATE]` — 创建日期
-   - 修改 Stata 可执行文件路径为你的本地路径
-
-5. **验证安装**
-   ```bash
-   # 在项目目录启动 Claude Code
-   claude
-
-   # 初始化一个新研究项目
-   /init-project
-   ```
-
----
-
-## 快速上手
-
-### 三步开始你的第一个分析
-
-1. **初始化项目** — 在 Claude Code 中运行 `/init-project`，按提示输入项目信息
-2. **放入数据** — 将原始数据放入 `v1/data/raw/`（此目录为只读，永远不会被修改）
-3. **运行分析** — 根据你的研究设计选择对应技能：
+### 4. 启动 Claude Code 并开始工作
 
 ```bash
-# 描述性统计
-/data-describe
+# 在项目目录中启动 Claude Code
+claude
 
-# 运行 DID 分析（支持 TWFE、Callaway-Sant'Anna、Bacon 分解等）
-/run-did
+# 初始化新研究项目（创建 v1/ 目录结构）
+/init-project
+```
 
-# 交叉验证 Stata 与 Python 结果（系数差异 < 0.1%）
-/cross-check
+将原始数据放入 `v1/data/raw/`，然后运行分析：
 
-# 生成发表质量的回归表格（支持三线表和 booktabs）
-/make-table
-
-# 对抗式质量审查（代码 + 计量 + 表格，最多 5 轮）
-/adversarial-review
-
-# 量化质量评分（6 维度，100 分制）
-/score
+```bash
+/data-describe → /run-did（或 /run-iv、/run-rdd、/run-panel）
+    → /cross-check → /make-table → /adversarial-review → /score
 ```
 
 ### 完整论文管道
