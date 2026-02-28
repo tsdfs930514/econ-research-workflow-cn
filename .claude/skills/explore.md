@@ -1,5 +1,5 @@
 ---
-description: "设置探索沙盒，放宽质量阈值"
+description: "设置探索沙盒，放宽质量阈值，用于快速假设检验和替代规范探索"
 user_invocable: true
 ---
 

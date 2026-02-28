@@ -1,5 +1,5 @@
 ---
-description: "将探索性文件提升至主流水线，含质量检查"
+description: "将 explore/ 沙盒中的探索性文件提升至主 vN/ 流水线，含重新编号和质量检查"
 user_invocable: true
 ---
 

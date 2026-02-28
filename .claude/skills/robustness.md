@@ -1,5 +1,5 @@
 ---
-description: "对回归结果运行全面的稳健性检验套件"
+description: "对基准回归结果运行稳健性检验套件——替代规范、子样本、聚类、Oster 界、野蛮聚类自助法"
 user_invocable: true
 ---
 

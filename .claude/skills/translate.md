@@ -18,9 +18,65 @@ user_invocable: true
 3. **格式**（可选）— `LaTeX`（默认）或 `Word`
 4. **待翻译文本**（必填）— 源文本
 
-## 步骤 2：CN→EN 模式（中译英）
+## 步骤 2：经济学术语与期刊风格
 
-你是顶尖科研写作专家，同时也是顶级经济学期刊（AER、QJE、JPE、Econometrica、REStud）的资深审稿人。
+在所有翻译中一致使用以下术语：
+
+| 英文 | 中文 |
+|---|---|
+| Difference-in-Differences (DID) | 双重差分 |
+| Instrumental Variables (IV) | 工具变量 |
+| Regression Discontinuity Design (RDD) | 断点回归设计 |
+| Two-Stage Least Squares (2SLS) | 两阶段最小二乘法 |
+| Fixed Effects (FE) | 固定效应 |
+| Random Effects (RE) | 随机效应 |
+| Generalized Method of Moments (GMM) | 广义矩估计 |
+| Propensity Score Matching (PSM) | 倾向得分匹配 |
+| Synthetic Control Method (SCM) | 合成控制法 |
+| Synthetic DID (SDID) | 合成双重差分 |
+| LASSO | LASSO（最小绝对收缩和选择算子） |
+| Treatment effect | 处理效应 |
+| Average Treatment Effect (ATE) | 平均处理效应 |
+| Average Treatment Effect on the Treated (ATT) | 处理组平均处理效应 |
+| Local Average Treatment Effect (LATE) | 局部平均处理效应 |
+| Intention-to-Treat (ITT) | 意向处理效应 |
+| Parallel trends assumption | 平行趋势假设 |
+| Event study | 事件研究 |
+| Robustness check | 稳健性检验 |
+| Heterogeneity analysis | 异质性分析 |
+| Mechanism analysis | 机制分析 |
+| Endogeneity | 内生性 |
+| Exogenous variation | 外生变异 |
+| Identification strategy | 识别策略 |
+| Causal inference | 因果推断 |
+| Standard errors clustered at... | 在...层面聚类的标准误 |
+| First stage | 第一阶段 |
+| Reduced form | 简约式 |
+| Exclusion restriction | 排他性约束 |
+| Selection bias | 选择偏差 |
+| Omitted variable bias | 遗漏变量偏差 |
+| Placebo test | 安慰剂检验 |
+| Wild cluster bootstrap | 野蛮聚类自助法 |
+
+如果论文始终使用某一替代术语，以论文的用法为准。
+
+根据目标期刊调整语调和行文规范：
+
+**英文期刊：**
+- **AER**：简洁直接；主动语态；面向广泛读者
+- **QJE**：行文生动；尽早强调宏观贡献
+- **JPE**：平衡正式度；表述清晰
+- **Econometrica**：正式、数学化；精确符号
+- **REStud**：技术性但可读；逻辑结构清晰
+
+**中文期刊：**
+- **经济研究**：正式学术中文；全篇使用"本文"；方法论严谨
+- **管理世界**：政策导向；强调实践意义
+- **经济学季刊**：方法论导向；技术深度
+
+## 步骤 3：CN→EN 模式（中译英）
+
+**方法：** 以顶级经济学期刊资深审稿人的标准进行翻译。
 
 ### LaTeX 感知
 
@@ -61,18 +117,17 @@ user_invocable: true
 
 ### 自我审查协议
 
-翻译完成后，以审稿人视角检查：
+翻译完成后，验证：
+- [ ] 英文自然流畅，符合经济学期刊表达习惯
+- [ ] 术语翻译正确且与术语表一致
+- [ ] 翻译未引入歧义
+- [ ] 逻辑连贯流畅
 
-1. 英文是否自然，是否符合经济学期刊的表达习惯？
-2. 术语翻译是否正确且一致？
-3. 翻译是否引入了歧义？
-4. 英文阅读的逻辑流畅度如何？
+如发现问题，修订并在 Part 2 中注明修改。
 
-如发现问题，修订翻译并在 Part 2 中注明修改。
+## 步骤 4：EN→CN 模式（英译中）
 
-## 步骤 3：EN→CN 模式（英译中）
-
-你是资深经济学学术翻译，擅长将顶级期刊论文译为中文。
+**方法：** 以专业学术翻译的严格直译标准进行翻译。
 
 ### LaTeX 清洗
 
@@ -98,62 +153,6 @@ user_invocable: true
 
 [翻译后的中文文本——纯文本段落，不含 LaTeX]
 ```
-
-## 步骤 4：经济学术语表
-
-在所有翻译中一致使用以下术语：
-
-| 英文 | 中文 |
-|---|---|
-| Difference-in-Differences (DID) | 双重差分 |
-| Instrumental Variables (IV) | 工具变量 |
-| Regression Discontinuity Design (RDD) | 断点回归设计 |
-| Two-Stage Least Squares (2SLS) | 两阶段最小二乘法 |
-| Fixed Effects (FE) | 固定效应 |
-| Random Effects (RE) | 随机效应 |
-| Generalized Method of Moments (GMM) | 广义矩估计 |
-| Propensity Score Matching (PSM) | 倾向得分匹配 |
-| Synthetic Control Method (SCM) | 合成控制法 |
-| Synthetic DID (SDID) | 合成双重差分 |
-| LASSO | LASSO（最小绝对收缩和选择算子） |
-| Treatment effect | 处理效应 |
-| Average Treatment Effect (ATE) | 平均处理效应 |
-| Average Treatment Effect on the Treated (ATT) | 处理组平均处理效应 |
-| Local Average Treatment Effect (LATE) | 局部平均处理效应 |
-| Intention-to-Treat (ITT) | 意向处理效应 |
-| Parallel trends assumption | 平行趋势假设 |
-| Event study | 事件研究 |
-| Robustness check | 稳健性检验 |
-| Heterogeneity analysis | 异质性分析 |
-| Mechanism analysis | 机制分析 |
-| Endogeneity | 内生性 |
-| Exogenous variation | 外生变异 |
-| Identification strategy | 识别策略 |
-| Causal inference | 因果推断 |
-| Standard errors clustered at... | 在...层面聚类的标准误 |
-| First stage | 第一阶段 |
-| Reduced form | 简约式 |
-| Exclusion restriction | 排他性约束 |
-| Selection bias | 选择偏差 |
-| Omitted variable bias | 遗漏变量偏差 |
-| Placebo test | 安慰剂检验 |
-| Wild cluster bootstrap | 野蛮聚类自助法 |
-
-## 步骤 5：期刊风格适配
-
-根据目标期刊调整语调和行文规范：
-
-**英文期刊：**
-- **AER**：简洁直接；主动语态；面向广泛读者
-- **QJE**：行文生动；尽早强调宏观贡献
-- **JPE**：平衡正式度；表述清晰
-- **Econometrica**：正式、数学化；精确符号
-- **REStud**：技术性但可读；逻辑结构清晰
-
-**中文期刊：**
-- **经济研究**：正式学术中文；全篇使用"本文"；方法论严谨
-- **管理世界**：政策导向；强调实践意义
-- **经济学季刊**：方法论导向；技术深度
 
 ---
 

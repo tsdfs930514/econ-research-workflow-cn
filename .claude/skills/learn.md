@@ -94,6 +94,7 @@ user_invocable: true
 
 ```markdown
 ---
+description: "{一句话描述}"
 user_invocable: true
 ---
 

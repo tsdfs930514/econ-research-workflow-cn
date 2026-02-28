@@ -122,7 +122,7 @@ claude
 | `/run-logit-probit` | Logit/Probit、倾向得分、处理效应（RA/IPW/AIPW）和条件 Logit |
 | `/run-lasso` | LASSO、双重选择后推断、严格 LASSO 和 R `glmnet` 匹配管道 |
 | `/cross-check` | Stata vs Python/R 回归结果交叉验证（目标：系数差异 < 0.1%） |
-| `/robustness` | 回归结果的综合稳健性检验套件 |
+| `/robustness` | 对基准回归结果运行稳健性检验套件——替代规范、子样本、聚类、Oster 界、野蛮聚类自助法 |
 | `/make-table` | 生成发表质量的 LaTeX 回归表格（AER 格式或三线表） |
 | `/write-section` | 按期刊规范撰写论文章节（支持中英文） |
 | `/review-paper` | 模拟三位匿名审稿人的结构化反馈；可选 APE 式多轮深度评审 |
@@ -132,8 +132,8 @@ claude
 | `/commit` | 智能 Git 提交，含类型前缀和数据安全警告 |
 | `/compile-latex` | 运行 pdflatex/bibtex 编译管道并检查错误 |
 | `/context-status` | 显示当前版本、近期决策、质量评分和 Git 状态 |
-| `/explore` | 设置探索沙盒，使用宽松质量阈值（≥ 60） |
-| `/promote` | 将探索性结果提升至正式 `vN/` 管道，含质量检查 |
+| `/explore` | 设置探索沙盒，放宽质量阈值（≥ 60），用于快速假设检验和替代规范探索 |
+| `/promote` | 将 `explore/` 沙盒中的探索性文件提升至正式 `vN/` 管道，含重新编号和质量检查 |
 | `/session-log` | 会话启动/结束管理，加载上下文并记录决策和学习 |
 | `/interview-me` | 苏格拉底式研究访谈 — 将模糊想法结构化为研究提案 |
 | `/devils-advocate` | 识别策略威胁评估 — 预分析阶段的魔鬼代言人 |
@@ -244,7 +244,7 @@ econ-research-workflow-cn/
 ├── tests/                # 测试用例（DID、RDD、IV、面板、完整管道）
 ├── CLAUDE.md             # 项目配置（填写占位符）
 ├── MEMORY.md             # 跨会话学习和决策日志
-├── ROADMAP.md            # Phase 1-6 实现历史
+├── ROADMAP.md            # Phase 1-7 实现历史
 └── README.md             # 本文件
 ```
 
@@ -357,6 +357,8 @@ Stata 执行通过 `.claude/scripts/run-stata.sh` 包装，并在 `permissions.a
 | 2026-02-26 | v0.10 | 一致性审计 — 修复 31 个文档/正则/YAML/交叉引用问题 |
 | 2026-02-27 | v0.11 | Phase 6 — 管道编排、综合报告、遗留代理重连、评分持久化 |
 | 2026-02-27 | v0.12-cn | 中文版发布 — 所有技能提示词、代理描述、规则和文档中文化 |
+| 2026-02-27 | v0.13-cn | 新增写作工具 — `/translate`、`/polish`、`/de-ai`、`/logic-check` |
+| 2026-02-28 | v0.14-cn | 技能审计 — 按 skill-creator 最佳实践更新 8 个技能：移除角色扮演语句、增加模式指南、误报提示、改进描述 |
 
 ---
 

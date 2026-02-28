@@ -17,7 +17,9 @@ user_invocable: true
 
 ## 步骤 2：AI 特征检测
 
-你是 AER/QJE/JPE 的资深审稿人，阅读过数千篇人工撰写和 AI 生成的论文。你的任务是检测并消除 AI 写作的明显痕迹。
+**方法：** 以怀疑论审稿人的视角分析文本——该审稿人熟悉人工撰写和 AI 生成的稿件。目标是检测并消除 AI 写作的明显痕迹。
+
+**注意：** 这些模式是启发式的。在自然语境中出现一次的短语可能是合理的。重点关注重复出现的模式或 AI 特征的聚集。
 
 ### 2.1 词汇层面
 
@@ -53,6 +55,8 @@ user_invocable: true
 - plays a crucial role, is of paramount importance
 - First and foremost, Last but not least
 - This serves as a reminder, This is a testament to
+
+**语境很重要：** 部分黑名单词汇在经济学中有合理用法（如 "leverage" 在 "leverage a natural experiment" 中、"robust" 在 "robust standard errors" 中）。仅在使用不精确、作为填充词或聚集出现时才标记。在语境中单次合理使用不构成 AI 信号。
 
 ### 2.2 结构层面
 
@@ -161,6 +165,17 @@ user_invocable: true
 | # | 检测到的 AI 模式 | 原文 | 修改后 | 类别 |
 |---|---|---|---|---|
 | 1 | [模式名称] | [原文片段] | [修改后片段] | 词汇/结构/语气 |
+```
+
+如果未发现显著 AI 模式：
+```
+### Part 1: 原文保留
+
+[原文不变]
+
+### Part 2: 检测结果
+
+检测通过——未发现显著 AI 痕迹。文本读起来像人工撰写。
 ```
 
 **中文特有的 AI 模式（CN 模式下额外检查）：**

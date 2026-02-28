@@ -133,7 +133,7 @@ vN/
 | `/run-panel` | 运行完整的面板数据 FE/RE/GMM 分析流水线 |
 | `/run-sdid` | 运行合成 DID 分析，包括单位/时间权重与推断 |
 | `/cross-check` | Stata、Python pyfixest、R fixest 之间的回归结果交叉验证 |
-| `/robustness` | 对回归结果运行全面的稳健性检验套件 |
+| `/robustness` | 对基准回归结果运行稳健性检验套件——替代规范、子样本、聚类、Oster 界、野蛮聚类自助法 |
 | `/make-table` | 生成可发表的 LaTeX 回归表格 |
 | `/write-section` | 撰写论文特定章节（中文或英文） |
 | `/review-paper` | 模拟三位审稿人给出结构化反馈；可选 APE 风格多轮深度评审 |
@@ -143,8 +143,8 @@ vN/
 | `/commit` | 智能 git commit，带类型前缀和数据安全警告 |
 | `/compile-latex` | 使用 pdflatex/bibtex 编译 LaTeX 论文并检查错误 |
 | `/context-status` | 显示当前版本、近期决策、质量评分、git 状态 |
-| `/explore` | 设置探索沙盒，放宽质量阈值（>= 60） |
-| `/promote` | 将探索性文件提升至主流水线，含重新编号和质量检查 |
+| `/explore` | 设置探索沙盒，放宽质量阈值（>= 60），用于快速假设检验和替代规范探索 |
+| `/promote` | 将 explore/ 沙盒中的探索性文件提升至主 vN/ 流水线，含重新编号和质量检查 |
 | `/session-log` | 会话启动/结束管理器——加载上下文、记录决策和经验 |
 | `/interview-me` | 双语苏格拉底式研究访谈——将想法形式化为结构化提案 |
 | `/devils-advocate` | 预分析识别策略挑战者——威胁评估，不涉及代码修复 |
