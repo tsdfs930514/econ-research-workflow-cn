@@ -164,27 +164,53 @@ vN/
 
 ## 钩子 (Hooks)
 
-`.claude/settings.json` 中配置了 3 个生命周期钩子：
+`.claude/settings.json` 中配置了 4 个生命周期钩子：
 
 | 钩子 | 事件 | 动作 |
 |------|-------|--------|
 | 会话启动加载器 | `SessionStart` | 读取 MEMORY.md，显示近期条目、上次会话和最新质量评分 |
 | 压缩前保存 | `PreCompact` | 提示 Claude 在上下文压缩前将会话摘要追加到 MEMORY.md |
 | Stata 运行后日志检查 | `PostToolUse` (Bash) | Stata 执行后解析 `.log` 文件中的 `r(xxx)` 错误 |
+| 原始数据守卫 | `PostToolUse` (Bash) | 比对 `data/raw/` 文件快照，检测未授权修改（捕获 Python/R 脚本绕过） |
 
 钩子脚本位于 `.claude/hooks/`：
 - `session-loader.py` — 会话启动上下文加载器
 - `stata-log-check.py` — Stata 错误自动检测
+- `raw-data-guard.py` — data/raw 完整性监控（防御层 2）
 
 ### 始终加载的规则
 
-3 条始终加载的规则（每次会话均加载，不限路径作用域）：
+4 条始终加载的规则（每次会话均加载，不限路径作用域）：
 
 | 规则 | 用途 |
 |------|---------|
 | `constitution.md` | 5 条不可变基本准则，约束所有工作流组件 |
 | `orchestrator-protocol.md` | 规格-计划-实施-验证-评审-修复-评分 任务循环 |
 | `stata-error-verification.md` | Stata 脚本重新运行前必须读取钩子输出 |
+| `bash-conventions.md` | 禁止链式命令（`&&`、`||`、`;`）；使用独立工具调用和绝对路径 |
+
+### 权限与安全
+
+权限系统采用**全量放行 + 拒绝清单**模型，配置在 `.claude/settings.json` 中：
+
+**Allow**：`Read`、`Edit`、`Write`、`Bash` — 所有工具自动批准，无弹框。
+
+**Deny**（3 类）：
+
+| 类别 | 规则 | 用途 |
+|------|------|------|
+| 原始数据保护 | `Edit/Write(data/raw/**)`、`Bash(*rm/mv/cd*data/raw*)` | 基本准则第 1 条 |
+| 破坏性操作 | `Bash(*rm -rf /*)`, `Bash(*git push*--force*)`, `Bash(*git reset --hard*)` | 防止不可逆损害 |
+| 凭证与基础设施 | `Read/Edit/Write(*.env)`、`Read/Edit/Write(*.credentials*)`、`Edit/Write(.claude/hooks/**)`、`Edit/Write(.claude/scripts/**)`、`Edit/Write(.claude/settings.json)` | 保护密钥和工作流基础设施 |
+
+**纵深防御架构**：
+
+| 层级 | 机制 | 捕获范围 |
+|------|------|---------|
+| 1 | `deny` 规则 | Claude 工具层的误操作（字符串匹配） |
+| 2 | `raw-data-guard.py` 钩子 | Python/R 脚本通过 OS 调用修改 `data/raw/` |
+| 3 | `attrib +R`（OS 级） | 所有途径——需在每个项目上手动设置 |
+| 4 | 基本准则 + 规则 | 行为约束（Claude 应遵循，非强制） |
 
 ---
 

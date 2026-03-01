@@ -317,27 +317,41 @@ econ-research-workflow-cn/
 
 ## 钩子
 
-3 个生命周期钩子配置在 `.claude/settings.json` 中：
+4 个生命周期钩子配置在 `.claude/settings.json` 中：
 
 | 钩子 | 触发事件 | 功能 |
 |------|----------|------|
 | 会话启动加载器 | `SessionStart` | 读取 MEMORY.md，显示近期条目和上次质量评分 |
 | 压缩前保存 | `PreCompact` | 提示在上下文压缩前将会话摘要追加到 MEMORY.md |
 | Stata 日志检查 | `PostToolUse`（Bash） | Stata 运行后自动解析 `.log` 文件中的 `r(xxx)` 错误 |
+| 原始数据守卫 | `PostToolUse`（Bash） | 比对 `data/raw/` 文件快照，检测未授权修改 |
 
 ### 常驻规则
 
-3 条常驻规则（无路径限定，每次会话均加载）：
+4 条常驻规则（无路径限定，每次会话均加载）：
 
 | 规则 | 用途 |
 |------|------|
 | `constitution.md` | 5 条不可变原则（原始数据完整性、可复现性、交叉验证、版本保存、评分诚信） |
 | `orchestrator-protocol.md` | Spec-Plan-Implement-Verify-Review-Fix-Score-Report 任务循环 |
 | `stata-error-verification.md` | 强制在重新运行 Stata 前读取钩子输出，防止日志覆盖导致的误判 |
+| `bash-conventions.md` | 禁止链式命令（`&&`、`||`、`;`）；使用独立工具调用和绝对路径 |
 
-### 自动批准
+### 权限与安全
 
-Stata 执行通过 `.claude/scripts/run-stata.sh` 包装，并在 `permissions.allow` 中配置 `Bash(bash *run-stata.sh *)` 自动批准模式，无需每次手动确认。
+权限系统采用**全量放行 + 拒绝清单**模型：
+
+- **Allow**：`Read`、`Edit`、`Write`、`Bash` — 所有工具自动批准，零弹框。
+- **Deny**：35 条规则覆盖 3 类场景——原始数据保护（基本准则第 1 条）、破坏性操作（`rm -rf`、`git push --force`、`git reset --hard`）、凭证与基础设施保护（`.env`、`.credentials`、`.claude/hooks/**`、`.claude/scripts/**`、`.claude/settings.json`）。
+
+纵深防御：
+
+| 层级 | 机制 | 范围 |
+|------|------|------|
+| 1 | settings.json 中的 `deny` 规则 | 工具层字符串匹配（防止常见误操作） |
+| 2 | `raw-data-guard.py` PostToolUse 钩子 | Bash 执行后检测 `data/raw/` 变动（捕获 Python/R 脚本绕过） |
+| 3 | OS 级 `attrib +R` 保护 `data/raw/` | 文件系统强制只读（需手动设置） |
+| 4 | 基本准则 + 行为规则 | Claude 自主遵循约束 |
 
 ---
 
@@ -359,6 +373,7 @@ Stata 执行通过 `.claude/scripts/run-stata.sh` 包装，并在 `permissions.a
 | 2026-02-27 | v0.12-cn | 中文版发布 — 所有技能提示词、代理描述、规则和文档中文化 |
 | 2026-02-27 | v0.13-cn | 新增写作工具 — `/translate`、`/polish`、`/de-ai`、`/logic-check` |
 | 2026-02-28 | v0.14-cn | 技能审计 — 按 skill-creator 最佳实践更新 8 个技能：移除角色扮演语句、增加模式指南、误报提示、改进描述 |
+| 2026-03-01 | v0.15-cn | 安全加固 — 全量放行 + 拒绝清单权限模型、`raw-data-guard.py` 钩子、`bash-conventions.md` 规则（禁止链式命令）、35 条 deny 规则、4 层纵深防御、凭证/基础设施保护 |
 
 ---
 

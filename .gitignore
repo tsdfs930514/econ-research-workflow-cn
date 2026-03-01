@@ -40,3 +40,6 @@ personal-memory.md
 .env
 *.credentials
 *.secret
+
+# Runtime-generated hook state (not shared)
+.claude/.raw-data-snapshot.json

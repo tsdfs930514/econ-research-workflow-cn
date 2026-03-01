@@ -1,7 +1,47 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bash *run-stata.sh *)"
+      "Read",
+      "Edit",
+      "Write",
+      "Bash"
+    ],
+    "deny": [
+      "Edit(data/raw/**)",
+      "Edit(**/data/raw/**)",
+      "Write(data/raw/**)",
+      "Write(**/data/raw/**)",
+      "Bash(*rm *data/raw*)",
+      "Bash(*mv *data/raw*)",
+      "Bash(*>*data/raw*)",
+      "Bash(*cd*data/raw*&&*rm*)",
+      "Bash(*cd*data/raw*&&*del*)",
+      "Bash(*cd*data/raw*;*rm*)",
+      "Bash(*rm -rf /)",
+      "Bash(*rm -rf /*)",
+      "Bash(*git push*--force*)",
+      "Bash(*git push*-f *)",
+      "Bash(*git reset --hard*)",
+      "Bash(*git clean*-f*)",
+      "Bash(*curl*|*sh*)",
+      "Bash(*curl*|*bash*)",
+      "Bash(*wget*|*sh*)",
+      "Bash(*wget*|*bash*)",
+      "Read(*.env)",
+      "Read(.env.*)",
+      "Edit(*.env)",
+      "Edit(.env.*)",
+      "Write(*.env)",
+      "Write(.env.*)",
+      "Read(*.credentials*)",
+      "Edit(*.credentials*)",
+      "Write(*.credentials*)",
+      "Edit(.claude/hooks/**)",
+      "Write(.claude/hooks/**)",
+      "Edit(.claude/scripts/**)",
+      "Write(.claude/scripts/**)",
+      "Edit(.claude/settings.json)",
+      "Write(.claude/settings.json)"
     ]
   },
   "hooks": {
@@ -35,6 +75,11 @@
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/stata-log-check.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/raw-data-guard.py\"",
             "timeout": 10
           }
         ]

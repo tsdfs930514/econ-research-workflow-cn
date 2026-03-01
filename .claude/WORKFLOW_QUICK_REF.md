@@ -152,6 +152,20 @@
 
 "直接执行"模式：平凡任务（<= 2 个文件、评分 >= 80、无严重发现）跳过多轮循环。
 
+### 权限与安全
+
+**模型**：全量放行 + 拒绝清单。`Read`/`Edit`/`Write`/`Bash` 全部自动批准。
+
+**Deny 规则**（35 条）：`data/raw/**`（Edit/Write/Bash）、破坏性 git、`rm -rf`、`*.env`、`*.credentials*`、`.claude/hooks/**`、`.claude/scripts/**`、`.claude/settings.json`。
+
+**防御层级**：
+1. `deny` 规则 → 工具层字符串匹配
+2. `raw-data-guard.py` → PostToolUse 快照比对 `data/raw/`
+3. `attrib +R` → OS 级保护（需手动设置）
+4. 基本准则 + `bash-conventions.md` → 行为约束
+
+**Bash 规则**：禁止 `&&`/`||`/`;` 串联。使用独立工具调用。使用绝对路径。禁止 `2>/dev/null`。
+
 ---
 
 ## 质量评分
