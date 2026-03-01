@@ -193,9 +193,15 @@ vN/
 
 权限系统采用**全量放行 + 拒绝清单**模型，配置在 `.claude/settings.json` 中：
 
-**Allow**：`Read`、`Edit`、`Write`、`Bash` — 所有工具自动批准，无弹框。
+**Allow**（在 `settings.local.json` 中配置，已 gitignore，属个人设置）：
 
-**Deny**（3 类）：
+默认情况下，fork 的仓库每次操作都会弹框确认。如需跳过弹框，复制模板：
+```
+cp .claude/settings.local.json.example .claude/settings.local.json
+```
+这会在本地将 `Read`、`Edit`、`Write`、`Bash` 加入 allow 列表。
+
+**Deny**（在 `settings.json` 中配置，已提交 git，所有人共享 — 3 类）：
 
 | 类别 | 规则 | 用途 |
 |------|------|------|

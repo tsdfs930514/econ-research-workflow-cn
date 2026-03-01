@@ -41,5 +41,8 @@ personal-memory.md
 *.credentials
 *.secret
 
+# Local permission overrides (personal, not shared)
+.claude/settings.local.json
+
 # Runtime-generated hook state (not shared)
 .claude/.raw-data-snapshot.json

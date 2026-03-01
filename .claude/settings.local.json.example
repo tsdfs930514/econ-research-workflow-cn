@@ -1,0 +1,11 @@
+{
+  "_comment": "将此文件复制为 settings.local.json 以跳过权限弹框。此文件已 gitignore，你的本地配置不会被共享。",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash"
+    ]
+  }
+}

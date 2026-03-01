@@ -154,7 +154,8 @@
 
 ### 权限与安全
 
-**模型**：全量放行 + 拒绝清单。`Read`/`Edit`/`Write`/`Bash` 全部自动批准。
+**模型**：拒绝清单（共享）+ 可选全量放行（个人）。
+跳过弹框：`cp .claude/settings.local.json.example .claude/settings.local.json`
 
 **Deny 规则**（35 条）：`data/raw/**`（Edit/Write/Bash）、破坏性 git、`rm -rf`、`*.env`、`*.credentials*`、`.claude/hooks/**`、`.claude/scripts/**`、`.claude/settings.json`。
 

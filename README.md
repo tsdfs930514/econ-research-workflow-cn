@@ -341,8 +341,8 @@ econ-research-workflow-cn/
 
 权限系统采用**全量放行 + 拒绝清单**模型：
 
-- **Allow**：`Read`、`Edit`、`Write`、`Bash` — 所有工具自动批准，零弹框。
-- **Deny**：35 条规则覆盖 3 类场景——原始数据保护（基本准则第 1 条）、破坏性操作（`rm -rf`、`git push --force`、`git reset --hard`）、凭证与基础设施保护（`.env`、`.credentials`、`.claude/hooks/**`、`.claude/scripts/**`、`.claude/settings.json`）。
+- **Deny**（共享，在 `settings.json` 中）：35 条规则覆盖 3 类场景——原始数据保护（基本准则第 1 条）、破坏性操作（`rm -rf`、`git push --force`、`git reset --hard`）、凭证与基础设施保护（`.env`、`.credentials`、`.claude/hooks/**`、`.claude/scripts/**`、`.claude/settings.json`）。
+- **Allow**（个人，在 `settings.local.json` 中，已 gitignore）：默认 fork 后每次操作都弹框。如需跳过：`cp .claude/settings.local.json.example .claude/settings.local.json`。
 
 纵深防御：
 
