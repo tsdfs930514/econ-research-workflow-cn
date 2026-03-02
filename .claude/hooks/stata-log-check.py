@@ -32,11 +32,11 @@ def main():
     if "StataMP" not in command and ".do" not in command and "run-stata" not in command:
         return
 
-    # Find the most recent .log file in the current working directory
-    log_files = glob.glob("*.log")
+    # 优先查找 output/logs/（正式日志位置）
+    log_files = glob.glob("output/logs/*.log")
     if not log_files:
-        # Also check output/logs/
-        log_files = glob.glob("output/logs/*.log")
+        # 备选：检查项目根目录（Stata -e 模式副产物）
+        log_files = glob.glob("*.log")
 
     if not log_files:
         print("[Stata 日志检查] 当前目录和 output/logs/ 中均未找到 .log 文件。")

@@ -22,11 +22,11 @@ cd "$PROJECT_DIR"
 
 # --- 内联日志检查（替代封装脚本调用的 PostToolUse 钩子）---
 DO_BASENAME=$(basename "$DO_FILE" .do)
-LOG_FILE="${DO_BASENAME}.log"
+LOG_FILE="output/logs/${DO_BASENAME}.log"
 
 if [ ! -f "$LOG_FILE" ]; then
-    # 备选：检查 output/logs/
-    LOG_FILE="output/logs/${DO_BASENAME}.log"
+    # 备选：检查项目根目录（Stata -e 模式副产物）
+    LOG_FILE="${DO_BASENAME}.log"
 fi
 
 if [ -f "$LOG_FILE" ]; then
@@ -41,3 +41,6 @@ if [ -f "$LOG_FILE" ]; then
 else
     echo "[Stata 日志检查] 警告: 未找到 $DO_FILE 对应的 .log 文件"
 fi
+
+# 清理 Stata -e 模式在项目根目录产生的重复 .log
+rm -f "${DO_BASENAME}.log"
