@@ -56,8 +56,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "在上下文压缩之前，请在 MEMORY.md 的 Session Log 部分追加一条简要会话摘要。格式：`| YYYY-MM-DD | 摘要 |`。包含关键决策、发现的问题以及当前质量评分（如已知）。"
+            "type": "command",
+            "command": "echo \"[PreCompact] 在上下文压缩前将会话摘要追加到 MEMORY.md 的 Session Log 部分。格式: | YYYY-MM-DD | 摘要 |。包含关键决策、发现的问题及当前质量评分。\"",
+            "timeout": 10
           }
         ]
       }

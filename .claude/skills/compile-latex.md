@@ -16,7 +16,14 @@ user_invocable: true
 
 ## 步骤 2：编译
 
-从包含 .tex 文件的目录运行标准 4 遍编译：
+**必须运行完整的 4 遍编译。** 跳过任何一遍都会产生错误输出：
+
+| 遍次 | 用途 | 跳过后的后果 |
+|------|------|------------|
+| 1. `pdflatex` | 初始编译，写入 `.aux`（含 `\citation` 和 `\label` 信息） | 无 PDF 输出 |
+| 2. `bibtex` | 读取 `.aux`，从 `.bib` 解析 `\cite{}`，写入 `.bbl` | 所有 `\cite{}` 显示 "?" |
+| 3. `pdflatex` | 嵌入 `.bbl` 参考文献，更新交叉引用 | 引用仍为 "?"，部分 `\ref{}` 仍为 "??" |
+| 4. `pdflatex` | 解析前向引用和页码 | 部分 `\ref{}` 和页码错误 |
 
 ```bash
 cd /path/to/paper/directory
@@ -27,6 +34,8 @@ pdflatex -interaction=nonstopmode main.tex
 ```
 
 使用 `-interaction=nonstopmode` 使编译在遇到错误时继续（以便收集所有问题）。
+
+**绝对不要只运行一遍 pdflatex。** 即使没有引用，第二遍和第三遍仍需运行以解析 `\ref{}`、`\pageref{}`、表格/图表编号和目录条目。如果 bibtex 报告 "I found no \citation commands"，剩余的 pdflatex 遍次仍必须执行。
 
 ## 步骤 3：检查错误
 

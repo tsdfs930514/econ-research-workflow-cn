@@ -82,6 +82,7 @@ vN/
   - `polars` -- 高性能 DataFrame 库
   - `matplotlib` -- 绑图与可视化
   - `stargazer` -- 回归表格格式化
+  - `csmarapi` -- CSMAR（国泰安）数据库 API 客户端
 
 - **回归交叉验证 (Cross-Validation)**：
   使用 `pyfixest` 的 `feols()` 对 Stata 回归结果进行交叉验证：
@@ -90,6 +91,16 @@ vN/
   result = pf.feols("y ~ x1 + x2 | fe1 + fe2", data=df)
   result.summary()
   ```
+
+- **CSMAR 数据获取**：
+  使用 `csmarapi` 从 CSMAR（国泰安）获取中国股票市场与会计数据：
+  ```python
+  from csmarapi import CsmarService
+  csmar = CsmarService()
+  csmar.login(account, password)
+  df = csmar.query(tableName="TRD_Dalyr", columns="Stkcd,Trddt,Dretwd", condition="Stkcd = '000001'")
+  ```
+  完整流程请参见 `/fetch-csmar`（含自动分页、数据来源追踪和标准化文件命名）。
 
 ---
 
@@ -158,6 +169,7 @@ vN/
 | `/translate` | 中英文经济学论文互译，支持期刊风格适配 |
 | `/polish` | 学术论文润色——英文/中文润色、精炼重写、缩写、扩写（5 种子模式） |
 | `/de-ai` | 检测并消除 AI 生成痕迹，使文本更接近人类研究者写作风格 |
+| `/fetch-csmar` | 浏览 CSMAR 数据库并通过 Python API 获取中国股票市场与会计数据 |
 | `/logic-check` | 论文终稿红线审查——仅捕捉致命错误，不涉及风格偏好 |
 
 ---

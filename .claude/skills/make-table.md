@@ -181,6 +181,94 @@ esttab m1 m2 m3 m4 m5 using "output/tables/tab_<name>.tex", ///
     substitute(\_ _)
 ```
 
+### esttab → LaTeX 兼容性规则
+
+生成 .tex 表格时**必须**遵循以下规则。这些规则防止常见编译错误，确保表格可直接通过 `pdflatex` 编译，无需手动后编辑（手动修改违反可复现性原则）。
+
+**规则 1：必须包含 `\label{}` — 使用 `fragment` 模式和手动包装器**
+
+`esttab` 的 `title()` 生成 `\caption{}` 但**不生成** `\label{}`，导致所有 `\ref{tab:xxx}` 显示为 "??"。使用 `prehead`/`postfoot` 配合 `fragment` 获得完全控制：
+
+```stata
+esttab m1 m2 m3 m4 using "output/tables/tab_main.tex", ///
+    se(4) b(4) star(* 0.10 ** 0.05 *** 0.01) ///
+    label nomtitles booktabs replace fragment ///
+    keep(<key variable>) ///
+    mgroups("OLS" "2SLS", pattern(1 0 1 0) ///
+        prefix(\multicolumn{@span}{c}{) suffix(}) span ///
+        erepeat(\cmidrule(lr){@span})) ///
+    scalars("N_clust Clusters" "r2_a Adj.\ $R^{2}$") ///
+    prehead("\begin{table}[htbp]" "\centering" ///
+            "\caption{处理效应对结果变量的影响}" ///
+            "\label{tab:main}" ///
+            "\begin{threeparttable}" ///
+            "\begin{tabular}{l*{4}{c}}" ///
+            "\toprule") ///
+    postfoot("\bottomrule" "\end{tabular}" ///
+             "\begin{tablenotes}[flushleft]" "\small" ///
+             "\item 注：括号内为企业层面聚类稳健标准误。" ///
+             "***、**、*分别表示在1\%、5\%、10\%水平上显著。" ///
+             "\end{tablenotes}" ///
+             "\end{threeparttable}" "\end{table}") ///
+    substitute(\_ _)
+```
+
+`fragment` 选项抑制 esttab 默认的 `\begin{table}` 包装——我们通过 `prehead`/`postfoot` 自行提供，同时嵌入 `\label{}` 和 `threeparttable`。
+
+**规则 2：避免重复列标题——禁止同时使用 `label` 和 `mtitles()`**
+
+`label` 和 `mtitles()` 都会生成标题行。同时使用会产生两行相同的列编号。只使用以下之一：
+- `nomtitles` + `mgroups(...)` — 分组标题配合 `\cmidrule`（推荐，适用于多规范表格）
+- `mtitles("OLS" "2SLS" ...) nolabel` — 显式标题，不使用变量标签
+- `label nomtitles` — 变量标签作为列标题，无模型标题行
+
+**规则 3：R² 必须使用数学模式——禁止 `\textsuperscript`**
+
+`\textsuperscript{2}` 与 tabular 列对齐宏冲突，产生 `Missing number, treated as zero` 错误。必须使用数学模式：
+- `R$^{2}$` 或 `Adj.\ $R^{2}$` 或 `Within $R^{2}$`
+- **禁止**: `R\textsuperscript{2}`、`Adj. R\textsuperscript{2}`
+
+在 `scalars()` 标签中：
+```stata
+scalars("r2_a Adj.\ $R^{2}$" "r2_within Within $R^{2}$" "r2 $R^{2}$")
+```
+
+**规则 4：正确转义下划线——注意 `addnotes()` 和 `substitute()` 的交互**
+
+`substitute(\_ _)` 处理**变量名**中的下划线，但可能在 `addnotes()` 文本中造成双重转义，产生 `\\_`，LaTeX 将其解释为换行+下划线，引发连锁错误。规则：
+- 在 `addnotes()` 中：下划线写 `\_`（单反斜杠），不要依赖变量名自动转义
+- 数学符号用数学模式：`$\sum$` 而非 `sum\_`，`$\bar{X}$` 而非 `\overline{X}`
+- 变量引用用 `\texttt{varname}`（无下划线）或 `\textit{var\_name}`（显式单转义）
+- 使用 `fragment` 模式 + `postfoot` 写注释时（规则 1 模式），注释中的下划线不受 `substitute()` 影响——正常写 `\_` 即可
+- **验证**：生成 .tex 后检查是否出现 `\\_`（双反斜杠-下划线），出现即为 bug
+
+**规则 5：Python 生成的表格必须用 `threeparttable` 包裹 `tablenotes`**
+
+`tablenotes` 环境要求 `threeparttable` 作为父环境。从 Python 生成 LaTeX 表格时（pandas `.to_latex()`、手动构建字符串等），必须同时包含：
+
+```python
+table_tex = r"""
+\begin{table}[htbp]
+\centering
+\caption{描述性统计}
+\label{tab:summary}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+...
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\small
+\item 注：...
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+"""
+```
+
+如果使用 `pandas.to_latex()`，它只生成 `tabular` 环境。必须手动添加 `table`、`caption`、`label` 和 `threeparttable` 包装。
+
 ## 步骤 4：按表格类型的特定格式
 
 ### 主回归表 (`main`)
