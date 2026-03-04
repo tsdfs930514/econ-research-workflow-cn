@@ -25,9 +25,10 @@ user_invocable: true
 
 ```
 <project-name>/
+  data/
+    raw/            # 原始数据文件（只读，禁止修改，跨版本共享）
   v1/
     data/
-      raw/          # 原始数据文件（只读，禁止修改）
       clean/        # 清洗后的数据集
       temp/         # 中间临时文件
     code/
@@ -77,7 +78,7 @@ set seed 12345
 * --- 设置路径 ---
 global root     "."
 global data     "$root/data"
-global raw      "$data/raw"
+global raw      "../data/raw"
 global clean    "$data/clean"
 global temp     "$data/temp"
 global code     "$root/code/stata"
@@ -166,8 +167,9 @@ di "=== Master script complete ==="
 - **当前版本**: v1
 
 ## 目录规范
-- 所有工作在 `v1/` 内进行（大版本修订时递增版本号）
-- 原始数据永不修改；所有清洗产生的文件存放在 `data/clean/`
+- 原始数据存放在项目根目录的 `data/raw/`（跨版本共享，只读）
+- 所有版本特定的工作在 `v1/` 内进行（大版本修订时递增版本号）
+- 原始数据永不修改；所有清洗产生的文件存放在 `v1/data/clean/`
 - 每个 Stata .do 文件必须在 `output/logs/` 有对应的 .log 文件
 - 表格存放在 `output/tables/`，格式为 .tex
 - 图表存放在 `output/figures/`，格式为 .pdf 或 .png
@@ -237,6 +239,9 @@ di "=== Master script complete ==="
 ## 文件结构
 
 ```
+data/
+└── raw/                        # 原始数据（只读，跨版本共享）
+
 v1/
 ├── code/
 │   ├── stata/
@@ -249,8 +254,8 @@ v1/
 │   └── python/
 │       └── cross_validation.py # 交叉验证 Stata 结果
 ├── data/
-│   ├── raw/                    # 原始数据（只读）
-│   └── clean/                  # 处理后数据
+│   ├── clean/                  # 处理后数据
+│   └── temp/                   # 中间文件
 ├── output/
 │   ├── tables/                 # LaTeX 表格
 │   ├── figures/                # PDF 图表
@@ -327,10 +332,14 @@ v1/
 *.xlsx
 *.sas7bdat
 *.rds
+
+# 原始数据（项目级，跨版本共享）
 data/raw/*
-data/temp/*
 !data/raw/.gitkeep
-!data/temp/.gitkeep
+
+# 版本特定的临时文件
+*/data/temp/*
+!*/data/temp/.gitkeep
 
 # Stata 日志和临时文件
 *.log
@@ -578,7 +587,7 @@ Thumbs.db
 
 同时创建空白占位文件：
 - `<project-name>/v1/paper/bib/references.bib`
-- `<project-name>/v1/data/raw/.gitkeep`
+- `<project-name>/data/raw/.gitkeep`
 - `<project-name>/v1/data/temp/.gitkeep`
 
 ## 步骤 11：打印总结
@@ -589,8 +598,9 @@ Thumbs.db
 项目"<project-name>"初始化成功！
 
 已创建结构：
+  data/raw/                           （项目级，跨版本共享）
   v1/
-    data/raw/  data/clean/  data/temp/
+    data/clean/  data/temp/
     code/stata/  code/python/  code/r/
     output/tables/  output/figures/  output/logs/
     paper/sections/  paper/bib/
@@ -611,7 +621,7 @@ Thumbs.db
   - .gitignore
 
 下一步：
-  1. 将原始数据文件放入 v1/data/raw/
+  1. 将原始数据文件放入 data/raw/
   2. 更新 REPLICATION.md 填写数据来源
   3. 使用 /data-describe 探索数据
   4. 使用 /run-did、/run-iv、/run-rdd 或 /run-panel 进行分析

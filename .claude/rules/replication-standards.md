@@ -50,6 +50,9 @@ paths:
 ### 目录结构
 
 ```
+data/
+└── raw/                        # 原始数据（只读，跨版本共享）
+
 vN/
 ├── code/
 │   ├── stata/
@@ -62,8 +65,8 @@ vN/
 │   └── python/
 │       └── cross_validation.py  # 验证 Stata 结果
 ├── data/
-│   ├── raw/                    # 原始数据（只读）
-│   └── clean/                  # 处理后数据
+│   ├── clean/                  # 处理后数据
+│   └── temp/                   # 中间文件
 ├── output/
 │   ├── tables/                 # LaTeX 表格
 │   ├── figures/                # PDF 图表
@@ -225,7 +228,7 @@ by panel_id: gen lag_y = y[_n-1]
 
 ## 使用说明
 1. 安装所需 Stata 包（见 code/stata/master.do 文件头）
-2. 将原始数据文件放入 data/raw/（数据来源见 REPLICATION.md）
+2. 将原始数据文件放入项目根目录的 `data/raw/`（数据来源见 REPLICATION.md）
 3. 运行 code/stata/master.do
 4. 检查 output/logs/ 中是否有错误
 

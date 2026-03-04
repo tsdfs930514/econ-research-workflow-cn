@@ -76,7 +76,7 @@ claude
 /init-project
 ```
 
-将原始数据放入 `v1/data/raw/`，然后运行分析：
+将原始数据放入 `data/raw/`，然后运行分析：
 
 ```bash
 /data-describe → /run-did（或 /run-iv、/run-rdd、/run-panel）
@@ -252,10 +252,11 @@ econ-research-workflow-cn/
 
 ```
 项目名称/
+├── data/
+│   └── raw/              # 原始数据（只读，跨版本共享）
 └── v1/
     ├── code/stata/       # .do 文件（按编号排序：01_、02_、...）
     ├── code/python/      # .py 文件（用于交叉验证）
-    ├── data/raw/         # 原始数据（只读，永不修改）
     ├── data/clean/       # 清洗后的数据集
     ├── data/temp/        # 中间文件
     ├── output/tables/    # LaTeX 表格（.tex）

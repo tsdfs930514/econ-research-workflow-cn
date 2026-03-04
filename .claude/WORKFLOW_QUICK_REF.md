@@ -185,7 +185,7 @@
 ## 关键规范
 
 ### 文件路径
-- 原始数据（只读）：`vN/data/raw/`
+- 原始数据（只读，项目级）：`data/raw/`
 - 清洗后数据：`vN/data/clean/`
 - Stata 代码：`vN/code/stata/`
 - Python 代码：`vN/code/python/`
