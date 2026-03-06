@@ -10,10 +10,10 @@
 
 ## 功能特点
 
-- **34 个技能** — 斜杠命令工作流，覆盖完整研究生命周期：数据清洗、DID/IV/RDD/面板/SDID/Bootstrap/安慰剂/Logit-Probit/LASSO 估计、交叉验证、表格生成、论文撰写、翻译、润色、去AI化重写、逻辑检查、审稿模拟、管道编排、综合报告、探索沙盒、会话连续性、苏格拉底式研究工具和自我扩展
+- **35 个技能** — 斜杠命令工作流，覆盖完整研究生命周期：数据清洗、DID/IV/RDD/面板/SDID/Bootstrap/安慰剂/Logit-Probit/LASSO 估计、交叉验证、表格生成、论文撰写、翻译、润色、去AI化重写、逻辑检查、审稿模拟、管道编排、综合报告、CSMAR 数据获取、探索沙盒、会话连续性、苏格拉底式研究工具和自我扩展
 - **12 个代理** — 专业审查者 + 3 对对抗式评审者-修复者（代码、计量、表格），强制关注点分离
-- **7 条规则** — 4 条路径限定的编码/计量规范 + 3 条常驻规则（基本准则、编排协议、Stata 错误验证）
-- **3 个生命周期钩子** — 自动加载会话上下文、压缩前记忆保存、Stata 运行后错误检测
+- **8 条规则** — 4 条路径限定的编码/计量规范 + 4 条常驻规则（基本准则、编排协议、Stata 错误验证、Bash 命令规范）
+- **4 个生命周期钩子** — 自动加载会话上下文、压缩前记忆保存、Stata 运行后错误检测、原始数据完整性守卫
 - **对抗式质量审查循环** — `/adversarial-review` 运行评审者 → 修复者 → 再评审循环（最多 5 轮），直到质量评分 ≥ 95
 - **可执行质量评分器** — `quality_scorer.py` 在 6 个维度上评分（满分 100），自动从 .do 文件检测计量方法
 - **探索沙盒** — `/explore` 提供宽松阈值的假设检验环境；`/promote` 将结果提升至正式管道
@@ -143,6 +143,7 @@ claude
 | `/translate` | 中英文经济学论文互译，支持期刊风格适配 |
 | `/polish` | 学术论文润色——英文/中文润色、精炼重写、缩写、扩写（5 种子模式） |
 | `/de-ai` | 检测并消除 AI 生成痕迹，使文本更接近人类研究者写作风格 |
+| `/fetch-csmar` | 浏览 CSMAR 数据库并通过 Python API 获取中国股票市场与会计数据 |
 | `/logic-check` | 论文终稿红线审查——仅捕捉致命错误，不涉及风格偏好 |
 
 ---
@@ -238,7 +239,7 @@ econ-research-workflow-cn/
 │   ├── scripts/          # 自动批准的包装脚本（run-stata.sh）
 │   ├── rules/            # 编码规范、计量标准（4 条路径限定 + 3 条常驻规则含基本准则）
 │   ├── settings.json     # 钩子 + 权限配置
-│   └── skills/           # 34 个斜杠命令技能 + 1 个参考指南
+│   └── skills/           # 35 个斜杠命令技能 + 1 个参考指南
 ├── scripts/
 │   └── quality_scorer.py # 可执行的 6 维度质量评分器
 ├── tests/                # 测试用例（DID、RDD、IV、面板、完整管道）
@@ -375,6 +376,10 @@ econ-research-workflow-cn/
 | 2026-02-27 | v0.13-cn | 新增写作工具 — `/translate`、`/polish`、`/de-ai`、`/logic-check` |
 | 2026-02-28 | v0.14-cn | 技能审计 — 按 skill-creator 最佳实践更新 8 个技能：移除角色扮演语句、增加模式指南、误报提示、改进描述 |
 | 2026-03-01 | v0.15-cn | 安全加固 — 全量放行 + 拒绝清单权限模型、`raw-data-guard.py` 钩子、`bash-conventions.md` 规则（禁止链式命令）、35 条 deny 规则、4 层纵深防御、凭证/基础设施保护 |
+| 2026-03-02 | v0.16-cn | 新增 `/fetch-csmar` 技能（CSMAR API 集成，含浏览/查询/下载/计数模式），修复 PreCompact 钩子（prompt→command），`/make-table` 新增 esttab→LaTeX 兼容规则，`/compile-latex` 4 遍编译要求 |
+| 2026-03-02 | v0.17-cn | 修复 Stata `-e` 模式产生重复 `.log` 文件的问题——`run-stata.sh` 和 `stata-log-check.py` 优先使用 `output/logs/` 并自动删除根目录副本 |
+| 2026-03-04 | v0.18-cn | 重构 `data/raw/` 至项目根目录（跨版本共享）——更新 `init-project`、`CLAUDE.md`、`README.md`、`replication-standards.md` 和项目模板 |
+| 2026-03-06 | v0.19-cn | 文档同步 — 修正特性计数（35 个技能、8 条规则、4 个钩子），技能表补充 `/fetch-csmar`，README/ROADMAP 与 CLAUDE.md 及实际代码库对齐 |
 
 ---
 
